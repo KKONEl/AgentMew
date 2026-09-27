@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def agent_loop(messages: list):
+    rounds_since_todo = 0
     while True:
         response = client.chat.completions.create(
             model=model,
@@ -34,7 +35,10 @@ def agent_loop(messages: list):
             return
 
         results = []
+        used_todo = False
         for tool in tool_calls:
+            if tool.function.name == "todo_write":
+                used_todo = True
             args = json.loads(tool.function.arguments)
             logger.info("Mew start run tool called : {} ".format(tool.function.name))
             logger.info("Mew start run tool args : {} ".format(args))
@@ -57,3 +61,8 @@ def agent_loop(messages: list):
                 "tool_call_id": tool.id
             })
         messages.extend(results)
+        rounds_since_todo = 0 if used_todo else rounds_since_todo + 1
+        if rounds_since_todo >= 3:
+            messages.append({"role": "user",
+                            "content": "<reminder>Update your todos.</reminder>"})
+            rounds_since_todo = 0
