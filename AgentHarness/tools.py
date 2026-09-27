@@ -1,3 +1,4 @@
+import logging
 import subprocess
 from pathlib import Path
 
@@ -5,9 +6,10 @@ from AgentHarness.configs.config import todo_len
 from AgentHarness.todo_manager import TODO, markers
 
 # -- Tool definition: just bash --
+logger = logging.getLogger(__name__)
 
 WORKDIR = Path.cwd()
-TOOLS = [
+BASE_TOOLS = [
     {
         "type": "function",
         "function": {
@@ -82,34 +84,38 @@ TOOLS = [
             }
         }
     },
-    {
-        "type": "function",
-        "function": {
-            "name": "todo_write",
-            "description": "Create and manage a task list for your current coding session.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "todos": {
-                        "type": "array",
-                        "maxItems": todo_len,
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "content": {"type": "string", "minLength": 1},
-                                "status": {
-                                    "type": "string",
-                                    "enum": list(markers)}},
-                            "required": ["content", "status"]
-                        },
-                    },
-                },
-                "required": ["todos"]
-            },
-        }
-    },
 ]
 
+TODO_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "todo_write",
+        "description": "Create and manage a task list for your current coding session.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "todos": {
+                    "type": "array",
+                    "maxItems": todo_len,
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "content": {"type": "string", "minLength": 1},
+                            "status": {
+                                "type": "string",
+                                "enum": list(markers)}},
+                        "required": ["content", "status"]
+                    },
+                },
+            },
+            "required": ["todos"]
+        },
+    }
+}
+
+
+
+TOOLS = [*BASE_TOOLS, TODO_TOOL]
 
 def run_bash(command: str) -> str:
     dangerous = ["rm -rf /", "sudo", "shutdown", "reboot", "> /dev/"]
@@ -189,7 +195,10 @@ def run_todo_write(todos: list | str) -> str:
         return f"Error: {e}"
 
 
-TOOL_HANDLERS = {
+
+BASE_HANDLERS = {
     "bash": run_bash, "read_file": run_read, "write_file": run_write,
-    "edit_file": run_edit, "glob": run_glob, "todo_write": run_todo_write
+    "edit_file": run_edit, "glob": run_glob,
 }
+TOOL_HANDLERS = {**BASE_HANDLERS,
+                 "todo_write": run_todo_write, }

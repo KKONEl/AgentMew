@@ -6,6 +6,7 @@ from openai import OpenAI
 
 from AgentHarness.hooks import trigger_hooks
 from AgentHarness.tools import TOOLS, TOOL_HANDLERS
+from AgentHarness.subagent import TASK_TOOL, run_subagent
 
 client = OpenAI(
     api_key=api_key,
@@ -13,6 +14,12 @@ client = OpenAI(
 )
 logger = logging.getLogger(__name__)
 
+PARENT_TOOLS = [*TOOLS, TASK_TOOL]
+
+PARENT_HANDLERS = {
+    **TOOL_HANDLERS,
+    "task": run_subagent,
+}
 
 def agent_loop(messages: list):
     rounds_since_todo = 0
@@ -20,7 +27,7 @@ def agent_loop(messages: list):
         response = client.chat.completions.create(
             model=model,
             messages=messages,
-            tools=TOOLS,
+            tools=PARENT_TOOLS,
             max_tokens=8000
         )
         message = response.choices[0].message
@@ -50,7 +57,7 @@ def agent_loop(messages: list):
                     "tool_call_id": tool.id
                 })
                 continue
-            handler = TOOL_HANDLERS.get(tool.function.name)
+            handler = PARENT_HANDLERS.get(tool.function.name)
             output = handler(**args) if handler else f"Unknown: {tool.function.name}"
 
             trigger_hooks("PostToolUse", tool.function.name, args, output)
@@ -64,5 +71,5 @@ def agent_loop(messages: list):
         rounds_since_todo = 0 if used_todo else rounds_since_todo + 1
         if rounds_since_todo >= 3:
             messages.append({"role": "user",
-                            "content": "<reminder>Update your todos.</reminder>"})
+                             "content": "<reminder>Update your todos.</reminder>"})
             rounds_since_todo = 0
