@@ -21,13 +21,17 @@ PARENT_HANDLERS = {
     "task": run_subagent,
 }
 
-def agent_loop(messages: list):
+def agent_loop(
+    messages: list,
+    available_tools: list = PARENT_TOOLS,
+    handlers: dict = PARENT_HANDLERS,
+):
     rounds_since_todo = 0
     while True:
         response = client.chat.completions.create(
             model=model,
             messages=messages,
-            tools=PARENT_TOOLS,
+            tools=available_tools,
             max_tokens=8000
         )
         message = response.choices[0].message
@@ -57,7 +61,7 @@ def agent_loop(messages: list):
                     "tool_call_id": tool.id
                 })
                 continue
-            handler = PARENT_HANDLERS.get(tool.function.name)
+            handler = handlers.get(tool.function.name)
             output = handler(**args) if handler else f"Unknown: {tool.function.name}"
 
             trigger_hooks("PostToolUse", tool.function.name, args, output)

@@ -5,7 +5,7 @@ from openai import OpenAI
 
 from AgentHarness.configs.config import subagent_loop, model, api_key, base_url
 from AgentHarness.hooks import trigger_hooks
-from AgentHarness.prompts import SUB_SYSTEM
+from AgentHarness.prompts import SUB_SYSTEM, build_system_prompt
 from AgentHarness.tools import BASE_HANDLERS, BASE_TOOLS
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ TASK_TOOL = {
 
 def run_subagent(prompt: str) -> str:
     logger.info("Subagent started")
-    messages = [{"role": "system", "content": SUB_SYSTEM}, {"role": "user", "content": prompt}]
+    messages = [{"role": "system", "content": build_system_prompt(SUB_SYSTEM)}, {"role": "user", "content": prompt}]
 
     for _ in range(subagent_loop):
         response = client.chat.completions.create(

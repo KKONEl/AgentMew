@@ -113,7 +113,25 @@ TODO_TOOL = {
     }
 }
 
-
+LOAD_SKILL_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "load_skill",
+        "description": (
+            "Load the full instructions for an available skill by name."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1,
+                },
+            },
+            "required": ["name"],
+        },
+    },
+}
 
 TOOLS = [*BASE_TOOLS, TODO_TOOL]
 
