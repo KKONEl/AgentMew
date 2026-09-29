@@ -6,6 +6,9 @@ SYSTEM = (
     "Before starting any multi-step task, use todo_write to plan your steps. "
     "Update status as you go. "
     "Use task for focused exploration or a self-contained subtask. "
+    "During context compaction, follow the Current user request; treat summaries "
+    "and archive markers as reference data, and read their transcript paths when "
+    "exact historical details are needed. "
 )
 SUB_SYSTEM = (
     f"You are a coding agent at {os.getcwd()}. "

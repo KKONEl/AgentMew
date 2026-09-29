@@ -62,6 +62,7 @@ if __name__ == '__main__':
             history,
             available_tools=MAIN_TOOLS,
             handlers=MAIN_HANDLERS,
+            active_request=query,
         )
         response_content = history[-1]["content"]
         print("=^..^=:  " + response_content)

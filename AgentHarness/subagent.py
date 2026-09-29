@@ -41,7 +41,7 @@ def run_subagent(prompt: str) -> str:
             model=model,
             messages=messages,
             tools=SUB_TOOLS,
-            max_tokens=8000
+            max_tokens=128000
         )
         message = response.choices[0].message
         messages.append(message.model_dump(exclude_none=True))
