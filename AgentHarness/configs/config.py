@@ -33,3 +33,18 @@ KEEP_TAIL_MESSAGES = 46
 KEEP_RECENT_RESULTS = 3
 KEEP_RECENT_MESSAGES = 5
 MAX_REACTIVE_RETRIES = 1
+
+
+PROJECT_DIR = HARNESS_DIR.parent
+MEMORY_DIR = PROJECT_DIR / ".memory"
+MEMORY_INDEX = MEMORY_DIR / "MEMORY.md"
+
+
+RECALL_CHAR_LIMIT = 20_000
+CONSOLIDATE_THRESHOLD = 10
+CONSOLIDATE_INPUT_CHAR_LIMIT = 20_000
+TEMPORARY_MEMORY_MARKERS = (
+    "this session", "current session", "this turn", "current turn",
+    "this task", "current task", "for now", "just this time", "today only",
+    "本次会话", "当前会话", "这一轮", "当前轮次", "本次任务", "当前任务", "暂时",
+)

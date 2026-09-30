@@ -4,8 +4,9 @@ from AgentHarness.agent_loop import (
     PARENT_HANDLERS,
     PARENT_TOOLS,
     agent_loop,
+    client,
 )
-from AgentHarness.configs.config import SKILLS_DIR
+from AgentHarness.configs.config import SKILLS_DIR, model
 from AgentHarness.configs.logging_config import setup_logging
 from AgentHarness.hooks import (
     register_hook,
@@ -19,6 +20,7 @@ from AgentHarness.hooks import (
 from AgentHarness.prompts import SYSTEM, build_system_prompt
 from AgentHarness.skill_loader import SkillLoader
 from AgentHarness.tools import LOAD_SKILL_TOOL
+from AgentHarness.memory import load_memories
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -57,6 +59,10 @@ if __name__ == '__main__':
             break
         trigger_hooks("UserPromptSubmit", query)
         history.append({"role": "user", "content": query})
+        recalled = load_memories(history, client, model)
+        history[0]["content"] = build_system_prompt(
+            SYSTEM, SKILL_LOADER.catalog(), recalled
+        )
         logger.info("into agent loop")
         agent_loop(
             history,

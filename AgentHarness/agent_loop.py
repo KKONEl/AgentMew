@@ -13,6 +13,7 @@ from AgentHarness.hooks import trigger_hooks
 from AgentHarness.tools import TOOLS, TOOL_HANDLERS
 from AgentHarness.subagent import TASK_TOOL, run_subagent
 from AgentHarness.compaction import Compactor
+from AgentHarness.memory import consolidate_memories, extract_memories
 
 client = OpenAI(
     api_key=api_key,
@@ -92,6 +93,8 @@ def agent_loop(
             if force:
                 messages.append({"role": "user", "content": str(force)})
                 continue
+            if extract_memories(messages, client, model):
+                consolidate_memories(client, model)
             return
 
         results = []
