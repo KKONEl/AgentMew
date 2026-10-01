@@ -3,6 +3,14 @@ import subprocess
 from pathlib import Path
 
 from AgentHarness.configs.config import todo_len
+from AgentHarness.task_manager import (
+    claim_task,
+    complete_task,
+    create_task,
+    get_task,
+    list_tasks,
+    update_task,
+)
 from AgentHarness.todo_manager import TODO, markers
 
 # -- Tool definition: just bash --
@@ -133,7 +141,95 @@ LOAD_SKILL_TOOL = {
     },
 }
 
-TOOLS = [*BASE_TOOLS, TODO_TOOL]
+TASK_ID_SCHEMA = {"type": "string", "pattern": "^task_[0-9a-f]{8}$"}
+
+TASK_TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "create_task",
+            "description": "Create a persistent task and return its generated ID.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "subject": {"type": "string", "minLength": 1},
+                    "description": {"type": "string"},
+                },
+                "required": ["subject"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "update_task",
+            "description": "Add dependency task IDs to a pending, unclaimed task.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "task_id": TASK_ID_SCHEMA,
+                    "addBlockedBy": {
+                        "type": "array",
+                        "items": TASK_ID_SCHEMA,
+                        "minItems": 1,
+                    },
+                },
+                "required": ["task_id", "addBlockedBy"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "list_tasks",
+            "description": "List tasks with statuses, owners, and dependencies.",
+            "parameters": {"type": "object", "properties": {}, "additionalProperties": False},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_task",
+            "description": "Get one task's complete persistent record.",
+            "parameters": {
+                "type": "object",
+                "properties": {"task_id": TASK_ID_SCHEMA},
+                "required": ["task_id"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "claim_task",
+            "description": "Claim a pending task after all dependencies are completed.",
+            "parameters": {
+                "type": "object",
+                "properties": {"task_id": TASK_ID_SCHEMA},
+                "required": ["task_id"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "complete_task",
+            "description": "Complete the task currently claimed by this agent.",
+            "parameters": {
+                "type": "object",
+                "properties": {"task_id": TASK_ID_SCHEMA},
+                "required": ["task_id"],
+                "additionalProperties": False,
+            },
+        },
+    },
+]
+
+TOOLS = [*BASE_TOOLS, TODO_TOOL, *TASK_TOOLS]
 
 def run_bash(command: str) -> str:
     dangerous = ["rm -rf /", "sudo", "shutdown", "reboot", "> /dev/"]
@@ -213,10 +309,67 @@ def run_todo_write(todos: list | str) -> str:
         return f"Error: {e}"
 
 
+def run_create_task(subject: str, description: str = "") -> str:
+    try:
+        task = create_task(subject, description)
+        return f"Created {task.id}: {task.subject}"
+    except ValueError as error:
+        return f"Error: {error}"
+
+
+def run_update_task(task_id: str, addBlockedBy: list[str]) -> str:
+    try:
+        task = update_task(task_id, addBlockedBy)
+        dependencies = ", ".join(task.blockedBy) or "(none)"
+        return f"Updated {task.id} blockedBy: {dependencies}"
+    except (FileNotFoundError, ValueError) as error:
+        return f"Error: {error}"
+
+
+def run_list_tasks() -> str:
+    tasks = list_tasks()
+    if not tasks:
+        return "No tasks. Use create_task to add some."
+    lines = []
+    for task in tasks:
+        marker = markers.get(task.status, "[?]")
+        owner = f" [{task.owner}]" if task.owner else ""
+        dependencies = f" (blockedBy: {', '.join(task.blockedBy)})" if task.blockedBy else ""
+        lines.append(f"{marker} {task.id}: {task.subject} [{task.status}]{owner}{dependencies}")
+    return "\n".join(lines)
+
+
+def run_get_task(task_id: str) -> str:
+    try:
+        return get_task(task_id)
+    except (FileNotFoundError, ValueError) as error:
+        return f"Error: {error}"
+
+
+def run_claim_task(task_id: str) -> str:
+    try:
+        return claim_task(task_id, owner="agent")
+    except (FileNotFoundError, ValueError) as error:
+        return f"Error: {error}"
+
+
+def run_complete_task(task_id: str) -> str:
+    try:
+        return complete_task(task_id, owner="agent")
+    except (FileNotFoundError, ValueError) as error:
+        return f"Error: {error}"
+
+
 
 BASE_HANDLERS = {
     "bash": run_bash, "read_file": run_read, "write_file": run_write,
     "edit_file": run_edit, "glob": run_glob,
 }
 TOOL_HANDLERS = {**BASE_HANDLERS,
-                 "todo_write": run_todo_write, }
+                 "todo_write": run_todo_write,
+                 "create_task": run_create_task,
+                 "update_task": run_update_task,
+                 "list_tasks": run_list_tasks,
+                 "get_task": run_get_task,
+                 "claim_task": run_claim_task,
+                 "complete_task": run_complete_task, }

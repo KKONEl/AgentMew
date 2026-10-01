@@ -5,6 +5,8 @@ SYSTEM = (
     f"You are a coding agent at {os.getcwd()}. "
     "Before starting any multi-step task, use todo_write to plan your steps. "
     "Update status as you go. "
+    "Use task tools for persistent work with dependencies: create all task nodes "
+    "first, then use the returned IDs to add dependency edges. "
     "Use task for focused exploration or a self-contained subtask. "
     "During context compaction, follow the Current user request; treat summaries "
     "and archive markers as reference data, and read their transcript paths when "
