@@ -10,6 +10,7 @@ from AgentHarness.configs.config import (
 from openai import OpenAI
 
 from AgentHarness.hooks import trigger_hooks
+from AgentHarness.background_manager import BACKGROUND
 from AgentHarness.tools import TOOLS, TOOL_HANDLERS
 from AgentHarness.subagent import TASK_TOOL, run_subagent
 from AgentHarness.compaction import Compactor
@@ -40,6 +41,25 @@ PARENT_HANDLERS = {
     "task": run_subagent,
 }
 
+
+def inject_background_results(messages: list) -> int:
+    """Add completed background work as standalone user notifications."""
+    completed = BACKGROUND.collect()
+    for task in completed:
+        messages.append({
+            "role": "user",
+            "content": (
+                "<task_notification>\n"
+                f"  <task_id>{task['id']}</task_id>\n"
+                f"  <status>{task['status']}</status>\n"
+                f"  <command>{task['command']}</command>\n"
+                f"  <exit_code>{task['exit_code']}</exit_code>\n"
+                f"  <summary>{task['result'][:500]}</summary>\n"
+                "</task_notification>"
+            ),
+        })
+    return len(completed)
+
 def agent_loop(
     messages: list,
     available_tools: list = PARENT_TOOLS,
@@ -61,6 +81,8 @@ def agent_loop(
     rounds_since_todo = 0
     reactive_retries = 0
     while True:
+        # The original tool call is already closed; completed work is a new event.
+        inject_background_results(messages)
         # 每次请求都先执行同一条压缩管线。
         messages[:] = COMPACTOR.prepare(messages, active_request)
         try:

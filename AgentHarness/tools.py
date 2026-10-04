@@ -2,6 +2,7 @@ import logging
 import subprocess
 from pathlib import Path
 
+from AgentHarness.background_manager import BACKGROUND
 from AgentHarness.configs.config import todo_len
 from AgentHarness.task_manager import (
     claim_task,
@@ -26,7 +27,8 @@ BASE_TOOLS = [
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "command": {"type": "string"}
+                    "command": {"type": "string"},
+                    "run_in_background":{"type":"boolean"}
                 },
                 "required": ["command"]
             }
@@ -231,10 +233,19 @@ TASK_TOOLS = [
 
 TOOLS = [*BASE_TOOLS, TODO_TOOL, *TASK_TOOLS]
 
-def run_bash(command: str) -> str:
+def run_bash(command: str, run_in_background: bool = False) -> str:
     dangerous = ["rm -rf /", "sudo", "shutdown", "reboot", "> /dev/"]
     if any(d in command for d in dangerous):
         return "Error: Dangerous command blocked"
+    if run_in_background is True:
+        try:
+            task_id = BACKGROUND.start(command)
+            return (
+                f"[Background task {task_id} started] "
+                "The result will be collected on a later turn."
+            )
+        except ValueError as error:
+            return f"Error: {error}"
     try:
         r = subprocess.run(command, shell=True, cwd=WORKDIR,
                            capture_output=True, text=True, errors="replace",
