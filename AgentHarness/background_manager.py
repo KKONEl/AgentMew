@@ -159,6 +159,14 @@ class BackgroundManager:
             self._ready.clear()
             return completed
 
+    def has_ready(self) -> bool:
+        with self._lock:
+            return bool(self._ready)
+
+    def has_running(self) -> bool:
+        with self._lock:
+            return any(task["status"] == "running" for task in self.tasks.values())
+
     def _run(self, task_id: str, command: str) -> None:
         try:
             output, exit_code = _run_bash_process(command)

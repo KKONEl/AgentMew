@@ -4,6 +4,7 @@ from pathlib import Path
 
 from AgentHarness.background_manager import BACKGROUND
 from AgentHarness.configs.config import todo_len
+from AgentHarness.cron_scheduler import cancel_job, list_jobs, schedule_job
 from AgentHarness.task_manager import (
     claim_task,
     complete_task,
@@ -231,7 +232,53 @@ TASK_TOOLS = [
     },
 ]
 
-TOOLS = [*BASE_TOOLS, TODO_TOOL, *TASK_TOOLS]
+CRON_TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "schedule_cron",
+            "description": "Schedule a prompt with a five-field cron expression.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "cron": {"type": "string"},
+                    "prompt": {"type": "string"},
+                    "recurring": {"type": "boolean", "default": True},
+                    "durable": {"type": "boolean", "default": True},
+                },
+                "required": ["cron", "prompt"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "list_crons",
+            "description": "List registered cron jobs and their delivery state.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": False,
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "cancel_cron",
+            "description": "Cancel a cron job by its ID.",
+            "parameters": {
+                "type": "object",
+                "properties": {"job_id": {"type": "string"}},
+                "required": ["job_id"],
+                "additionalProperties": False,
+            },
+        },
+    },
+]
+
+TOOLS = [*BASE_TOOLS, TODO_TOOL, *TASK_TOOLS, *CRON_TOOLS]
 
 def run_bash(command: str, run_in_background: bool = False) -> str:
     dangerous = ["rm -rf /", "sudo", "shutdown", "reboot", "> /dev/"]
@@ -251,7 +298,7 @@ def run_bash(command: str, run_in_background: bool = False) -> str:
                            capture_output=True, text=True, errors="replace",
                            timeout=120)
         out = (r.stdout + r.stderr).strip()
-        return out[:50000] if out else "(no output)"
+        return f"exit_code={r.returncode}\n" + (out[:50000] if out else "(no output)")
     except subprocess.TimeoutExpired:
         return "Error: Timeout (120s)"
     except (FileNotFoundError, OSError) as e:
@@ -371,6 +418,44 @@ def run_complete_task(task_id: str) -> str:
         return f"Error: {error}"
 
 
+def run_schedule_cron(
+    cron: str,
+    prompt: str,
+    recurring: bool = True,
+    durable: bool = True,
+) -> str:
+    try:
+        result = schedule_job(cron, prompt, recurring, durable)
+    except Exception as error:
+        return f"Error: {error}"
+    if isinstance(result, str):
+        return f"Error: {result}"
+    return f"Scheduled {result.id}: {result.cron} -> {result.prompt}"
+
+
+def run_list_crons() -> str:
+    jobs = list_jobs()
+    if not jobs:
+        return "No cron jobs."
+    lines = []
+    for job in jobs:
+        frequency = "recurring" if job.recurring else "one-shot"
+        storage = "durable" if job.durable else "session"
+        delivery = "pending delivery" if job.pending_delivery else "waiting"
+        lines.append(
+            f"{job.id}: {job.cron} -> {job.prompt[:60]} "
+            f"[{frequency}, {storage}, {delivery}]"
+        )
+    return "\n".join(lines)
+
+
+def run_cancel_cron(job_id: str) -> str:
+    try:
+        return cancel_job(job_id)
+    except Exception as error:
+        return f"Error: {error}"
+
+
 
 BASE_HANDLERS = {
     "bash": run_bash, "read_file": run_read, "write_file": run_write,
@@ -383,4 +468,7 @@ TOOL_HANDLERS = {**BASE_HANDLERS,
                  "list_tasks": run_list_tasks,
                  "get_task": run_get_task,
                  "claim_task": run_claim_task,
-                 "complete_task": run_complete_task, }
+                 "complete_task": run_complete_task,
+                 "schedule_cron": run_schedule_cron,
+                 "list_crons": run_list_crons,
+                 "cancel_cron": run_cancel_cron, }

@@ -1,20 +1,26 @@
 import json
 import logging
+import os
 
+from openai import OpenAI
+
+from AgentHarness.background_manager import BACKGROUND
+from AgentHarness.compaction import Compactor
 from AgentHarness.configs.config import (
     MAX_REACTIVE_RETRIES,
     api_key,
     base_url,
     model,
 )
-from openai import OpenAI
-
+from AgentHarness.cron_scheduler import consume_cron_queue, restore_cron_jobs, acknowledge_cron_jobs
 from AgentHarness.hooks import trigger_hooks
-from AgentHarness.background_manager import BACKGROUND
-from AgentHarness.tools import TOOLS, TOOL_HANDLERS
-from AgentHarness.subagent import TASK_TOOL, run_subagent
-from AgentHarness.compaction import Compactor
 from AgentHarness.memory import consolidate_memories, extract_memories
+from AgentHarness.mcp_runtime import assemble_tool_pool
+from AgentHarness.goal_runtime import GOAL
+from AgentHarness.subagent import TASK_TOOL, run_subagent
+from AgentHarness.team_runtime import TEAM, TEAM_HANDLERS, TEAM_TOOLS
+from AgentHarness.tools import TOOLS, TOOL_HANDLERS
+from AgentHarness.workflow_runtime import WORKFLOW_TOOL, run_workflow
 
 client = OpenAI(
     api_key=api_key,
@@ -34,11 +40,13 @@ COMPACT_TOOL = {
     },
 }
 
-PARENT_TOOLS = [*TOOLS, TASK_TOOL, COMPACT_TOOL]
+PARENT_TOOLS = [*TOOLS, TASK_TOOL, COMPACT_TOOL, *TEAM_TOOLS, WORKFLOW_TOOL]
 
 PARENT_HANDLERS = {
     **TOOL_HANDLERS,
     "task": run_subagent,
+    **TEAM_HANDLERS,
+    "Workflow": run_workflow,
 }
 
 
@@ -60,12 +68,31 @@ def inject_background_results(messages: list) -> int:
         })
     return len(completed)
 
+
+def inject_team_events(messages: list) -> int:
+    events = TEAM.consume_lead_events()
+    if events:
+        messages.append({"role": "user", "content": "[Team events]\n" +
+                         "\n".join(json.dumps(event, ensure_ascii=False) for event in events)})
+    return len(events)
+
+
 def agent_loop(
-    messages: list,
-    available_tools: list = PARENT_TOOLS,
-    handlers: dict = PARENT_HANDLERS,
-    active_request: str | None = None,
+        messages: list,
+        available_tools: list = PARENT_TOOLS,
+        handlers: dict = PARENT_HANDLERS,
+        active_request: str | None = None,
 ):
+    fired = consume_cron_queue()
+    scheduled_messages = []
+    for job in fired:
+        scheduled_message = {
+            "role": "user",
+            "content": f"[Scheduled] {job.prompt}",
+        }
+        messages.append(scheduled_message)
+        scheduled_messages.append(scheduled_message)
+    waiting_for_ack = list(fired)
     # 保存本轮原始 query，避免之后的历史摘要覆盖用户当前请求。
     if active_request is None:
         active_request = next(
@@ -73,31 +100,38 @@ def agent_loop(
                 message.get("content", "")
                 for message in reversed(messages)
                 if message.get("role") == "user"
-                and isinstance(message.get("content"), str)
+                   and isinstance(message.get("content"), str)
             ),
             "",
         )
 
     rounds_since_todo = 0
     reactive_retries = 0
+    total_rounds = 0
+    max_turns = int(os.getenv("MAX_TURNS", "30"))
     while True:
+        if total_rounds >= max_turns:
+            logger.warning("Agent turn limit reached; goal remains active if set")
+            return
         # The original tool call is already closed; completed work is a new event.
         inject_background_results(messages)
+        inject_team_events(messages)
         # 每次请求都先执行同一条压缩管线。
         messages[:] = COMPACTOR.prepare(messages, active_request)
         try:
+            current_tools, current_handlers = assemble_tool_pool(available_tools, handlers)
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
-                tools=available_tools,
+                tools=current_tools,
                 max_tokens=128000,
             )
+            total_rounds += 1
             reactive_retries = 0
         except Exception as error:
-            # 字符数只是 token 的估算；API 拒绝后进行一次补救压缩并重试。
             if (
-                COMPACTOR.is_context_length_error(error)
-                and reactive_retries < MAX_REACTIVE_RETRIES
+                    COMPACTOR.is_context_length_error(error)
+                    and reactive_retries < MAX_REACTIVE_RETRIES
             ):
                 messages[:] = COMPACTOR.reactive_compact(
                     messages,
@@ -105,8 +139,24 @@ def agent_loop(
                 )
                 reactive_retries += 1
                 continue
+
+            if waiting_for_ack:
+                messages[:] = [
+                    message
+                    for message in messages
+                    if not any(message is scheduled for scheduled in scheduled_messages)
+                ]
+                restore_cron_jobs(waiting_for_ack)
+                waiting_for_ack.clear()
             raise
         message = response.choices[0].message
+        if waiting_for_ack:
+            try:
+                acknowledge_cron_jobs(waiting_for_ack)
+            except Exception as error:
+                logger.error("Cron acknowledgement failed: %s", error)
+            finally:
+                waiting_for_ack.clear()
         messages.append(message.model_dump(exclude_none=True))
 
         tool_calls = message.tool_calls or []
@@ -115,6 +165,14 @@ def agent_loop(
             if force:
                 messages.append({"role": "user", "content": str(force)})
                 continue
+            action, reason = GOAL.after_turn(messages, background_pending=BACKGROUND.has_running())
+            if action == "block":
+                messages.append({"role": "user", "content":
+                                 f"[Goal not yet met] {reason}. Continue working and verify the result."})
+                continue
+            if action in {"defer", "limit", "error", "impossible"}:
+                logger.info("Goal stopped or deferred: %s: %s", action, reason)
+                return
             if extract_memories(messages, client, model):
                 consolidate_memories(client, model)
             return
@@ -135,7 +193,14 @@ def agent_loop(
 
             if tool.function.name == "todo_write":
                 used_todo = True
-            args = json.loads(tool.function.arguments)
+            try:
+                args = json.loads(tool.function.arguments)
+                if not isinstance(args, dict):
+                    raise ValueError("Tool arguments must be an object")
+            except (json.JSONDecodeError, ValueError) as error:
+                results.append({"role": "tool", "content": f"Error: {error}",
+                                "tool_call_id": tool.id})
+                continue
             logger.info("Mew start run tool called : {} ".format(tool.function.name))
             logger.info("Mew start run tool args : {} ".format(args))
             blocked = trigger_hooks("PreToolUse", tool.function.name, args)
@@ -146,8 +211,11 @@ def agent_loop(
                     "tool_call_id": tool.id
                 })
                 continue
-            handler = handlers.get(tool.function.name)
-            output = handler(**args) if handler else f"Unknown: {tool.function.name}"
+            handler = current_handlers.get(tool.function.name)
+            try:
+                output = handler(**args) if handler else f"Unknown: {tool.function.name}"
+            except Exception as error:
+                output = f"Error: {type(error).__name__}: {error}"
 
             trigger_hooks("PostToolUse", tool.function.name, args, output)
             output = str(output)

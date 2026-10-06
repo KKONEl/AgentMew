@@ -1,5 +1,9 @@
 import json
 import secrets
+import os
+import tempfile
+import threading
+from contextlib import contextmanager
 from dataclasses import dataclass, asdict
 
 from AgentHarness.todo_manager import markers
@@ -14,14 +18,30 @@ class Task:
     status: str
     owner: str | None
     blockedBy: list[str]
+    worktree: str | None = None
 
 
 import re
+import fcntl
 from pathlib import Path
 
 WORKDIR = Path.cwd()
 TASKS_DIR = WORKDIR / ".tasks"
 TASK_ID_PATTERN = re.compile(r"^task_[0-9a-f]{8}$")
+_TASK_LOCK = threading.RLock()
+
+
+@contextmanager
+def task_store_lock():
+    """Serialize task transitions across threads and local processes."""
+    with _TASK_LOCK:
+        TASKS_DIR.mkdir(parents=True, exist_ok=True)
+        with (TASKS_DIR / ".lock").open("a+b") as handle:
+            fcntl.flock(handle, fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(handle, fcntl.LOCK_UN)
 
 
 class TaskStore:
@@ -71,8 +91,17 @@ class TaskStore:
         raise RuntimeError(f"Could not allocate a unique task ID")
 
     def save(self, task: Task) -> None:
-        self._path(task.id, create_root=True).write_text(
-            json.dumps(asdict(task), indent=2), encoding="utf-8")
+        path = self._path(task.id, create_root=True)
+        fd, temporary = tempfile.mkstemp(prefix=f".{task.id}.", dir=path.parent)
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                json.dump(asdict(task), handle, indent=2)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(temporary, path)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
 
     def load(self, task_id: str) -> Task:
         data = json.loads(self._path(task_id).read_text(encoding="utf-8"))
@@ -131,7 +160,8 @@ def create_task(subject: str, description: str) -> Task:
 
 
 def update_task(task_id: str, addBlockedBy: list[str]) -> Task:
-    return TASKS.update_dependencies(task_id, addBlockedBy)
+    with task_store_lock():
+        return TASKS.update_dependencies(task_id, addBlockedBy)
 
 
 def load_task(task_id: str) -> Task:
@@ -162,42 +192,43 @@ def can_start(task_id: str) -> bool:
 
 
 def claim_task(task_id: str, owner: str = "agent") -> str:
-    task = load_task(task_id)
-    if task.status != "pending":
-        return f"Task {task_id} is {task.status} cannot be claimed"
-    dependencies = incomplete_dependencies(task)
-    if dependencies:
-        return f"Task {task_id} depends on {', '.join(dependencies)} cannot be claimed"
-    task.owner = owner
-    task.status = "in_progress"
-    TASKS.save(task)
-    print(f"Task {task_id} claimed {task.status}")
-    return f"Claimed {task.id} ({task.subject})"
+    with task_store_lock():
+        task = load_task(task_id)
+        if task.status != "pending" or task.owner is not None:
+            return f"Task {task_id} is no longer available"
+        if any(t.status == "in_progress" and t.owner == owner for t in list_tasks()):
+            return f"Owner {owner} already has an in-progress task"
+        dependencies = incomplete_dependencies(task)
+        if dependencies:
+            return f"Task {task_id} depends on {', '.join(dependencies)} cannot be claimed"
+        if task.worktree:
+            directory = (WORKDIR / ".worktrees" / task.worktree).resolve()
+            if not directory.is_relative_to((WORKDIR / ".worktrees").resolve()) \
+                    or not directory.is_dir():
+                return f"Task {task_id} worktree is unavailable"
+        task.owner = owner
+        task.status = "in_progress"
+        TASKS.save(task)
+        return f"Claimed {task.id} ({task.subject})"
 
 
 def complete_task(task_id: str, owner: str = "agent") -> str:
-    task = load_task(task_id)
-    if task.status != "in_progress":
-        return f"Task {task_id} is {task.status}, cannot complete"
-    if task.owner != owner:
-        return f"Task {task_id} is owned by {task.owner}, not {owner}"
-    ready_before = {
-        candidate.id
-        for candidate in list_tasks()
-        if candidate.status == "pending"
-           and candidate.blockedBy
-           and can_start(candidate.id)
-    }
-    task.status = "completed"
-    TASKS.save(task)
-    unblocked = [candidate.subject for candidate in list_tasks()
-                 if candidate.status == "pending"
-                 and candidate.blockedBy
-                 and candidate.id not in ready_before
-                 and can_start(candidate.id)]
-    print(f"  [complete] {task.subject}")
-    message = f"Completed {task.id} ({task.subject})"
-    if unblocked:
-        message += f"\nUnblocked: {', '.join(unblocked)}"
-        print(f"  [unblocked] {', '.join(unblocked)}")
-    return message
+    with task_store_lock():
+        task = load_task(task_id)
+        if task.status != "in_progress":
+            return f"Task {task_id} is {task.status}, cannot complete"
+        if task.owner != owner:
+            return f"Task {task_id} is owned by {task.owner}, not {owner}"
+        ready_before = {
+            candidate.id for candidate in list_tasks()
+            if candidate.status == "pending" and candidate.blockedBy and can_start(candidate.id)
+        }
+        task.status = "completed"
+        TASKS.save(task)
+        unblocked = [candidate.subject for candidate in list_tasks()
+                     if candidate.status == "pending" and candidate.blockedBy
+                     and candidate.id not in ready_before and can_start(candidate.id)]
+        message = f"Completed {task.id} ({task.subject})"
+        if unblocked:
+            message += f"\nUnblocked: {', '.join(unblocked)}"
+        return message
