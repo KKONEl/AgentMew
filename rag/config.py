@@ -16,7 +16,9 @@ persist_directory = "./chroma_db"
 
 # Spliter
 chunk_size = 1000
+new_after_n_chars = chunk_size * 0.85
 chunk_overlap = 100
+combine_text_under_n_chars = 200
 separators = ["\n\n", "\n", "。", "！", "？", "；", "，", " ", ""]
 max_spliter_char_number = 1000
 

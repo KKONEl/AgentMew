@@ -8,6 +8,14 @@ elements = partition(
     filename=pdf_path,
     content_type="application/pdf"
 )
+element = elements[0]
+
+print(element.category)
+print(element.text[:100])
+print(element.metadata.page_number)
+print(element.metadata.to_dict().keys())
+
+print("----------")
 
 # 打印解析结果
 print(f"解析完成: {len(elements)} 个元素, {sum(len(str(e)) for e in elements)} 字符")

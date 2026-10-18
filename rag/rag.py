@@ -5,7 +5,7 @@ from langchain_openai import OpenAI, ChatOpenAI
 
 from config import embedding_model, api_key, base_url, chatting_model
 from vector_stores import VectorStoreService
-from langchain_community.embeddings import DashScopeEmbedding
+from langchain_community.embeddings import DashScopeEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 
 client = OpenAI(
@@ -17,7 +17,7 @@ client = OpenAI(
 class RagService(object):
     def __init__(self):
         self.vector_service = VectorStoreService(
-            embedding=DashScopeEmbedding(
+            embedding=DashScopeEmbeddings(
                 model=embedding_model
             )
         )

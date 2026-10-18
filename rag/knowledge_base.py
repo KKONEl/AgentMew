@@ -4,12 +4,16 @@
 import os
 from datetime import datetime
 
+from langchain_core.documents import Document
+from unstructured.chunking.title import chunk_by_title
+
 import config
 import hashlib
 from langchain_chroma import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from unstructured.partition.auto import partition
 
-from rag.model import embedding
+from model import embedding
 
 
 def check_md5(md5_str :str):
@@ -67,4 +71,38 @@ class KnowledgeBaseService(object):
         )
 
         save_md5(md5_hex)
+        return f"{filename} success into 向量数据库"
+
+    def upload_file(self,file,filename,filetype):
+        elements = partition(
+            file=file,
+            metadata_filename=filename,
+            content_type=filetype
+        )
+
+        chunks = chunk_by_title(
+            elements,
+            max_characters=config.chunk_size,
+            new_after_n_chars=config.new_after_n_chars,
+            combine_text_under_n_chars=config.combine_text_under_n_chars
+        )
+        #  转换为 Document
+        documents = []
+        for chunk in chunks:
+            metadata = {
+                "source": filename,
+                "create_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "operator": "test"
+            }
+            if chunk.metadata.page_number is not None:
+                metadata["page_number"] = chunk.metadata.page_number
+            documents.append(
+                Document(
+                    page_content=chunk.text,
+                    metadata=metadata
+                )
+            )
+        # 4. 存入 Chroma
+        if documents:
+            self.chroma.add_documents(documents)
         return f"{filename} success into 向量数据库"

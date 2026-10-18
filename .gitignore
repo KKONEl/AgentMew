@@ -57,3 +57,7 @@ Thumbs.db
 
 # Local data sources
 /data_source/
+
+# Local RAG database and file deduplication state
+chroma_db/
+md5.text

@@ -3,7 +3,7 @@
 """
 import streamlit as st
 
-from rag.knowledge_base import KnowledgeBaseService
+from knowledge_base import KnowledgeBaseService
 
 st.title("知识库更新")
 uploader_file =  st.file_uploader(
@@ -21,9 +21,5 @@ if uploader_file is not None:
     file_size = uploader_file.size / 1024
     st.subheader(f"文件名：{file_name}")
     st.write(f"格式：{file_type} | 大小 {file_size:.2f} KB")
-
-    # 展示内容
-    text = uploader_file.getvalue().decode("utf-8")
-    # sl.write(text)
-    res = st.session_state["service"].upload_by_str(text, file_name)
+    res = st.session_state["service"].upload_file(uploader_file, file_name, file_type)
     st.write(res)
