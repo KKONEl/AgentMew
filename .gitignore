@@ -1,0 +1,33 @@
+# Local secrets and environment configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+
+# Local credentials and tool state
+.netrc
+.npmrc
+.aws/
+.ssh/
+credentials.json
+service-account*.json
+service_account*.json
+
+# OS and editor metadata
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Python-generated local files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/

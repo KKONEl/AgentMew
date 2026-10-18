@@ -1,0 +1,18 @@
+# 知识点状态
+
+状态仅依据可观察证据更新。`confidence` 为 0–5；日期使用 `YYYY-MM-DD`；多个项目引用用 `<br>`，多个错题 ID 用逗号。
+
+| id | topic | status | confidence | first_seen | last_review | review_count | success_streak | interval_days | next_review | related_project | common_mistakes | notes |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| openai-compatible-tool-loop | OpenAI-compatible 工具调用循环 | learning | 4 | 2026-09-19 | 2026-10-02 | 8 | 2 | 7 | 2026-10-09 | AgentHarness/agent_loop.py<br>AgentHarness/hooks.py | agent-loop-vs-cli-loop,tool-result-message-schema | v0.2 已校准：跨日独立说明原调用已由占位结果闭合，后台完成必须用独立通知传递。 |
+| hook-dispatch | Hook 注册、顺序与短路 | understood | 4 | 2026-09-22 | 2026-09-23 | 16 | 9 | 6 | 2026-09-29 | AgentHarness/agent_loop.py<br>AgentHarness/hooks.py | post-hook-before-output | 清理后端到端回归仍验证 Pre→handler→Post→Stop 的顺序与统计。 |
+| tool-dispatch | 工具注册与分发 | learning | 2 | 2026-09-20 | 2026-09-20 | 3 | 0 | 1 | 2026-09-21 | AgentHarness/tools.py<br>AgentHarness/agent_loop.py |  | 已正确声明并注册五个工具、实现未知工具反馈；当前 handler(*args["command"]) 有参数解包错误，待改为 **args 并独立解释。 |
+| permission-pipeline | 工具执行前的权限管线 | understood | 4 | 2026-09-21 | 2026-09-23 | 10 | 2 | 3 | 2026-09-26 | AgentHarness/permission.py<br>AgentHarness/hooks.py<br>AgentHarness/agent_loop.py | permission-api-shape-mismatch | OpenAI 形状的 PreToolUse 已验证放行、硬拒绝与模拟拒绝审批三条路径。 |
+| todo-plan-state | Todo 计划状态与不变量 | understood | 4 | 2026-09-23 | 2026-09-27 | 4 | 3 | 4 | 2026-10-01 | AgentHarness/todo_manager.py | todo-single-in-progress | 已实现内容非空、状态枚举和至多一个 `in_progress`；合法三项计划的渲染经运行验证。 |
+| todo-reminder-cadence | Todo reminder 计数节奏 | understood | 4 | 2026-09-26 | 2026-09-27 | 3 | 2 | 4 | 2026-10-01 | AgentHarness/agent_loop.py |  | 已实现并回归验证：按完整工具调用轮次累计，连续三轮未使用 Todo 时注入一次 reminder，Todo 调用后清零。 |
+| todo-input-validation | Todo 输入安全解析与校验 | understood | 5 | 2026-09-26 | 2026-09-27 | 5 | 4 | 8 | 2026-10-05 | AgentHarness/todo_manager.py |  | 已独立实现 JSON 优先、`literal_eval` 回退、逐项校验和全量通过后替换；`eval` 会执行模型提供的代码。 |
+| todo-integration-boundaries | TodoWrite 模块职责与接入边界 | understood | 4 | 2026-09-26 | 2026-09-27 | 5 | 3 | 4 | 2026-10-01 | AgentHarness/todo_manager.py<br>AgentHarness/tools.py<br>AgentHarness/agent_loop.py<br>AgentHarness/prompts.py | todo-responsibility-boundaries | 已完成并验证：TodoManager 管理状态，tools 管理 schema/handler/注册，prompts 提供计划指令，agent_loop 按轮次维护 reminder。 |
+| subagent-context-boundary | Subagent 上下文隔离与共享副作用 | understood | 4 | 2026-09-27 | 2026-09-27 | 6 | 4 | 5 | 2026-10-02 | AgentHarness/agent_loop.py<br>AgentHarness/tools.py<br>AgentHarness/skills/agent-builder/references/subagent-pattern.py | subagent-context-vs-workspace | 已回归验证：子循环使用独立 messages 与基础工具；子工具结果留在子历史；`run_subagent` 返回摘要，父循环以父侧调用 ID 封装为 tool result。 |
+| skill-catalog-lazy-loading | Skill 目录与按需全文加载 | understood | 4 | 2026-09-27 | 2026-09-27 | 5 | 4 | 6 | 2026-10-03 | AgentHarness/skills<br>AgentHarness/skill_loader.py<br>AgentHarness/tools.py<br>AgentHarness/prompts.py<br>AgentHarness/main.py |  | 已实现并验证 manifest-only 扫描、稳定路径、name/description/content 注册表和注入式 `load_skill`；能说明注册表查询阻断模型参数导致的路径遍历，完整 Skill 以 tool result 回传。 |
+| multitenant-skill-governance | 多租户 Skill 的隔离、版本与授权 | learning | 3 | 2026-09-27 | 2026-09-28 | 2 | 1 | 2 | 2026-09-30 | AgentHarness/skill_loader.py<br>AgentHarness/subagent.py |  | 能建立 `(tenant_id, skill_name, version)` 注册表键、会话版本快照和子代理能力缩减模型；仍需补全记录元数据、会话授权快照，以及区分不同宿主的 Skill 继承规则。 |
+| context-compaction-priority | 上下文压缩的优先级与保真边界 | learning | 3 | 2026-09-28 | 2026-09-28 | 25 | 1 | 1 | 2026-09-29 | AgentHarness/agent_loop.py<br>AgentHarness/main.py | compact-pipeline-trigger-confusion,tool-call-result-compaction-boundary,compact-output-archive,compact-vs-reactive-tail | 能识别 `reactive_compact` 保留最近 5 条；40k/50k 触发线、完整工具结果归档与不同摘要输出形状仍需回忆。 |

@@ -1,0 +1,8 @@
+interface:
+  display_name: "Learning Coach"
+  short_description: "项目驱动的长期学习、主动回忆、错题复习和进度管理"
+  default_prompt: "Use $learning-coach to teach me through the current project and update my learning state."
+
+policy:
+  allow_implicit_invocation: true
+
