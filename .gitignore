@@ -54,3 +54,6 @@ Thumbs.db
 .workflow/
 .goal_status.json
 .scheduled_tasks.json
+
+# Local data sources
+/data_source/
