@@ -14,11 +14,35 @@ Python 学习项目，包含 Agent Harness 和 RAG 知识库实验。
 在项目根目录创建 `.env`，配置所用服务的环境变量：
 
 ```dotenv
-api_key=your-api-key
-base_url=https://your-provider.example/v1
-model=your-chat-model
-embedding_model=your-embedding-model
-chatting_model=your-chat-model
+api_key=""
+base_url="https://openrouter.ai/api/v1"
+model="openrouter/free"
+chatting_model="openrouter/free"
+embedding_model="nvidia/nemotron-3-embed-1b:free"
+```
+
+使用时在本地填入 `api_key`。`model` 供 Agent Harness 使用，`chatting_model` 和 `embedding_model` 供 RAG 使用。
+
+以下 RAG 参数在 `rag/config.py` 中配置；当前代码不会从 `.env` 读取这些参数：
+
+```python
+# RAG 文件去重记录
+md5_path = "./md5.text"
+
+# Chroma
+collection_name = "rag"
+persist_directory = "./chroma_db"
+
+# 文档分块
+chunk_size = 1000
+new_after_n_chars = chunk_size * 0.85
+chunk_overlap = 100
+combine_text_under_n_chars = 200
+separators = ["\n\n", "\n", "。", "！", "？", "；", "，", " ", ""]
+max_spliter_char_number = 1000
+
+# 检索阈值
+similarity_threshold = 2
 ```
 
 `.env`、本地数据源、Chroma 数据库、去重记录、运行状态和 IDE 配置不纳入版本控制。
