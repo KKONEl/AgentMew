@@ -1,4 +1,5 @@
 from langchain_chroma import Chroma
+from langchain_core.documents import Document
 import config
 
 
@@ -18,3 +19,8 @@ class VectorStoreService(object):
     def get_retriever(self):
         """ 返回向量检索器"""
         return self.vector_store.as_retriever(search_kwargs={"k": config.similarity_threshold})
+
+
+    def search(self, query: str, k: int = 5) -> list[Document]:
+        """返回与问题最相关的 k 个片段，保留文本及元数据。"""
+        return self.vector_store.similarity_search(query, k=k)

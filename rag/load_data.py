@@ -1,11 +1,13 @@
 from unstructured.partition.auto import partition
 
+from config import DATA_SOURCE_DIR
+
 # PDF文件路径
-pdf_path = "/Users/kkone/AgentStudy/agentDemo/data_source/24-大模型（LLMs）RAG 优化策略 —— RAG-Fusion篇.pdf"
+pdf_path = DATA_SOURCE_DIR / "24-大模型（LLMs）RAG 优化策略 —— RAG-Fusion篇.pdf"
 
 # 使用Unstructured加载并解析PDF文档
 elements = partition(
-    filename=pdf_path,
+    filename=str(pdf_path),
     content_type="application/pdf"
 )
 element = elements[0]

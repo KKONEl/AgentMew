@@ -74,6 +74,12 @@ class KnowledgeBaseService(object):
         return f"{filename} success into 向量数据库"
 
     def upload_file(self,file,filename,filetype):
+        file.seek(0)
+        file_bytes = file.read()
+        md5_hex = hashlib.md5(file_bytes).hexdigest()
+        file.seek(0)
+        if check_md5(md5_hex):
+            return f"跳过{filename}已经存在在数据库中"
         elements = partition(
             file=file,
             metadata_filename=filename,
@@ -105,4 +111,6 @@ class KnowledgeBaseService(object):
         # 4. 存入 Chroma
         if documents:
             self.chroma.add_documents(documents)
-        return f"{filename} success into 向量数据库"
+            save_md5(md5_hex)
+            return f"{filename} success into 向量数据库"
+        return f"{filename} fail into 向量数据库"
