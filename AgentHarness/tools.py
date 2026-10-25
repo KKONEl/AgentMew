@@ -2,6 +2,7 @@ import logging
 import subprocess
 from pathlib import Path
 
+from AgentHarness.knowledge_tool import KNOWLEDGE_TOOL, search_knowledge
 from AgentHarness.background_manager import BACKGROUND
 from AgentHarness.configs.config import todo_len
 from AgentHarness.cron_scheduler import cancel_job, list_jobs, schedule_job
@@ -278,7 +279,7 @@ CRON_TOOLS = [
     },
 ]
 
-TOOLS = [*BASE_TOOLS, TODO_TOOL, *TASK_TOOLS, *CRON_TOOLS]
+TOOLS = [*BASE_TOOLS, TODO_TOOL, *TASK_TOOLS, *CRON_TOOLS, KNOWLEDGE_TOOL]
 
 def run_bash(command: str, run_in_background: bool = False) -> str:
     dangerous = ["rm -rf /", "sudo", "shutdown", "reboot", "> /dev/"]
@@ -462,6 +463,7 @@ BASE_HANDLERS = {
     "edit_file": run_edit, "glob": run_glob,
 }
 TOOL_HANDLERS = {**BASE_HANDLERS,
+                 "search_knowledge": search_knowledge,
                  "todo_write": run_todo_write,
                  "create_task": run_create_task,
                  "update_task": run_update_task,

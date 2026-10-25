@@ -1,6 +1,9 @@
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
-import config
+if __package__:
+    from . import config
+else:
+    import config
 
 
 class VectorStoreService(object):

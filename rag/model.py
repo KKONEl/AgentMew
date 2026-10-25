@@ -1,6 +1,9 @@
 from langchain_openai import OpenAIEmbeddings
 
-import config
+if __package__:
+    from . import config
+else:
+    import config
 
 embedding = OpenAIEmbeddings(
     model=config.embedding_model,
