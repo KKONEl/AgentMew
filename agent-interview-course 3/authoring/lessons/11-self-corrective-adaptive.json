@@ -1,0 +1,279 @@
+{
+  "id": "11",
+  "slug": "11-self-corrective-adaptive",
+  "title": "Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同",
+  "stage": "04 Agentic RAG 与 GraphRAG",
+  "prerequisites": [
+    "10"
+  ],
+  "minutes": 75,
+  "goals": [
+    "按决策位置区分四种方法",
+    "知道论文复现和工程借鉴边界",
+    "识别自评信号的误差"
+  ],
+  "sources": [
+    "通用知识/Agentic RAG与GraphRAG深度解析.md",
+    "通用知识/2026-10-RAG与检索面试题与参考答案.md"
+  ],
+  "body": "## 先提出四个决策问题\n这些名字常同时出现，但不要背成四套完全互斥的架构。先问：什么时候需要检索？已有检索结果可信到什么程度？问题值不值得多步处理？生成到一半发现缺证据怎么办？不同工作把决策放在不同位置，并使用不同训练与推理信号。工程借鉴可以组合，但复现论文需要遵循论文定义。\n\n## Self-RAG：学习生成反思信号\nSelf-RAG把检索和批判信号作为特殊token参与模型学习与推理，覆盖是否检索、段落相关性、生成内容的证据支持和有用性。关键区别是这些信号经过训练，不是给任意聊天模型加一句“反思一下”就成为论文中的Self-RAG。反思token帮助选择证据和候选生成，但不会变成逻辑上绝对正确的证明。[原论文](https://arxiv.org/abs/2310.11511)\n\n工程上可借鉴分开检查检索相关性与答案支持，但把外置LLM裁判称为“Self-RAG风格”更准确。教材把critic简化成GPT-4直接生成全部标注，会省略论文的critic学习过程；研究细节要回到论文，不能拿教学简写代替训练流程。\n\n## CRAG：先判断检索是否需要纠正\nCorrective RAG重点是检索评估与补救：利用评估信号决定保留/精炼知识、补充外部搜索或采用组合策略。它是对检索失败的纠偏，不是“搜索引擎一定能兜底”。外网可能没有你的内部制度，数据还可能不可信、过期或不允许外发。生产中应该把允许的数据源、查询隐私和失败策略加入路由。[原论文](https://arxiv.org/abs/2401.15884)\n\n知识精炼可以把长文拆成更小信息条，移除噪声，但要保留否定、时间和条件。把“除上海外均为400”精炼成“均为400”就是破坏证据。精炼结果应关联原始段落，不应成为无法追溯的新事实源。\n\n## Adaptive-RAG：按需要分配计算\nAdaptive-RAG研究按问题复杂度选择不检索、单步或多步RAG的策略。工程关心的是路由错误的代价：把难题送单步可能失准，把简单题送多步浪费成本。路由器要在任务数据上标注和评估，不能只按问句长度判断难度。“今天汇率多少”很短却需要新鲜数据，“把上文改为三段话”很长也未必需要检索。[原论文](https://arxiv.org/abs/2403.14403)\n\n## FLARE：生成过程中的主动检索\nFLARE利用即将生成的内容预测和不确定性来触发检索，再修正继续生成。低token概率只是信号，不等价于事实错误概率；罕见但正确的人名也可能低概率。API是否暴露足够的token概率、如何形成查询、如何控制检索开销，都影响能否复现。不能无条件说任何模型都能直接实现原论文机制。[原论文](https://arxiv.org/abs/2305.06983)\n\n## 已解例：从故障决定借鉴哪一项\n如果系统明明查到文档，却经常把不相关内容交给模型，先检查检索质量及纠偏，CRAG方向直接；如果各种题都执行昂贵多跳检索，先做路由与成本分层，Adaptive方向直接；如果长答案后半段不断增加无依据断言，可考虑分段证据检查与主动检索；如果想复现Self-RAG，需确认训练与推理能力，而不是只改prompt。\n\n面试时先说明故障和信号，再说策略、代价与评测。例如“我在检索后检查证据是否包含金额与适用日期，缺字段则查允许的其他源；两轮仍不足就拒答”，比“我使用自我反思提高准确率”可检验得多。下面实验只模拟检索纠偏分支，不是复现任何论文，也没有训练分类器；先学会把三种结果转成明确动作。",
+  "diagram": {
+    "nodes": [
+      "查看规则与四组分数",
+      "高分走精炼",
+      "低分走补救",
+      "混合结果走组合",
+      "空列表也走补救",
+      "输出并核对已有断言"
+    ],
+    "caption": "本图只展开《检索纠偏的三分支模拟》的代码机制；每一帧与下方程序、当前正文概念对应。",
+    "walkthrough": {
+      "scenario": "沿《检索纠偏的三分支模拟》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "正常：逐行对照参考程序",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "title": "查看规则与四组分数",
+              "section": "CRAG：先判断检索是否需要纠正",
+              "code_lines": [
+                1,
+                9
+              ],
+              "input": "四个列表按代码第8行顺序给定",
+              "action": "调用decide，观察分数如何触发分支。",
+              "output": "函数只返回动作名",
+              "state": "inputs=[[.9,.85],[.1,.2],[.9,.2],[]]",
+              "why": "先将“信号”和“执行动作”分开，避免把路由当已经补到证据。",
+              "failure": false,
+              "node": 0
+            },
+            {
+              "title": "高分走精炼",
+              "section": "CRAG：先判断检索是否需要纠正",
+              "code_lines": [
+                2,
+                3
+              ],
+              "input": "scores=[0.9,0.85]",
+              "action": "两项均>=0.8且列表非空。",
+              "output": "refine",
+              "state": "all_high=true",
+              "why": "这对应评估可信检索结果后保留并精炼的方向。",
+              "failure": false,
+              "node": 1
+            },
+            {
+              "title": "低分走补救",
+              "section": "CRAG：先判断检索是否需要纠正",
+              "code_lines": [
+                4,
+                5
+              ],
+              "input": "scores=[0.1,0.2]",
+              "action": "非空且max=0.2<0.3。",
+              "output": "fallback",
+              "state": "max_score=.2",
+              "why": "判断出需要兜底，不代表外部源一定有答案。",
+              "failure": false,
+              "node": 2
+            },
+            {
+              "title": "混合结果走组合",
+              "section": "CRAG：先判断检索是否需要纠正",
+              "code_lines": [
+                2,
+                6
+              ],
+              "input": "scores=[0.9,0.2]",
+              "action": "不满足全高，也不是全低，进入最后返回。",
+              "output": "combine",
+              "state": "some_useful=true",
+              "why": "保留有用部分并补缺，而不是仅看均值全部丢弃。",
+              "failure": false,
+              "node": 3
+            },
+            {
+              "title": "空列表也走补救",
+              "section": "CRAG：先判断检索是否需要纠正",
+              "code_lines": [
+                2,
+                5
+              ],
+              "input": "scores=[]",
+              "action": "第2行因空列表不返回；第4行not scores为真，短路。",
+              "output": "fallback",
+              "state": "max_on_empty_not_evaluated=true",
+              "why": "空列表的控制流保护是一行真实代码，不是模型反思。",
+              "failure": false,
+              "node": 4
+            },
+            {
+              "title": "输出并核对已有断言",
+              "section": "CRAG：先判断检索是否需要纠正",
+              "code_lines": [
+                8,
+                11
+              ],
+              "input": "四次调用完成",
+              "action": "按顺序输出，并检查混合与空列表两个边界。",
+              "output": "refine\nfallback\ncombine\nfallback",
+              "state": "assertions=pass",
+              "why": "这四行正是紧接着实验的预期输出。",
+              "failure": false,
+              "node": 5
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "边界变式：对照同一份程序",
+          "basis": "边界分支沿用同一实验。若列出替换行，代码片段展示替换后的变式；下方完整参考程序仍保留正常版本。",
+          "steps": [
+            {
+              "title": "查看规则与四组分数",
+              "section": "CRAG：先判断检索是否需要纠正",
+              "code_lines": [
+                1,
+                9
+              ],
+              "input": "四个列表按代码第8行顺序给定",
+              "action": "调用decide，观察分数如何触发分支。",
+              "output": "函数只返回动作名",
+              "state": "inputs=[[.9,.85],[.1,.2],[.9,.2],[]]",
+              "why": "先将“信号”和“执行动作”分开，避免把路由当已经补到证据。",
+              "failure": false,
+              "node": 0
+            },
+            {
+              "title": "高分走精炼",
+              "section": "CRAG：先判断检索是否需要纠正",
+              "code_lines": [
+                2,
+                3
+              ],
+              "input": "scores=[0.9,0.85]",
+              "action": "两项均>=0.8且列表非空。",
+              "output": "refine",
+              "state": "all_high=true",
+              "why": "这对应评估可信检索结果后保留并精炼的方向。",
+              "failure": false,
+              "node": 1
+            },
+            {
+              "title": "低分走补救",
+              "section": "CRAG：先判断检索是否需要纠正",
+              "code_lines": [
+                4,
+                5
+              ],
+              "input": "scores=[0.1,0.2]",
+              "action": "非空且max=0.2<0.3。",
+              "output": "fallback",
+              "state": "max_score=.2",
+              "why": "判断出需要兜底，不代表外部源一定有答案。",
+              "failure": false,
+              "node": 2
+            },
+            {
+              "title": "混合结果走组合",
+              "section": "CRAG：先判断检索是否需要纠正",
+              "code_lines": [
+                2,
+                6
+              ],
+              "input": "scores=[0.9,0.2]",
+              "action": "不满足全高，也不是全低，进入最后返回。",
+              "output": "combine",
+              "state": "some_useful=true",
+              "why": "保留有用部分并补缺，而不是仅看均值全部丢弃。",
+              "failure": false,
+              "node": 3
+            },
+            {
+              "title": "空列表也走补救",
+              "section": "CRAG：先判断检索是否需要纠正",
+              "code_lines": [
+                2,
+                5
+              ],
+              "input": "scores=[]，变式删除空列表短路保护",
+              "action": "第4行直接求max([])，触发ValueError。",
+              "output": "ValueError: max() arg is an empty sequence",
+              "state": "first_three_outputs=[refine,fallback,combine]; fourth_result=error",
+              "why": "失败来自Python空集合操作，不应解释成CRAG判断资料不存在。",
+              "failure": true,
+              "node": 4
+            }
+          ],
+          "code_overrides": {
+            "4": "    if max(scores) < 0.3:"
+          },
+          "verified_result": {
+            "returncode": 1,
+            "stdout": "refine\nfallback\ncombine\n",
+            "exception": "ValueError: max() iterable argument is empty"
+          }
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "给模型加“检查你的答案”是不是Self-RAG？",
+      "a": "可称通用反思或外置自评，但不等于论文里训练反思token的Self-RAG。必须区分工程借鉴与方法复现，说明用了什么信号、训练和推理过程。",
+      "rubric": "区分prompt与训练机制。"
+    },
+    {
+      "q": "CRAG的Web搜索能补内部报销标准吗？",
+      "a": "通常不能假设可以。私有制度可能从未公开，搜索也可能泄露查询敏感信息。只路由到授权内部源或澄清，外部信息要做信任与版本判断。",
+      "rubric": "不是把网络当全知兜底。"
+    },
+    {
+      "q": "“今天的价格是多少”很短，适合不检索吗？",
+      "a": "长度不是可靠复杂度/新鲜度代理。价格需时间与来源，即使语法简单也应查新鲜可信源。路由应结合任务属性、时效和风险，而不是只靠模型熟悉感。",
+      "rubric": "分离语义复杂度和知识新鲜度。"
+    },
+    {
+      "q": "低token概率是否就是事实不可靠？",
+      "a": "不是。它表示在模型分布下的生成不确定性，罕见人名可低概率而正确，常见误传可高概率而错误。需与检索证据支持和业务字段校验配合。",
+      "rubric": "用至少一个反例。"
+    }
+  ],
+  "lab": {
+    "title": "检索纠偏的三分支模拟",
+    "task": "运行规则分类器，为每种结果画出下一步；阈值只是人为实验参数，不能直接当论文或生产默认值。",
+    "code": "def decide(scores):\n    if all(s >= 0.8 for s in scores) and scores:\n        return \"refine\"\n    if not scores or max(scores) < 0.3:\n        return \"fallback\"\n    return \"combine\"\n\nfor scores in ([0.9,0.85], [0.1,0.2], [0.9,0.2], []):\n    print(decide(scores))\nassert decide([0.9,0.2]) == \"combine\"\nassert decide([]) == \"fallback\"\n",
+    "expected": "refine\nfallback\ncombine\nfallback\n",
+    "explanation": "全高分走精炼，全低分或空结果走授权兜底，其余组合。通过混合样本说明平均分可能掩盖证据差异。生产中信号还需校准、覆盖与权限检查。",
+    "extensions": [
+      "均值0.55的[0.9,0.2]为什么不能只凭均值全丢？",
+      "fallback也没有结果时应该做什么？"
+    ],
+    "extension_answers": [
+      "其中有高价值文档，均值丢失分布信息；应保留有用部分并补缺，且检查是否支持必需字段。",
+      "有限尝试后说明缺口或请求澄清；不把无结果等同于事实不存在。"
+    ]
+  },
+  "pitfalls": [
+    "把所有反思都叫Self-RAG",
+    "认为网络兜底总能补答案",
+    "把阈值写成通用最优"
+  ],
+  "checkpoint": "面对三种不同故障，先解释信号与动作，再选适合借鉴的方法。",
+  "alignment": {
+    "case_title": "检索纠偏的三分支模拟",
+    "insert_after": "CRAG：先判断检索是否需要纠正",
+    "bridge": "这一节讨论CRAG式检索纠偏，下面的小实验只把“评估信号怎样变成下一动作”写成可运行规则。`scores`是已经给定的教学分数，不是本程序从文档里算出来的。固定四组输入依次为`[0.9,0.85]`、`[0.1,0.2]`、`[0.9,0.2]`和`[]`，因此演示和程序都只围绕这四组数，绝不突然出现内部API返回500元等未实现的数据。\n\n先看第2行：分数全不低于0.8且列表非空，返回`refine`。否则第4行判断空列表或所有结果都很弱，返回`fallback`。剩余混合信号返回`combine`。你看到的三个词只是路由结果；真正精炼文档、联网搜索、再生成答案还没有执行。区分“决定去做什么”和“已经做完什么”，就是读Agent代码时必须保留的边界。\n\n最后再看空列表：第4行的`not scores or ...`通过短路避免对空列表求max。边界演示故意删除`not scores or`，前三组仍可得到结果，第四组才报错。这样你既能把CRAG的纠偏位置与真实代码对应，也能看到一个明确的Python控制流边界。本课其余Self-RAG、Adaptive和FLARE继续作为机制对比，不伪装成这个规则函数已经实现。",
+    "coverage": "仅模拟检索后路由；没有训练评分模型、反思token、问题复杂度分类器或FLARE检索，也不执行Web搜索。0.8/0.3为人为示例阈值。",
+    "question_sections": [
+      "Self-RAG：学习生成反思信号",
+      "CRAG：先判断检索是否需要纠正",
+      "Adaptive-RAG：按需要分配计算",
+      "FLARE：生成过程中的主动检索"
+    ],
+    "coverage_summary": "分数已人工给定，函数只决定下一动作，不实际联网搜索或训练反思模型。"
+  }
+}

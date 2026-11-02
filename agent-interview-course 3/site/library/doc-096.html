@@ -1,0 +1,274 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>2026-10 算法与手写面试题与参考答案 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-096.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">面试算法题/2026-10-算法与手写面试题与参考答案.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/2026-10-%E7%AE%97%E6%B3%95%E4%B8%8E%E6%89%8B%E5%86%99%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md">GitHub 固定版本</a> · <a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/2026-10-%E7%AE%97%E6%B3%95%E4%B8%8E%E6%89%8B%E5%86%99%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F">使用方式</a><a href="#%E5%8F%AF%E6%89%A7%E8%A1%8C%E4%BB%A3%E7%A0%81%E4%B8%8E%E9%AA%8C%E8%AF%81">可执行代码与验证</a><a href="#121-%E5%AE%9E%E7%8E%B0%E5%B5%8C%E5%A5%97-json-%E7%9A%84%E6%B7%B1%E5%90%88%E5%B9%B6%E5%B9%B6%E6%98%8E%E7%A1%AE%E5%AE%9A%E4%B9%89%E5%88%97%E8%A1%A8%E5%92%8C%E5%BC%82%E7%B1%BB%E5%9E%8B%E5%90%8C%E5%90%8D%E5%AD%97%E6%AE%B5%E7%9A%84%E5%A4%84%E7%90%86%E8%A7%84%E5%88%99">121. 实现嵌套 JSON 的深合并，并明确定义列表和异类型同名字段的处理规则。</a><a href="#122-%E5%AE%9E%E7%8E%B0%E8%AF%BB%E5%86%99%E5%9D%87%E4%B8%BA%E5%B8%B8%E6%95%B0%E7%BA%A7%E5%A4%8D%E6%9D%82%E5%BA%A6%E7%9A%84-lru%E5%B9%B6%E8%A7%A3%E9%87%8A%E9%93%BE%E8%A1%A8%E4%B8%8E%E7%B4%A2%E5%BC%95%E5%A6%82%E4%BD%95%E4%BF%9D%E6%8C%81%E4%B8%80%E8%87%B4">122. 实现读写均为常数级复杂度的 LRU，并解释链表与索引如何保持一致。</a><a href="#123-%E7%BC%96%E5%86%99%E6%9C%80%E9%95%BF%E5%9B%9E%E6%96%87%E5%AD%90%E4%B8%B2%E7%AE%97%E6%B3%95%E5%B9%B6%E8%AF%B4%E6%98%8E%E6%97%B6%E9%97%B4%E4%B8%8E%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6">123. 编写最长回文子串算法，并说明时间与空间复杂度。</a><a href="#124-%E8%AE%BE%E8%AE%A1%E5%A2%9E%E9%87%8F-json-%E8%A7%A3%E6%9E%90%E5%99%A8%E6%AD%A3%E7%A1%AE%E5%A4%84%E7%90%86%E7%BD%91%E7%BB%9C%E6%95%B0%E6%8D%AE%E7%9A%84%E5%8D%8A%E5%8C%85%E7%B2%98%E5%8C%85%E5%92%8C%E8%B7%A8%E5%9D%97%E5%AD%97%E7%AC%A6%E4%B8%B2">124. 设计增量 JSON 解析器，正确处理网络数据的半包、粘包和跨块字符串。</a><a href="#125-%E5%AE%9E%E7%8E%B0-ip-%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%E5%88%97%E5%87%BA%E6%A0%BC%E5%BC%8F%E8%8C%83%E5%9B%B4%E5%92%8C%E9%9D%9E%E6%B3%95%E8%BE%93%E5%85%A5%E7%9A%84%E6%A0%A1%E9%AA%8C%E8%A7%84%E5%88%99">125. 实现 IP 地址解析，列出格式、范围和非法输入的校验规则。</a><a href="#126-%E6%89%8B%E5%86%99%E4%BA%8C%E5%8F%89%E6%A0%91%E6%8C%89%E5%B1%82%E9%81%8D%E5%8E%86%E5%B9%B6%E8%AF%B4%E6%98%8E%E9%98%9F%E5%88%97%E4%B8%8E%E6%AF%8F%E5%B1%82%E7%BB%93%E6%9E%9C%E7%9A%84%E7%A9%BA%E9%97%B4%E5%BC%80%E9%94%80">126. 手写二叉树按层遍历，并说明队列与每层结果的空间开销。</a><a href="#127-%E5%AE%9E%E7%8E%B0%E6%95%B0%E7%BB%84%E4%B8%89%E6%95%B0%E4%B9%8B%E5%92%8C%E8%A7%A3%E9%87%8A%E5%8E%BB%E9%87%8D%E7%AD%96%E7%95%A5%E5%92%8C%E5%A4%8D%E6%9D%82%E5%BA%A6">127. 实现数组三数之和，解释去重策略和复杂度。</a><a href="#128-%E5%8F%AA%E9%81%8D%E5%8E%86%E4%B8%80%E6%AC%A1%E9%93%BE%E8%A1%A8%E6%97%B6%E5%A6%82%E4%BD%95%E5%88%A0%E9%99%A4%E5%80%92%E6%95%B0%E7%AC%AC-n-%E4%B8%AA%E8%8A%82%E7%82%B9%E5%B9%B6%E5%A4%84%E7%90%86%E5%A4%B4%E8%8A%82%E7%82%B9%E8%BE%B9%E7%95%8C">128. 只遍历一次链表时，如何删除倒数第 N 个节点并处理头节点边界？</a><a href="#129-%E4%BB%8E%E4%B8%8D%E9%99%90%E6%AC%A1%E6%95%B0%E5%88%B0%E6%9C%80%E5%A4%9A%E4%B8%A4%E6%AC%A1%E5%86%8D%E5%88%B0%E6%9C%80%E5%A4%9A-k-%E6%AC%A1%E4%BA%A4%E6%98%93%E6%80%8E%E6%A0%B7%E7%BB%9F%E4%B8%80%E8%AE%BE%E8%AE%A1%E8%82%A1%E7%A5%A8%E4%B9%B0%E5%8D%96%E7%8A%B6%E6%80%81%E8%BD%AC%E7%A7%BB">129. 从不限次数到最多两次、再到最多 K 次交易，怎样统一设计股票买卖状态转移？</a><a href="#130-%E5%AE%9E%E7%8E%B0%E4%B8%A4%E4%B8%AA%E5%8C%BA%E9%97%B4%E9%9B%86%E5%90%88%E7%9A%84%E5%B7%AE%E9%9B%86%E8%AF%B4%E6%98%8E%E7%9B%B8%E4%BA%A4%E5%B5%8C%E5%A5%97%E5%92%8C%E7%AB%AF%E7%82%B9%E8%BE%B9%E7%95%8C%E7%BA%A6%E5%AE%9A">130. 实现两个区间集合的差集，说明相交、嵌套和端点边界约定。</a><a href="#131-%E5%AE%9E%E7%8E%B0%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97%E5%B9%B6%E6%AF%94%E8%BE%83%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E4%B8%8E%E6%9B%B4%E4%BD%8E%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E7%9A%84%E6%96%B9%E6%A1%88">131. 实现最长递增子序列，并比较动态规划与更低时间复杂度的方案。</a><a href="#132-%E6%95%B0%E7%BB%84%E5%8F%AF%E5%8C%85%E5%90%AB%E8%B4%9F%E6%95%B0%E6%97%B6%E6%80%8E%E6%A0%B7%E6%B1%82%E5%92%8C%E7%AD%89%E4%BA%8E-k-%E7%9A%84%E6%9C%80%E9%95%BF%E8%BF%9E%E7%BB%AD%E5%AD%90%E6%95%B0%E7%BB%84%E9%95%BF%E5%BA%A6">132. 数组可包含负数时，怎样求和等于 K 的最长连续子数组长度？</a><a href="#133-%E5%8E%9F%E5%9C%B0%E5%8F%8D%E8%BD%AC%E5%8D%95%E9%93%BE%E8%A1%A8%E5%B9%B6%E7%94%A8%E7%A9%BA%E9%93%BE%E8%A1%A8%E5%92%8C%E5%8D%95%E8%8A%82%E7%82%B9%E8%AF%B4%E6%98%8E%E8%BE%B9%E7%95%8C%E5%A4%84%E7%90%86">133. 原地反转单链表，并用空链表和单节点说明边界处理。</a><a href="#134-%E6%B1%82%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%AD%E6%9C%80%E9%95%BF%E6%9C%89%E6%95%88%E6%8B%AC%E5%8F%B7%E6%AE%B5%E7%9A%84%E9%95%BF%E5%BA%A6%E5%B9%B6%E8%A7%A3%E9%87%8A%E7%8A%B6%E6%80%81%E6%88%96%E6%A0%88%E7%9A%84%E5%90%AB%E4%B9%89">134. 求字符串中最长有效括号段的长度，并解释状态或栈的含义。</a><a href="#135-%E5%88%86%E5%88%AB%E7%94%A8%E6%B7%B1%E5%BA%A6%E5%92%8C%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E9%81%8D%E5%8E%86%E7%BB%9F%E8%AE%A1%E7%BD%91%E6%A0%BC%E5%B2%9B%E5%B1%BF%E8%AF%B4%E6%98%8E%E8%AE%BF%E9%97%AE%E6%A0%87%E8%AE%B0%E5%92%8C%E5%A4%8D%E6%9D%82%E5%BA%A6">135. 分别用深度和广度优先遍历统计网格岛屿，说明访问标记和复杂度。</a></nav></details><article class="prose source-prose"><h1 id="2026-10-算法与手写面试题与参考答案">2026-10 算法与手写面试题与参考答案</h1>
+<blockquote>
+<p>来源快照：2026-10-22；答案整理：2026-10-23。此次迁入不代表重新抓取。
+本批题目按公开面经报道主题改写，是练习题，不是公司官方真题；答案为编辑综合参考，未经独立专家逐题复核，不是公司标准答案。</p>
+</blockquote>
+<p><a href="doc-048.html">返回本批索引</a> · <a href="doc-047.html">来源分级与资料</a></p>
+<h2 id="使用方式">使用方式</h2>
+<p>先独立回答，再对照得分点、追问和易错点。难度为编辑估计，非公司定级。
+公司标签只表示来源报道过相关主题，不证明逐字问过本题。B 仅代表曾找到原帖，不保证全文可读、作者亲历或题目真实；C 为待核验聚合线索。</p>
+<h2 id="可执行代码与验证">可执行代码与验证</h2>
+<p><a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">Python 参考实现</a> · <a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/test_algorithm_answers.py">离线测试</a> · <a href="doc-099.html">输入契约与测试说明</a></p>
+<p>Python 3.11+；实现仅用标准库，测试依赖 pytest。这些实现是面试练习，不是生产库。增量 JSON 仅支持顶层对象/数组；区间使用半开约定；链表、树与深合并的具体输入契约以代码为准。</p>
+<p><a id="Q-a5d2402649a1"></a></p>
+<h2 id="121-实现嵌套-json-的深合并并明确定义列表和异类型同名字段的处理规则">121. 实现嵌套 JSON 的深合并，并明确定义列表和异类型同名字段的处理规则。</h2>
+<p><strong>题目 ID</strong>：<code>Q-a5d2402649a1</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>约定输入为无环 JSON 对象：同名对象递归合并、数组拼接，其余类型冲突右侧覆盖；不修改输入。示例用显式栈避免深嵌套递归栈溢出，复杂度为总输入规模 O(N+M)。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>明确 null、异类型与列表的规则</li>
+<li>代码见 algorithm_answers.py 的 deep_merge</li>
+</ul>
+<p><strong>追问</strong>：数组中的对象需要按 ID 合并吗？</p>
+<p><strong>易错点</strong>：未说明冲突策略，就谈不上实现正确。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939623386806751232?sourceSSR=post" rel="noreferrer">INT-2bfa666e65</a>（B：曾定位公开原帖）；<a href="https://www.nowcoder.com/discuss/932407145864130560?sourceSSR=post" rel="noreferrer">INT-bfd0fa0cf9</a>（B：曾定位公开原帖）；<a href="https://www.nowcoder.com/discuss/931893943342465024?sourceSSR=post" rel="noreferrer">INT-52d6d4862a</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>deep_merge</code></p>
+<hr>
+<p><a id="Q-4500b7204ef7"></a></p>
+<h2 id="122-实现读写均为常数级复杂度的-lru并解释链表与索引如何保持一致">122. 实现读写均为常数级复杂度的 LRU，并解释链表与索引如何保持一致。</h2>
+<p><strong>题目 ID</strong>：<code>Q-4500b7204ef7</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>用哈希索引加双向链表：命中/更新移到最新端，超容量从最旧端删除并同步删索引。示例显式维护链表指针和哈希索引，平均 get/put 为 O(1)，空间 O(capacity)。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>容量0与更新已有键都要测试</li>
+<li>代码函数 LRUCache</li>
+</ul>
+<p><strong>追问</strong>：并发使用时锁应该保护哪些操作？</p>
+<p><strong>易错点</strong>：不能只移动链表节点而忘记更新索引。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/bytedance-volcano-engine-agent-autumn-first-round-2923108/" rel="noreferrer">INT-f135ac968c</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>LRUCache</code></p>
+<hr>
+<p><a id="Q-af790ce38de5"></a></p>
+<h2 id="123-编写最长回文子串算法并说明时间与空间复杂度">123. 编写最长回文子串算法，并说明时间与空间复杂度。</h2>
+<p><strong>题目 ID</strong>：<code>Q-af790ce38de5</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>以每个字符及字符间隙为中心向两边扩展，记录最长合法区间，时间 O(n²)、附加空间 O(1)，返回切片还需结果空间。更优算法可另讲 Manacher，但不必为复杂度牺牲实现正确。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>覆盖奇偶长度和空串</li>
+<li>代码函数 longest_palindrome</li>
+</ul>
+<p><strong>追问</strong>：长度相同时返回哪一个？</p>
+<p><strong>易错点</strong>：只处理奇数长度会漏掉 abba。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/bytedance-volcano-engine-agent-autumn-second-round-2923110/" rel="noreferrer">INT-04666050b7</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>longest_palindrome</code></p>
+<hr>
+<p><a id="Q-8068fe1e879b"></a></p>
+<h2 id="124-设计增量-json-解析器正确处理网络数据的半包粘包和跨块字符串">124. 设计增量 JSON 解析器，正确处理网络数据的半包、粘包和跨块字符串。</h2>
+<p><strong>题目 ID</strong>：<code>Q-8068fe1e879b</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：快手</p>
+<p><strong>参考答案</strong></p>
+<p>先定义消息边界。示例接受连续的顶层对象/数组，用增量 UTF-8 解码器跨字节块拼接，raw_decode 成功后仅消费对应前缀；未完整数据等待，结束时有残留则报错，并限制缓冲大小。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>网络块不等于JSON消息</li>
+<li>完整实现见 JSONStream</li>
+</ul>
+<p><strong>追问</strong>：如果流里允许顶层数字，12 分成 1 和 2 怎么处理？</p>
+<p><strong>易错点</strong>：任意 JSON 标量流需要分隔或长度帧，不能把每个收到的数字立刻当完整值。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/931679347587444736?sourceSSR=post" rel="noreferrer">INT-2706b0f563</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>JSONStream</code></p>
+<hr>
+<p><a id="Q-89e9ce6e74d0"></a></p>
+<h2 id="125-实现-ip-地址解析列出格式范围和非法输入的校验规则">125. 实现 IP 地址解析，列出格式、范围和非法输入的校验规则。</h2>
+<p><strong>题目 ID</strong>：<code>Q-89e9ce6e74d0</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：度小满</p>
+<p><strong>参考答案</strong></p>
+<p>先约定支持范围。示例按 IPv4/IPv6 字面量解析，拒绝主机名、CIDR 和 zone ID；IPv4 检查四段十进制、0—255及前导零，IPv6 交给标准库处理压缩与范围。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>解析和DNS查询分离</li>
+<li>代码函数 parse_ip</li>
+</ul>
+<p><strong>追问</strong>：是否允许IPv4映射IPv6及前导零？</p>
+<p><strong>易错点</strong>：不要用一次简单 split 来冒充完整 IPv6 解析。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/duxiaoman-agent-dev-first-round-2916408/" rel="noreferrer">INT-a6e173857b</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>parse_ip</code></p>
+<hr>
+<p><a id="Q-b0fb9fd54eda"></a></p>
+<h2 id="126-手写二叉树按层遍历并说明队列与每层结果的空间开销">126. 手写二叉树按层遍历，并说明队列与每层结果的空间开销。</h2>
+<p><strong>题目 ID</strong>：<code>Q-b0fb9fd54eda</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动、美团</p>
+<p><strong>参考答案</strong></p>
+<p>队列保存下一批待访问节点，每轮先记当前队列长度并只弹出该层，再把子节点加入。时间 O(n)，队列空间 O(最大层宽)，输出本身 O(n)。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>空树与偏斜树要覆盖</li>
+<li>代码函数 level_order</li>
+</ul>
+<p><strong>追问</strong>：为什么不能循环到队列为空才算一层？</p>
+<p><strong>易错点</strong>：共享可变 list 并追加引用可能让多层结果指向同一对象。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/bytedance-ai-agent-development-first-round-2927700/" rel="noreferrer">INT-c2cabe7e5b</a>（C：仅聚合线索）；<a href="https://mj.mianlingai.com/interview/meituan-fullstack-first-round-931526208536182784/" rel="noreferrer">INT-0f90bd85b5</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>level_order</code></p>
+<hr>
+<p><a id="Q-7c92780601d4"></a></p>
+<h2 id="127-实现数组三数之和解释去重策略和复杂度">127. 实现数组三数之和，解释去重策略和复杂度。</h2>
+<p><strong>题目 ID</strong>：<code>Q-7c92780601d4</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：拼多多</p>
+<p><strong>参考答案</strong></p>
+<p>先排序，逐个固定第一项，用左右指针找和为0的另外两项，按和移动指针并跳过重复值。时间 O(n²)，示例排序复制输入，排序和输出另占空间。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>固定项和双指针都要去重</li>
+<li>代码函数 three_sum</li>
+</ul>
+<p><strong>追问</strong>：多个0与全部同数值怎样处理？</p>
+<p><strong>易错点</strong>：返回值去重不能只依靠最后套一个不明确顺序的集合。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/pdd-agent-first-round-2923332/" rel="noreferrer">INT-a896abf415</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>three_sum</code></p>
+<hr>
+<p><a id="Q-66e96969e944"></a></p>
+<h2 id="128-只遍历一次链表时如何删除倒数第-n-个节点并处理头节点边界">128. 只遍历一次链表时，如何删除倒数第 N 个节点并处理头节点边界？</h2>
+<p><strong>题目 ID</strong>：<code>Q-66e96969e944</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动、小红书</p>
+<p><strong>参考答案</strong></p>
+<p>加哑节点，让快指针先走 N 步，再同速移动快慢指针直到快指针到最后，删除慢指针后继。时间 O(n)，附加空间 O(1)，约定 N 非法时抛错。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>覆盖删除头/尾及空链表</li>
+<li>代码函数 remove_nth_from_end</li>
+</ul>
+<p><strong>追问</strong>：N 超过链表长度怎样报告？</p>
+<p><strong>易错点</strong>：不使用哑节点容易漏掉删除头节点。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/bytedance-agent-first-round-2929450/" rel="noreferrer">INT-8a955ba862</a>（C：仅聚合线索）；<a href="https://www.nowcoder.com/discuss/934237893025890304?sourceSSR=post" rel="noreferrer">INT-55b114dad5</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>remove_nth_from_end</code></p>
+<hr>
+<p><a id="Q-aa3a4fc405a7"></a></p>
+<h2 id="129-从不限次数到最多两次再到最多-k-次交易怎样统一设计股票买卖状态转移">129. 从不限次数到最多两次、再到最多 K 次交易，怎样统一设计股票买卖状态转移？</h2>
+<p><strong>题目 ID</strong>：<code>Q-aa3a4fc405a7</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>对最多 K 次交易维护各次数下的持仓/空仓最大收益，按上一天状态转移，时间 O(nK)、空间 O(K)。K≥n/2 时退化为不限次数，可累加所有正涨幅。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>价格和交易次数边界明确</li>
+<li>代码函数 max_profit_k</li>
+</ul>
+<p><strong>追问</strong>：手续费或冷冻期会修改哪些状态？</p>
+<p><strong>易错点</strong>：不能把最多两次交易写成只挑两段局部最大涨幅。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/bytedance-agent-first-round-2913828/" rel="noreferrer">INT-e52c427938</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>max_profit_k</code></p>
+<hr>
+<p><a id="Q-d492d4cc1e18"></a></p>
+<h2 id="130-实现两个区间集合的差集说明相交嵌套和端点边界约定">130. 实现两个区间集合的差集，说明相交、嵌套和端点边界约定。</h2>
+<p><strong>题目 ID</strong>：<code>Q-d492d4cc1e18</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：百度</p>
+<p><strong>参考答案</strong></p>
+<p>先约定半开区间 [l,r)，排序并归一化两组区间；对每段 A 沿 B 的重叠段切出未覆盖部分。排序后扫描为线性输出敏感，含排序总计 O((n+m)log(n+m)+k)。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>相邻、包含和零长度要约定</li>
+<li>代码函数 interval_difference</li>
+</ul>
+<p><strong>追问</strong>：若改成闭区间且坐标为浮点数，端点如何表示？</p>
+<p><strong>易错点</strong>：未定义开闭端点就写“减一/加一”通常有错。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/baidu-ai-algorithm-first-second-round-2916318/" rel="noreferrer">INT-c0e8c51474</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>interval_difference</code></p>
+<hr>
+<p><a id="Q-c266feaddda6"></a></p>
+<h2 id="131-实现最长递增子序列并比较动态规划与更低时间复杂度的方案">131. 实现最长递增子序列，并比较动态规划与更低时间复杂度的方案。</h2>
+<p><strong>题目 ID</strong>：<code>Q-c266feaddda6</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：网易</p>
+<p><strong>参考答案</strong></p>
+<p>基础 DP 用 dp[i] 表示以 i 结尾的最优长度，为 O(n²)；优化维护每个长度的最小结尾，用二分替换首个≥当前值的位置，O(nlogn)、O(n) 空间。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>严格递增与非递减区分</li>
+<li>代码函数 lis_length</li>
+</ul>
+<p><strong>追问</strong>：最小结尾数组是否一定是一条真实子序列？</p>
+<p><strong>易错点</strong>：要返回具体序列还需维护前驱，不能直接返回 tails。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938914958287306752?sourceSSR=post" rel="noreferrer">INT-02e3d8f7b6</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>lis_length</code></p>
+<hr>
+<p><a id="Q-fb97d7bc9514"></a></p>
+<h2 id="132-数组可包含负数时怎样求和等于-k-的最长连续子数组长度">132. 数组可包含负数时，怎样求和等于 K 的最长连续子数组长度？</h2>
+<p><strong>题目 ID</strong>：<code>Q-fb97d7bc9514</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：海康威视</p>
+<p><strong>参考答案</strong></p>
+<p>维护前缀和及每个前缀和最早出现的位置；当前和为 s 时查 s-K，更新最长距离。时间平均 O(n)、空间 O(n)，初始映射含0对应位置-1。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>最早位置不能被后出现覆盖</li>
+<li>代码函数 longest_subarray_sum_k</li>
+</ul>
+<p><strong>追问</strong>：若含负数，普通双指针为什么不可靠？</p>
+<p><strong>易错点</strong>：先覆盖旧前缀位置会错过最长解。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/940356350117228544?sourceSSR=post" rel="noreferrer">INT-e363eb73e2</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>longest_subarray_sum_k</code></p>
+<hr>
+<p><a id="Q-c2a7527de45a"></a></p>
+<h2 id="133-原地反转单链表并用空链表和单节点说明边界处理">133. 原地反转单链表，并用空链表和单节点说明边界处理。</h2>
+<p><strong>题目 ID</strong>：<code>Q-c2a7527de45a</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：快手</p>
+<p><strong>参考答案</strong></p>
+<p>迭代保存 next，再让当前节点指向 prev，随后前移两个指针。时间 O(n)、附加空间 O(1)，空链表返回 None，单节点保持不变；约定无环输入。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>改变链接前先保存后继</li>
+<li>代码函数 reverse_list</li>
+</ul>
+<p><strong>追问</strong>：要求不修改输入时如何处理？</p>
+<p><strong>易错点</strong>：先改 next 再找原后继，会丢失剩余链表。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938541475766206464?sourceSSR=post" rel="noreferrer">INT-bbcb367aed</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>reverse_list</code></p>
+<hr>
+<p><a id="Q-ff0bd487d69b"></a></p>
+<h2 id="134-求字符串中最长有效括号段的长度并解释状态或栈的含义">134. 求字符串中最长有效括号段的长度，并解释状态或栈的含义。</h2>
+<p><strong>题目 ID</strong>：<code>Q-ff0bd487d69b</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：阿里巴巴</p>
+<p><strong>参考答案</strong></p>
+<p>栈保存未匹配括号位置，初始放-1作起点；遇左括号压栈，右括号弹栈，栈空则记录新的分界，否则用当前位置减栈顶更新长度。时间 O(n)、空间 O(n)。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>输入限定括号字符</li>
+<li>代码函数 longest_valid_parentheses</li>
+</ul>
+<p><strong>追问</strong>：为什么需要一个无效起点哨兵？</p>
+<p><strong>易错点</strong>：统计左右括号总数无法处理合法区间被截断的问题。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938174747332956160?sourceSSR=post" rel="noreferrer">INT-39b8389f8f</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<blockquote>
+<p>归属提醒（INT-39b8389f8f）：聚合站标注阿里巴巴，但牛客原标题写阿里巴巴蚂蚁；归属未独立核实，不能算官方阿里面试题。</p>
+</blockquote>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>longest_valid_parentheses</code></p>
+<hr>
+<p><a id="Q-3d45f06d2681"></a></p>
+<h2 id="135-分别用深度和广度优先遍历统计网格岛屿说明访问标记和复杂度">135. 分别用深度和广度优先遍历统计网格岛屿，说明访问标记和复杂度。</h2>
+<p><strong>题目 ID</strong>：<code>Q-3d45f06d2681</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：阿里巴巴</p>
+<p><strong>参考答案</strong></p>
+<p>扫描网格，遇未访问陆地计数并用 DFS/BFS 标记整个连通块；每格至多处理常数次，时间 O(RC)、空间 O(RC) 最坏。示例给出非递归 DFS 和 BFS，默认四邻接且不修改原网格。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>检查矩形网格</li>
+<li>避免递归深度风险</li>
+<li>代码函数 num_islands_dfs/num_islands_bfs</li>
+</ul>
+<p><strong>追问</strong>：允许斜向相邻后结果怎么变？</p>
+<p><strong>易错点</strong>：把BFS的 list.pop(0) 当常数时间，会引入额外开销。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938174747332956160?sourceSSR=post" rel="noreferrer">INT-39b8389f8f</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<blockquote>
+<p>归属提醒（INT-39b8389f8f）：聚合站标注阿里巴巴，但牛客原标题写阿里巴巴蚂蚁；归属未独立核实，不能算官方阿里面试题。</p>
+</blockquote>
+<p><strong>代码入口</strong>：<a href="../../source/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/python/algorithm_answers.py">algorithm_answers.py</a> — <code>num_islands_dfs</code>、<code>num_islands_bfs</code></p>
+<hr></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

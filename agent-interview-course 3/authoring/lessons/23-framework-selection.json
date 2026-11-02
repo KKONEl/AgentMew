@@ -1,0 +1,261 @@
+{
+  "id": "23",
+  "slug": "23-framework-selection",
+  "title": "框架与平台选型：职责、恢复契约和 Skill 生命周期",
+  "stage": "06 模型、项目与面试",
+  "prerequisites": [
+    "11",
+    "15",
+    "18",
+    "20"
+  ],
+  "minutes": 75,
+  "goals": [
+    "按组件、编排、协作和平台职责比较框架",
+    "把选型理由转成可执行验收契约",
+    "设计候选Skill的评测、启用和回滚流程"
+  ],
+  "sources": [
+    "通用知识/Agent框架全景.md",
+    "通用知识/LangChain与LangGraph深度解析.md",
+    "通用知识/企业级Agent平台与AgentOS.md",
+    "通用知识/自进化Agent与Skill生命周期.md"
+  ],
+  "body": "## 场景：六个名字，实际是几个不同问题\n团队要构建一个可暂停审批、隔天恢复的文档助手，同时让运营人员维护流程。有人提议LangChain，有人说LangGraph，还有人推荐AutoGen、CrewAI、Dify和AgentOS。若直接问“哪个框架最强”，讨论会把不同层混为一谈。先写出业务不可妥协的条件：租户隔离、可解释流程、恢复不重复写、成本预算、交付物与回滚。再决定谁提供组件、谁负责控制流、谁承载运行环境，最后才选择产品。\n\n仓库材料含特定年份的API、生态数量、依赖关系和成熟度评价，适合学习概念与历史快照；本离线课不把它们转述成当前排行榜。安装某版本前需要查看该版本官方文档、迁移说明与实测。这里提供的是持久的职责比较，不承诺某个类名在任意新版本仍可调用，也不要求下载任何依赖。\n\n## 原理：将组件、控制流和运行环境分开\nLangChain的典型价值在模型、提示、工具、检索器、解析器等应用组件与集成接口，帮助组合调用。LangGraph侧重有状态图编排：节点执行局部工作，边表达条件和循环，状态与检查点支撑中断恢复。两者可组合，但不是所有简单链都需要状态图，也不能因为选了图就自动得到端到端幂等、权限和业务正确性。\n\nAutoGen以消息和多个参与者的交互为重要抽象，适合研究明确的消息协议、轮次、发言者选择和终止条件。CrewAI强调角色、任务和团队流程，容易把业务分工映射为任务结构；角色描述写得像组织架构不等于有清晰输入输出，仍要约束共享状态和冲突解决。两者都不能让“专家讨论一致”替代外部测试。不同版本还可能提供更广泛的编排方式，所以不能只用一个历史标签概括全部功能。\n\nDify属于应用构建与运营平台这一层，典型吸引力是可视化流程、知识接入、配置管理和协作交付。选平台时要验证部署、导出、身份集成、自定义工具、审计与版本管理，而不能仅凭界面快速做出demo就推断满足生产治理。代码框架也可以配可视化管理；低代码平台也有扩展代码，二者没有天然质量高低。\n\nAgentOS在本课程指企业Agent运行与治理平台的架构范畴，并非一个统一标准或单一同名产品。它需要控制平面维护身份、策略、注册表、版本与发布，运行平面维护队列、Worker、沙箱、检查点、工具执行和产物。模型网关、审计、预算、租户隔离等跨越单个Agent。控制面不应因一条模型请求失败而失效，执行面不应能自行扩大权限。某厂商把产品命名为AgentOS，仍需逐条验证它究竟覆盖哪些职责。\n\n## 已解例：用Skill版本检验治理契约\n框架选型不能只看演示界面。本课选一个可由任何候选实现的小契约：同一个Skill只能有一个Active版本；未经评测不能启用；权限检查失败必须拒绝；新版本启用后保留旧版回滚。代码中的Registry不是某个真实框架，而是用来定义验收行为的内存参照实现。\n\nr先提出v1，立即尝试activate会被拒绝；evaluate同时检查regression_ok和permission_ok，通过后才能启用。随后v2-bad虽然回归通过，但权限检查为False，状态变为rejected，不能覆盖当前v1。再提出真正通过的v2，切换时将v1标记deprecated；最后rollback回到v1。最终打印active=v1，旧候选v2为deprecated，v2-bad仍为rejected。正常演示完整跟随这条顺序，失败演示单独放大v2-bad被拒绝的既有分支。\n\n这个契约可用来询问候选框架或平台：状态存在哪里？两个Worker同时启用是否会产生两个Active？审批与评测结果能否审计？升级后旧版本还能否恢复？代码只存字典并直接用布尔值代表评测结果，没有数据库事务、真实人工审批或第三方框架比较。具体平台需要针对同一用例补持久化、并发与故障测试，才能填写“已验证”，不能从本课状态机推出厂商能力。\n\n## Skill生命周期：把经验变成受控资产\nSkill是可复用任务方法及其资源，不等于模型权重，也不等于某一条聊天记忆。用户偏好适合Memory，临时执行进度适合Checkpoint，稳定安全要求适合Policy，失败输入适合Eval Case，多次可迁移的操作流程才可能沉淀为Skill。不同载体混用会产生问题：把临时工具报错写成长期规则，可能让系统永远拒绝一个已修复能力。\n\n安全生命周期可表示Draft→Proposed→Evaluating→Approved→Active，再到Deprecated或Archived。候选必须带来源Run、适用范围、依赖版本、权限、风险、Owner、测试和回滚目标。一次任务成功只足以产生候选，不足以自动启用。评测要包括旧任务不退化、新任务能迁移、权限不扩大、无敏感信息及提示注入。规则冲突时维护者给出差异与理由，由策略或人工审批，不能让新Skill覆盖更高优先级安全约束。\n\n实验采用显式状态机，未评测的版本不能启用；回归未过的候选不能晋级；同一时刻仅有一个版本Active；启用新版本把旧版标记为Deprecated，并支持回滚。这里用函数模拟治理规则，不集成任何真实框架，也不宣称已经验证它们的持久化实现。学习者应关注“哪些状态转移应该失败”，而不是仅观察成功路径。\n\n## 边界：框架不会替你定义责任\n检查点只保存某种状态，不保证外部副作用只发生一次；多Agent只提供协作形态，不保证互相独立；工具装饰器只描述接口，不替代执行器授权；Skill包含操作说明，也不能自行获得访问凭证。若框架升级改变了序列化或工具协议，旧任务恢复可能出错，因此要固定代码、模型、提示、工具和状态版本，设计迁移或明确终止旧任务。\n\n面试中可以这样表达：“我按恢复、审批、可观测和团队维护方式做选型；组件与编排可组合，平台补齐治理。我用同一套故障用例检验候选，而非比较星数。Skill只允许候选经验经过回归与权限审查后启用，并保留上版回滚。”如果只做过离线状态机，坦诚说明下一步要验证具体版本的存储、并发恢复和运维成本。明确未知项，比拿生态标签代替测试更能体现工程判断。",
+  "diagram": {
+    "nodes": [
+      "提出v1候选",
+      "拦截未评测启用",
+      "评测并启用v1",
+      "拒绝权限不合格v2-bad",
+      "发布合格v2",
+      "回滚并验证唯一Active"
+    ],
+    "caption": "实际调用顺序包含预期拒绝和最终回滚；当前active最终是v1。",
+    "walkthrough": {
+      "scenario": "沿《simple：不依赖框架的Skill发布状态机》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "原程序：发布与回滚全路径",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "提出v1候选",
+              "input": "新Registry，items={}，active=None。",
+              "action": "propose('v1','run-001','repo-a')保存来源、范围与proposed状态。",
+              "output": "items['v1']['status']='proposed'。",
+              "state": "active仍为None。",
+              "failure": false,
+              "section": "已解例：用Skill版本检验治理契约",
+              "why": "保存候选与启用必须分开，否则生成经验会直接改变当前行为。",
+              "code_lines": [
+                29,
+                30
+              ]
+            },
+            {
+              "node": 1,
+              "title": "拦截未评测启用",
+              "input": "v1仍处于proposed；请求activate('v1')。",
+              "action": "activate要求approved，否则抛ValueError；测试捕获错误。",
+              "output": "v1未启用，异常被预期捕获。",
+              "state": "active=None；v1=proposed。",
+              "failure": false,
+              "section": "Skill生命周期：把经验变成受控资产",
+              "why": "评测未完成时即使版本存在，也没有发布资格。",
+              "code_lines": [
+                31,
+                35
+              ]
+            },
+            {
+              "node": 2,
+              "title": "评测并启用v1",
+              "input": "v1的regression_ok=True且permission_ok=True。",
+              "action": "evaluate设approved，activate再设active。",
+              "output": "active='v1'；v1=active。",
+              "state": "当前版本为v1。",
+              "failure": false,
+              "section": "Skill生命周期：把经验变成受控资产",
+              "why": "两个条件共同成立才晋级，启用负责真正切换活动引用。",
+              "code_lines": [
+                36,
+                36
+              ]
+            },
+            {
+              "node": 3,
+              "title": "拒绝权限不合格v2-bad",
+              "input": "提出v2-bad；regression_ok=True，permission_ok=False。",
+              "action": "evaluate设rejected；activate被拦截并捕获。",
+              "output": "v2-bad=rejected；active仍为v1。",
+              "state": "权限失败不会被回归成功抵消。",
+              "failure": false,
+              "section": "Skill生命周期：把经验变成受控资产",
+              "why": "门禁使用逻辑与，不能只凭一个质量条件通过就扩大能力。",
+              "code_lines": [
+                37,
+                43
+              ]
+            },
+            {
+              "node": 4,
+              "title": "发布合格v2",
+              "input": "提出v2，两项评测均True；当前active=v1。",
+              "action": "启用v2返回旧版本v1，并将v1标记deprecated。",
+              "output": "v2=active；v1=deprecated。",
+              "state": "active=v2；v2-bad仍rejected。",
+              "failure": false,
+              "section": "已解例：用Skill版本检验治理契约",
+              "why": "保留上一版状态才能提供明确回滚目标。",
+              "code_lines": [
+                44,
+                47
+              ]
+            },
+            {
+              "node": 5,
+              "title": "回滚并验证唯一Active",
+              "input": "v1是deprecated，v2是active。",
+              "action": "rollback将v2设deprecated、v1设active，断言Active数量为1。",
+              "output": "最终active=v1；states={'v1':'active','v2-bad':'rejected','v2':'deprecated'}。",
+              "state": "内存状态满足单Active不变量。",
+              "failure": false,
+              "section": "边界：框架不会替你定义责任",
+              "why": "回滚是版本状态切换，不代表真实数据库事务、缓存和外部影响已撤回。",
+              "code_lines": [
+                48,
+                54
+              ]
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "原程序：权限失败候选被拒",
+          "basis": "沿用v1已启用状态，放大第37—43行已有测试；不会假定v2-bad被发布。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "提出v1候选",
+              "input": "新Registry，items={}，active=None。",
+              "action": "propose('v1','run-001','repo-a')保存来源、范围与proposed状态。",
+              "output": "items['v1']['status']='proposed'。",
+              "state": "active仍为None。",
+              "failure": false,
+              "section": "已解例：用Skill版本检验治理契约",
+              "why": "保存候选与启用必须分开，否则生成经验会直接改变当前行为。",
+              "code_lines": [
+                29,
+                30
+              ]
+            },
+            {
+              "node": 1,
+              "title": "拦截未评测启用",
+              "input": "v1仍处于proposed；请求activate('v1')。",
+              "action": "activate要求approved，否则抛ValueError；测试捕获错误。",
+              "output": "v1未启用，异常被预期捕获。",
+              "state": "active=None；v1=proposed。",
+              "failure": false,
+              "section": "Skill生命周期：把经验变成受控资产",
+              "why": "评测未完成时即使版本存在，也没有发布资格。",
+              "code_lines": [
+                31,
+                35
+              ]
+            },
+            {
+              "node": 2,
+              "title": "评测并启用v1",
+              "input": "v1的regression_ok=True且permission_ok=True。",
+              "action": "evaluate设approved，activate再设active。",
+              "output": "active='v1'；v1=active。",
+              "state": "当前版本为v1。",
+              "failure": false,
+              "section": "Skill生命周期：把经验变成受控资产",
+              "why": "两个条件共同成立才晋级，启用负责真正切换活动引用。",
+              "code_lines": [
+                36,
+                36
+              ]
+            },
+            {
+              "node": 3,
+              "title": "权限失败无法覆盖v1",
+              "input": "当前active=v1；v2-bad已proposed，permission_ok=False。",
+              "action": "evaluate把v2-bad设为rejected；activate检查状态不是approved后抛ValueError。",
+              "output": "预期错误被捕获；active=v1，v2-bad=rejected。",
+              "state": "停止放大此失败点；原完整程序稍后仍会处理合格v2。",
+              "failure": true,
+              "section": "Skill生命周期：把经验变成受控资产",
+              "why": "失败来自明确的状态条件，不能写成程序没有实现的线上审批或工具超时。",
+              "code_lines": [
+                37,
+                43
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "LangChain与LangGraph怎么选？",
+      "a": "先判断需求：线性模型/检索/工具组合可以从简单组件链开始；有循环、持久状态、暂停和恢复时可采用状态图。两者可组合，框架只是实现载体。还要实测重复恢复是否重放副作用、状态版本如何迁移，不能把checkpointer等同exactly-once。若任务简单，直接Python工作流可能维护成本更低。",
+      "rubric": "3分：职责、需求取舍、恢复边界各1分。"
+    },
+    {
+      "q": "AutoGen、CrewAI与Dify能否排出统一优劣？",
+      "a": "不能脱离任务统一排序。消息协作、角色任务流程与可视化应用平台强调的职责不同，具体版本能力也会变化。将审批、并发、审计、定制、导出和预算写成验收矩阵，执行同样任务和故障注入，比较自建成本及运维能力。UI快不代表治理完备，多Agent角色多也不等于结果更准。",
+      "rubric": "3分：职责比较、实测方法、成本与风险各1分。"
+    },
+    {
+      "q": "AgentOS为什么不只是一个聊天页面？",
+      "a": "平台还要管理租户与身份、任务生命周期、队列和沙箱、工具与Skill注册、凭证、审批、预算、Trace、发布回滚。控制面修改策略，执行面执行任务，二者权限应分开；执行失败不能顺带破坏管理能力。AgentOS在这里是架构范畴，不能仅凭产品名推断实现。",
+      "rubric": "3分：核心职责、平面隔离、命名边界各1分。"
+    },
+    {
+      "q": "一次成功经验能自动成为Active Skill吗？",
+      "a": "只能生成带来源与范围的候选。先去重、查冲突和隐私注入，再测迁移效果与历史回归，审查权限后审批启用，并保留版本和回滚目标。一次成功可能偶然、存在隐含前提或来自恶意输入；回滚后还需处理已经污染的缓存和记忆，不只是切换文本。",
+      "rubric": "3分：生命周期、因果风险、回滚外延各1分。"
+    }
+  ],
+  "lab": {
+    "title": "simple：不依赖框架的Skill发布状态机",
+    "task": "执行后画出每个版本的生命周期，并指出框架集成时需持久化哪些字段。",
+    "code": "class Registry:\n    def __init__(self):\n        self.items, self.active = {}, None\n    def propose(self, version, source, scope):\n        if version in self.items:\n            raise ValueError('duplicate version')\n        self.items[version] = dict(status='proposed', source=source, scope=scope)\n    def evaluate(self, version, regression_ok, permission_ok):\n        item = self.items[version]\n        if item['status'] != 'proposed':\n            raise ValueError('invalid evaluation transition')\n        item['status'] = 'approved' if regression_ok and permission_ok else 'rejected'\n    def activate(self, version):\n        if self.items[version]['status'] != 'approved':\n            raise ValueError('approval required')\n        old = self.active\n        if old is not None:\n            self.items[old]['status'] = 'deprecated'\n        self.items[version]['status'] = 'active'\n        self.active = version\n        return old\n    def rollback(self, version):\n        if self.items[version]['status'] != 'deprecated':\n            raise ValueError('rollback target unavailable')\n        self.items[self.active]['status'] = 'deprecated'\n        self.items[version]['status'] = 'active'\n        self.active = version\n\nr = Registry()\nr.propose('v1', 'run-001', 'repo-a')\ntry:\n    r.activate('v1')\n    raise AssertionError('unreviewed activation')\nexcept ValueError:\n    pass\nr.evaluate('v1', True, True); r.activate('v1')\nr.propose('v2-bad', 'run-002', 'repo-a')\nr.evaluate('v2-bad', True, False)\ntry:\n    r.activate('v2-bad')\n    raise AssertionError('permission expansion')\nexcept ValueError:\n    pass\nr.propose('v2', 'run-003', 'repo-a')\nr.evaluate('v2', True, True)\nassert r.activate('v2') == 'v1'\nassert r.items['v1']['status'] == 'deprecated'\nr.rollback('v1')\nassert r.active == 'v1'\nassert sum(i['status']=='active' for i in r.items.values()) == 1\nassert r.items['v2-bad']['status'] == 'rejected'\nprint('active:', r.active)\nprint('states:', {k:v['status'] for k,v in r.items.items()})\nprint('blocked: unreviewed activation and permission expansion')\n",
+    "expected": "active: v1\nstates: {'v1': 'active', 'v2-bad': 'rejected', 'v2': 'deprecated'}\nblocked: unreviewed activation and permission expansion\n",
+    "explanation": "assert验证审批与权限失败会阻止启用，发布与回滚维持单Active不变量。它只是内存状态机；真实并发启用还要使用数据库事务或版本比较，不能依赖此对象实现跨Worker一致性。",
+    "extensions": [
+      "如何避免两个Worker同时启用不同版本？",
+      "候选声明scope=repo-a，却想在repo-b使用，应怎么处理？"
+    ],
+    "extension_answers": [
+      "用事务锁住同一Skill的active记录，或以expected_active_version做compare-and-swap；版本变动则重新读取并评测，不能靠进程内锁覆盖多个实例。同时把切换事件写入审计日志。",
+      "执行器先检查当前资源属于scope，repo-b默认拒绝。扩大scope应产生新候选，补repo-b回归与权限审查后发布，不能让模型临时口头声明兼容。"
+    ]
+  },
+  "pitfalls": [
+    "按历史星数和API名称作当前选型结论",
+    "把checkpointer当副作用幂等保障",
+    "把自进化理解成自动改安全策略"
+  ],
+  "checkpoint": "能为审批隔天恢复的流程列出六项验收用例，解释六类框架/平台职责，并演示未审批候选无法启用。",
+  "alignment": {
+    "case_title": "Registry中v1、v2-bad与v2的发布回滚",
+    "insert_after": "Skill生命周期：把经验变成受控资产",
+    "bridge": "前文按职责比较组件、编排与平台，接下来用Registry代码把治理要求具体化。你先关注items和active：前者保存每个版本的记录，后者只指向当前活动版本。propose只产生候选，evaluate用回归与权限两个布尔条件决定能否晋级，activate才改变活动引用。\n\n演示从run-001提出的v1开始，依次经历未评测启用被拒、评测通过后启用；再遇到权限失败的v2-bad，确认它不会覆盖v1；最后启用合格v2，再回滚到v1。这样每个步骤都能追到同名方法、具体版本和断言，最终状态与打印输出完全一致。失败分支只是把原程序已经捕获的权限失败放大，不另造线上事故。\n\n把这段代码视作候选框架应满足的验收契约，而非框架能力实测：字典没有替你执行真实测试，布尔值也不等于人工审批。读完后应该能说明，如果要换成数据库和多个执行进程，哪些状态变更需要事务保护，哪些审批与评测证据必须额外保存。",
+    "coverage": "仅实现单进程内存Skill注册、布尔门禁、启用与回滚；未安装或调用任何框架，未比较厂商、持久化、并发事务或真实审批。",
+    "question_sections": [
+      "原理：将组件、控制流和运行环境分开",
+      "原理：将组件、控制流和运行环境分开",
+      "场景：六个名字，实际是几个不同问题",
+      "Skill生命周期：把经验变成受控资产"
+    ],
+    "coverage_summary": "内存注册表模拟Skill版本治理，不集成具体框架或生产发布平台。"
+  }
+}

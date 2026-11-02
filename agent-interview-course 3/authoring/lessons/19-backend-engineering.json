@@ -1,0 +1,276 @@
+{
+  "id": "19",
+  "slug": "19-backend-engineering",
+  "title": "后端工程：并发、队列、缓存与事务",
+  "stage": "05 生产与可靠性",
+  "prerequisites": [
+    "15",
+    "18",
+    "Python函数、异常与SQL基本读写"
+  ],
+  "minutes": 60,
+  "goals": [
+    "将长任务API设计为持久化提交和异步Worker",
+    "通过事务与版本条件维护并发不变量",
+    "用时间线解释缓存旧值回填和Redis原子限流边界"
+  ],
+  "sources": [
+    "通用知识/2026-10-后端基础面试题与参考答案.md",
+    "通用知识/2026-10-状态与恢复面试题与参考答案.md"
+  ],
+  "body": "## 问题：模型调用只是后端链路中的一个等待点\n某Agent服务在测试时一次请求只需两秒，上线后却频繁超时，CPU仍很低。原因可能是模型配额排队、数据库连接池耗尽、工具网络等待或锁竞争。低CPU不等于系统有充足容量。先给请求打Trace，把入口排队、检索、模型、工具与提交分开，关联线程栈、连接池和依赖指标，再决定改哪里。盲目增加线程可能只让更多请求一起争抢同一个依赖。\n\n从客户端请求到服务响应，还经过域名解析、连接建立、TLS、网关和服务端处理。复用连接可减少重复建连，但不意味着所有请求都无需这些阶段；缓存和协议会影响路径。系统调用切换权限到内核，不一定发生线程调度切换。区分权限模式、任务调度和网络等待，有助于避免把所有“慢”都归为模型推理。\n\n## 机制一：长任务先持久化，再交给有界Worker\n同步请求等待十分钟的Agent任务容易受网关超时和客户端断线影响。可以让提交接口在一个事务里写task_id、幂等提交键、输入引用和queued状态，返回任务ID；客户端独立查询状态与结果。Worker从数据库任务表或消息队列领取工作，记录租约、重试次数与截止时间。没有MQ也能异步，关键在可靠任务表、原子领取和崩溃恢复，而不是把线程放到后台就结束。\n\n队列将瞬时到达与执行解耦，但不会凭空增加下游容量。入口需要有界长度、租户配额、优先级和拒绝策略。若到达长期高于处理能力，无界队列只会把拒绝变成更晚的超时与内存耗尽。过载时可以返回明确重试信息、降级只读或减少非必要步骤，策略要和任务重要性匹配。取消标记也需传播到Worker和工具，不应只从UI隐藏任务。\n\n线程共享进程的地址空间和文件等资源，各自有栈与执行状态；进程通常有独立地址空间，也可以显式共享内存。线程适合许多I/O等待，但共享状态需要同步；CPU密集工作要结合语言运行时和进程池实测。异步协程改善等待期间的调度效率，不会让CPU计算自动并行。创建与切换开销依赖系统与负载，不能背固定倍数替代判断。\n\n## 机制二：把业务不变量放进原子边界\n假设账户剩余配额为1，两个Worker先读到1，各自扣成0，最后两个任务都被接受。这是先读后写的竞态，即便每次get和set单独线程安全也会发生。可用事务内锁定并检查，或条件更新：UPDATE quota SET remaining=remaining-1 WHERE remaining>0，再检查影响行数。跨多个字段的不变量通常需要事务，不能用一个线程安全字典宣称全部业务安全。\n\n乐观并发用版本条件更新；失败者重读并重算，而非继续覆盖。悲观锁适合需要串行保护的临界区，代价是等待和死锁风险。CAS适合预期值匹配的原子更新，高竞争会产生重试，ABA可能需要版本标记；可见性保证并不等于复合操作原子。提交状态时把合法状态转换也写入条件，避免旧结果让done退回running。\n\n## 已解例：缓存为空为什么还会复活旧数据\n时间线如下：读请求R在数据库版本7时取出旧值，尚未回填缓存；写请求W提交版本8并删除缓存；随后R把版本7写进已经为空的缓存。最终缓存又变旧。仅“先更新DB再删缓存”没有排除这个调度；延迟双删只在一定时间假设下减小概率，不能保证任意慢读都已结束。\n\n一种方案是维护单调失效水位：写入版本8时推进水位，即便缓存值被删掉也保留版本8；回填时原子比较读取版本与水位，低于水位拒绝写入。失效事件通过outbox或CDC可靠重试，TTL限制残留窗口。这里还有边界：DB更新与缓存水位更新之间仍可能暂时不一致，强一致读取走权威数据库或额外协调协议；不能用一个缓存技巧宣称跨系统强一致。\n\n缓存键还应包含租户、权限与数据版本。缓存问答结果可能依赖上下文和来源，不能只按用户问题文本复用。热门键过期可能造成缓存击穿，可使用单飞加载、短期互斥和过期抖动；但锁失效与旧回填仍要版本约束。空结果缓存可缓解穿透，也要限制寿命，避免新增数据长期不可见。\n\n## Redis限流与数据库事务各有作用域\n令牌桶需要读取余额和上次时间、计算补充、判断扣减并写回。客户端分开的GET/计算/SET会并发超发；短小原子脚本可把同一Redis执行域里的步骤合并。还要处理时间回拨、合理过期、租户key和集群槽位。单节点脚本原子不等于故障切换后所有历史都强一致；高风险业务配额仍应由权威系统兜底。Redis不可用时放行还是拒绝，由业务风险决定，不能默认无限放行。\n\n面试中可以沿一条具体业务链回答：先定义不变量，例如同一任务只能提交一次有效结果；再给任务持久化、原子领取、有界队列、事务提交、版本缓存和监控；最后沿重复消息、Worker崩溃、旧读回填与过载解释行为。本课缓存实验用确定性顺序重现并发交错，而非依赖线程碰运气，证明旧版本即使遇到空缓存也会被水位拒绝。真实环境的跨系统失效窗口仍需单独测量和设计。",
+  "diagram": {
+    "nodes": [
+      "初始化old/v7与空缓存",
+      "R复制v7旧读快照",
+      "W写new/v8并保留水位8",
+      "拒绝R的v7旧回填",
+      "接纳当前v8新回填",
+      "断言并打印最终缓存"
+    ],
+    "caption": "只演示实验中R/W的确定性交错；水位判断在真实共享缓存中还须原子执行。",
+    "walkthrough": {
+      "scenario": "沿《用版本水位阻止旧缓存复活》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "原实验逐步执行",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "初始化数据库、空缓存和水位7",
+              "input": "database={value:old,version:7}；cache={}",
+              "action": "建立watermark[item]=7，并定义带水位与现值版本检查的fill。",
+              "output": "三份状态互相独立",
+              "state": "DB=old/v7；cache空；水位7",
+              "failure": false,
+              "section": "已解例：缓存为空为什么还会复活旧数据",
+              "why": "缓存没有值时仍需要版本记忆，所以watermark不能只依附缓存项存在。",
+              "code_lines": [
+                1,
+                13
+              ]
+            },
+            {
+              "node": 1,
+              "title": "R拿到v7后暂停回填",
+              "input": "database仍old/v7",
+              "action": "old_read=dict(database)，保存一份旧读快照。",
+              "output": "old_read={value:old,version:7}",
+              "state": "DB=old/v7；cache空；R持有v7",
+              "failure": false,
+              "section": "已解例：缓存为空为什么还会复活旧数据",
+              "why": "用复制而非引用，保证后面DB更新不会把R手中的旧版本一起改掉。",
+              "code_lines": [
+                15,
+                15
+              ]
+            },
+            {
+              "node": 2,
+              "title": "W写v8并推进水位",
+              "input": "R仍持有old/v7",
+              "action": "database改为new/v8，watermark推进8，删除cache[item]。",
+              "output": "DB=new/v8；cache仍空；水位8",
+              "state": "R持有v7，W的更新已在本模拟完成",
+              "failure": false,
+              "section": "已解例：缓存为空为什么还会复活旧数据",
+              "why": "删除缓存不删除水位，才能在迟到旧读填入前识别其版本太旧。",
+              "code_lines": [
+                16,
+                19
+              ]
+            },
+            {
+              "node": 3,
+              "title": "拒绝R迟到回填",
+              "input": "fill(item,old,7)；水位8",
+              "action": "第7行判断7<8成立返回False；断言cache仍无item。",
+              "output": "accepted_old=False",
+              "state": "DB=new/v8；cache空；水位8",
+              "failure": false,
+              "section": "已解例：缓存为空为什么还会复活旧数据",
+              "why": "旧值尚未写入就被拒绝，即使cache.get得到空也不应绕过水位。",
+              "code_lines": [
+                20,
+                21
+              ]
+            },
+            {
+              "node": 4,
+              "title": "接受v8新回填",
+              "input": "fill(item,new,8)；水位8",
+              "action": "版本不低于水位，缓存也无更高版本，写new/v8并返回True。",
+              "output": "accepted_new=True；cache[item]={value:new,version:8}",
+              "state": "DB与cache均为new/v8",
+              "failure": false,
+              "section": "已解例：缓存为空为什么还会复活旧数据",
+              "why": "允许相等版本，拒绝更旧版本；这里只是按顺序执行，没有线程间原子操作。",
+              "code_lines": [
+                22,
+                24
+              ]
+            },
+            {
+              "node": 5,
+              "title": "输出交错后的结果",
+              "input": "两次accepted值与最终cache",
+              "action": "打印旧填充False、新填充True、缓存new和版本8。",
+              "output": "old_fill=False；new_fill=True；cached=new；version=8",
+              "state": "原assert全部通过",
+              "failure": false,
+              "section": "已解例：缓存为空为什么还会复活旧数据",
+              "why": "同时检查旧回填被拒和最终新值，避免最终被覆盖正确就掩盖曾接受旧值的事实。",
+              "code_lines": [
+                25,
+                28
+              ]
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "同一实验的失败变式",
+          "basis": "单因素变式把fill第7行条件改成if False，实际运行在原第21行抛AssertionError；没有添加真实线程或Redis操作。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "初始化数据库、空缓存和水位7",
+              "input": "database={value:old,version:7}；cache={}",
+              "action": "建立watermark[item]=7，并定义带水位与现值版本检查的fill。",
+              "output": "三份状态互相独立",
+              "state": "DB=old/v7；cache空；水位7",
+              "failure": false,
+              "section": "已解例：缓存为空为什么还会复活旧数据",
+              "why": "缓存没有值时仍需要版本记忆，所以watermark不能只依附缓存项存在。",
+              "code_lines": [
+                1,
+                13
+              ]
+            },
+            {
+              "node": 1,
+              "title": "R拿到v7后暂停回填",
+              "input": "database仍old/v7",
+              "action": "old_read=dict(database)，保存一份旧读快照。",
+              "output": "old_read={value:old,version:7}",
+              "state": "DB=old/v7；cache空；R持有v7",
+              "failure": false,
+              "section": "已解例：缓存为空为什么还会复活旧数据",
+              "why": "用复制而非引用，保证后面DB更新不会把R手中的旧版本一起改掉。",
+              "code_lines": [
+                15,
+                15
+              ]
+            },
+            {
+              "node": 2,
+              "title": "W写v8并推进水位",
+              "input": "R仍持有old/v7",
+              "action": "database改为new/v8，watermark推进8，删除cache[item]。",
+              "output": "DB=new/v8；cache仍空；水位8",
+              "state": "R持有v7，W的更新已在本模拟完成",
+              "failure": false,
+              "section": "已解例：缓存为空为什么还会复活旧数据",
+              "why": "删除缓存不删除水位，才能在迟到旧读填入前识别其版本太旧。",
+              "code_lines": [
+                16,
+                19
+              ]
+            },
+            {
+              "node": 3,
+              "title": "变式：删除水位判断",
+              "input": "R带old/v7回来；cache仍为空；水位仍为8",
+              "action": "【变式已运行】把第7行改为if False；当前缓存检查也因空缓存而不拒绝，写入old/v7。",
+              "output": "accepted_old=True；cache[item]={value:old,version:7}",
+              "state": "DB=new/v8；cache=old/v7；水位8",
+              "failure": true,
+              "section": "已解例：缓存为空为什么还会复活旧数据",
+              "why": "仅比较已有缓存版本无法保护空缓存，这正是旧值复活的调度。",
+              "code_lines": [
+                5,
+                13
+              ]
+            },
+            {
+              "node": 4,
+              "title": "原断言在新回填前报错",
+              "input": "accepted_old=True，不符合原期望False",
+              "action": "原第21行assert失败，新回填与四行打印都没有执行。",
+              "output": "AssertionError；stdout为空",
+              "state": "停止时DB与cache版本不一致",
+              "failure": true,
+              "section": "已解例：缓存为空为什么还会复活旧数据",
+              "why": "不能跳到第22行新值修复后宣称没出过错；测试在关键交错处检查不变量。",
+              "code_lines": [
+                20,
+                24
+              ]
+            }
+          ],
+          "code_overrides": {
+            "7": "    if False:  # 变式：跳过版本水位比较"
+          }
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "没有MQ如何实现异步任务服务？",
+      "a": "数据库保存task_id、输入、状态与幂等键，提交后立即返回ID。Worker通过事务或条件更新领取，带租约与预算，客户端查询状态和产物。崩溃后重新领取可能重做，因此副作用仍要稳定键去重；线程里直接启动函数并不可靠。",
+      "rubric": "持久化、原子领取、查询、恢复和副作用幂等。"
+    },
+    {
+      "q": "CPU很低但请求很慢，为什么加线程不一定有用？",
+      "a": "慢可能来自模型配额、网络、DB连接池、锁和磁盘等待。更多线程可能让瓶颈队列更长。先通过Trace与池指标确认等待位置，再调整并发、背压或依赖容量；若CPU密集则需分析计算而非盲目异步化。",
+      "rubric": "等待定位、依赖容量和过载的因果。"
+    },
+    {
+      "q": "先改数据库再删缓存能保证强一致吗？",
+      "a": "不能。旧读在更新前拿到值，更新删缓存后才回填，旧缓存会复活。可原子校验版本水位拒绝旧回填，配合可靠失效与TTL；DB到缓存的传播仍有窗口，强一致读需权威存储或额外协议。",
+      "rubric": "完整时间线、空缓存水位和跨系统边界。"
+    },
+    {
+      "q": "Redis Lua原子脚本意味着绝不会超发吗？",
+      "a": "它使一个执行域中的桶读改写不被其他命令插入，但需正确key范围、时间处理和短脚本。集群多key要满足同槽等约束；复制与故障切换仍有一致性边界。高风险配额不能仅靠一句Lua原子保证整个分布式业务。",
+      "rubric": "区分局部原子与故障后的全局保证。"
+    }
+  ],
+  "lab": {
+    "title": "用版本水位阻止旧缓存复活",
+    "task": "逐行扮演旧读R和写请求W，运行后解释为什么不能在删除缓存时一起删掉watermark。",
+    "code": "database = {\"value\": \"old\", \"version\": 7}\ncache = {}\nwatermark = {\"item\": 7}\n\ndef fill(key, value, version):\n    # 真实共享服务需将比较与写入做成原子操作\n    if version < watermark.get(key, 0):\n        return False\n    current = cache.get(key)\n    if current and version < current[\"version\"]:\n        return False\n    cache[key] = {\"value\": value, \"version\": version}\n    return True\n\nold_read = dict(database)  # R读取后暂停\n# W在数据库提交新值，并把失效水位推进到8\ndatabase.update(value=\"new\", version=8)\nwatermark[\"item\"] = 8\ncache.pop(\"item\", None)\naccepted_old = fill(\"item\", old_read[\"value\"], old_read[\"version\"])\nassert accepted_old is False and \"item\" not in cache\naccepted_new = fill(\"item\", database[\"value\"], database[\"version\"])\nassert accepted_new is True\nassert cache[\"item\"] == {\"value\": \"new\", \"version\": 8}\nprint(\"old_fill=\" + str(accepted_old))\nprint(\"new_fill=\" + str(accepted_new))\nprint(\"cached=\" + cache[\"item\"][\"value\"])\nprint(\"version=\" + str(cache[\"item\"][\"version\"]))\n",
+    "expected": "old_fill=False\nnew_fill=True\ncached=new\nversion=8\n",
+    "explanation": "用确定性顺序模拟R读旧值、W更新并失效、R迟到回填。缓存删除后仍保存水位，防止空缓存接纳旧值。示例按顺序运行，实际并发中水位比较与缓存写入必须原子化，DB到缓存传播的窗口也未在此消除。",
+    "extensions": [
+      "删掉水位版本比较，观察哪个断言揭示旧值复活。",
+      "设计一个有界任务队列，满时明确拒绝而非静默丢任务。"
+    ],
+    "extension_answers": [
+      "旧值会被接纳，accepted_old is False断言首先失败。即使随后新值覆盖也不能否认中间读到了旧值；因此测试要在每个关键交错点断言。",
+      "使用queue.Queue(maxsize=N)，入口put_nowait捕获Full返回busy/重试信息；只有可靠持久化成功的任务返回accepted。持久化任务与投递需outbox或扫描恢复，不能先承诺成功再丢失。"
+    ]
+  },
+  "pitfalls": [
+    "线程安全容器的get再put被误认为业务原子操作",
+    "无界队列掩盖过载并把延迟拖到超时",
+    "把缓存删除或延迟双删说成任意调度下的强一致证明"
+  ],
+  "checkpoint": "能解释旧缓存复活的三步时间线并运行水位实验；能为长任务API给出持久化、领取、背压与恢复方案。",
+  "alignment": {
+    "case_title": "用版本水位阻止旧缓存复活",
+    "insert_after": "已解例：缓存为空为什么还会复活旧数据",
+    "bridge": "前面谈到事务和原子边界，这里只把其中一个缓存竞态缩成下面能运行的时间线。database字典代表权威值，初始是old与版本7；cache初始为空；watermark独立保存item不能接受的旧版本边界。old_read=dict(database)代表读请求R拿到v7后暂停，它是一份快照，所以W随后把database改为new/v8不会改变它。W同时把水位推进8并删除缓存。\n\n现在R恢复，fill收到版本7，先判断7<8就返回False，cache仍空；再用当前数据库版本8回填，才写入new/v8并返回True。因此四行输出依次是old_fill=False、new_fill=True、cached=new、version=8。演示的失败分支只跳过水位检查，空缓存就会接受旧值，原第21行断言马上失败。\n\n程序人为排好交错顺序，没有真正并发线程或数据库事务；它验证的是版本规则，而不是消除数据库到缓存传播的所有一致性窗口。",
+    "coverage": "实现三个Python字典、复制旧读快照、顺序交错、版本水位检查和缓存回填断言；未实现任务API、队列、Worker租约、真实DB/Redis、并发原子脚本、事务、outbox/CDC、TTL、网络故障或跨系统强一致。",
+    "question_sections": [
+      "机制一：长任务先持久化，再交给有界Worker",
+      "问题：模型调用只是后端链路中的一个等待点",
+      "已解例：缓存为空为什么还会复活旧数据",
+      "Redis限流与数据库事务各有作用域"
+    ],
+    "coverage_summary": "字典按指定顺序模拟缓存竞态；真实并发需让版本比较和写入原子执行。"
+  }
+}

@@ -1,0 +1,128 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>阿里巴巴 AI Agent 工程师 - 面试题 &amp; 面经 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-095.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">阿里巴巴/面试题与面经.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4/%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E9%9D%A2%E7%BB%8F.md">GitHub 固定版本</a> · <a href="../../source/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4/%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E9%9D%A2%E7%BB%8F.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E9%9D%A2%E8%AF%95%E7%89%B9%E7%82%B9">面试特点</a><a href="#%E4%B8%80agent-%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5">一、Agent 核心概念</a><a href="#q-%E4%BB%80%E4%B9%88%E6%98%AF-ai-agent%E4%B8%8E%E4%BC%A0%E7%BB%9F-ai%E8%87%AA%E5%8A%A8%E5%8C%96%E8%84%9A%E6%9C%AC%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8C%BA%E5%88%AB">Q: 什么是 AI Agent？与传统 AI/自动化脚本的核心区别？</a><a href="#q-%E5%A4%A7%E6%A8%A1%E5%9E%8B-agent-%E7%9A%84%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%E6%A8%A1%E5%9D%97">Q: 大模型 Agent 的核心技术模块？</a><a href="#q-llm-%E5%9C%A8-agent-%E4%B8%AD%E7%9A%84%E4%BD%9C%E7%94%A8%E4%B8%8E%E5%B1%80%E9%99%90%E6%80%A7">Q: LLM 在 Agent 中的作用与局限性？</a><a href="#q-react-%E6%A1%86%E6%9E%B6%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86">Q: ReAct 框架的工作原理？</a><a href="#q-agent-%E5%92%8C-rag-%E7%9A%84%E5%8C%BA%E5%88%AB%E5%A6%82%E4%BD%95%E7%BB%93%E5%90%88%E4%BD%BF%E7%94%A8">Q: Agent 和 RAG 的区别？如何结合使用？</a><a href="#q-agent-%E8%B0%83%E7%94%A8-mcp-%E7%9A%84%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B">Q: Agent 调用 MCP 的整体流程？</a><a href="#q-%E5%8D%95-agent-vs-%E5%A4%9A-agent-%E6%80%8E%E4%B9%88%E9%80%89">Q: 单 Agent vs 多 Agent 怎么选？</a><a href="#q-%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E9%80%9A%E7%94%A8-agent-%E6%A1%86%E6%9E%B6">Q: 如何设计通用 Agent 框架？</a><a href="#%E4%BA%8C%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%9F%BA%E7%A1%80">二、大模型基础</a><a href="#q-transformer-%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C%E4%B8%BA%E4%BB%80%E4%B9%88%E6%AF%94-rnn-%E6%9B%B4%E9%80%82%E5%90%88%E9%95%BF%E5%BA%8F%E5%88%97">Q: Transformer 自注意力机制如何工作？为什么比 RNN 更适合长序列？</a><a href="#q-rope%E6%97%8B%E8%BD%AC%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81vs-%E7%BB%9D%E5%AF%B9%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81">Q: ROPE（旋转位置编码）vs 绝对位置编码？</a><a href="#q-mhamqagqa-%E7%9A%84%E5%8C%BA%E5%88%AB">Q: MHA、MQA、GQA 的区别？</a><a href="#%E4%B8%89%E9%A1%B9%E7%9B%AE%E6%8B%B7%E6%89%93%E9%87%8D%E7%82%B9">三、项目拷打（重点！）</a><a href="#%E9%9D%A2%E8%AF%95%E5%AE%98%E4%BC%9A%E9%97%AE%E7%9A%84%E9%97%AE%E9%A2%98%E7%BB%B4%E5%BA%A6">面试官会问的问题维度：</a><a href="#%E5%87%86%E5%A4%87%E5%BB%BA%E8%AE%AE">准备建议：</a><a href="#%E5%9B%9B%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80%E4%BB%8D%E7%84%B6%E4%BC%9A%E8%80%83">四、计算机基础（仍然会考！）</a><a href="#%E4%BA%94%E7%AE%97%E6%B3%95%E9%A2%98">五、算法题</a></nav></details><article class="prose source-prose"><h1 id="阿里巴巴-ai-agent-工程师-面试题-面经">阿里巴巴 AI Agent 工程师 - 面试题 &amp; 面经</h1>
+<h2 id="面试特点">面试特点</h2>
+<ul>
+<li>非常注重<strong>项目拷打</strong>，会深挖每个项目的细节</li>
+<li>可能出现 <strong>vibe coding</strong>（现场编程）环节</li>
+<li>技术广度 + 深度并重</li>
+</ul>
+<hr>
+<h2 id="一agent-核心概念">一、Agent 核心概念</h2>
+<h3 id="q-什么是-ai-agent与传统-ai自动化脚本的核心区别">Q: 什么是 AI Agent？与传统 AI/自动化脚本的核心区别？</h3>
+<p><strong>参考答案：</strong>
+AI Agent 是具备自主感知环境、决策规划和执行行动能力的智能系统。与传统 AI 的区别：
+- 传统 AI：输入→输出的单次映射（如分类器）
+- 自动化脚本：预定义流程，无决策能力
+- Agent：具备<strong>自主循环</strong>——感知→思考→行动→观察→再思考，能处理开放域任务</p>
+<h3 id="q-大模型-agent-的核心技术模块">Q: 大模型 Agent 的核心技术模块？</h3>
+<p><strong>参考答案：</strong>
+四大模块：
+1. <strong>规划（大脑）</strong>：任务分解、制定计划、反思调整
+2. <strong>感知（五官）</strong>：理解用户输入、多模态信息处理
+3. <strong>工具（手脚）</strong>：API 调用、代码执行、外部系统交互
+4. <strong>记忆（记忆）</strong>：短期记忆（对话上下文）+ 长期记忆（向量存储/数据库）</p>
+<h3 id="q-llm-在-agent-中的作用与局限性">Q: LLM 在 Agent 中的作用与局限性？</h3>
+<p><strong>参考答案：</strong>
+- 作用：作为 Agent 的"大脑"，负责推理、规划和决策
+- 局限性：
+  - 幻觉问题（生成不存在的信息）
+  - 上下文长度限制
+  - 实时知识缺失
+  - 复杂数学/逻辑推理能力不足
+  - 无法直接与外部系统交互（需工具）</p>
+<h3 id="q-react-框架的工作原理">Q: ReAct 框架的工作原理？</h3>
+<p><strong>参考答案：</strong>
+ReAct = Reasoning + Acting，交替执行思考和行动：</p>
+<pre><code>Thought: 分析当前情况，决定下一步
+Action: 调用工具/执行操作
+Observation: 观察执行结果
+Thought: 基于结果继续推理
+...循环直到任务完成
+</code></pre>
+<p>优势：思维链可追溯，行动有依据，比纯 CoT 更实用。</p>
+<h3 id="q-agent-和-rag-的区别如何结合使用">Q: Agent 和 RAG 的区别？如何结合使用？</h3>
+<p><strong>参考答案：</strong>
+- RAG：检索增强生成，给 LLM 补充外部知识，是被动的信息增强
+- Agent：自主决策系统，RAG 只是 Agent 可调用的工具之一
+- 结合：Agent 在需要知识时主动调用 RAG 检索，获取信息后继续推理决策</p>
+<h3 id="q-agent-调用-mcp-的整体流程">Q: Agent 调用 MCP 的整体流程？</h3>
+<p><strong>参考答案：</strong>
+1. 用户发出请求 → Agent 解析意图
+2. Agent 规划任务，确定需要调用的工具
+3. 通过 MCP 协议发现可用工具（Tool Discovery）
+4. 构造工具调用请求（参数填充）
+5. MCP Server 执行工具并返回结果
+6. Agent 接收结果，整合到上下文继续推理
+7. 最终生成回复返回用户</p>
+<h3 id="q-单-agent-vs-多-agent-怎么选">Q: 单 Agent vs 多 Agent 怎么选？</h3>
+<p><strong>参考答案：</strong>
+- <strong>单 Agent</strong>：任务简单、工具数量少（&lt;10）、对延迟敏感
+- <strong>多 Agent</strong>：
+  - 任务涉及多领域专业知识
+  - 需要并行处理子任务
+  - 工具数量多需分组管理
+  - 需要检查/验证机制（如一个 Agent 生成，另一个审核）
+- 注意：多 Agent 增加复杂度和延迟，不要过度设计</p>
+<h3 id="q-如何设计通用-agent-框架">Q: 如何设计通用 Agent 框架？</h3>
+<p><strong>参考答案：</strong>
+分层设计：
+1. <strong>接口层</strong>：统一输入输出协议
+2. <strong>编排层</strong>：任务分解、Agent 调度、流程控制
+3. <strong>能力层</strong>：LLM 推理、工具调用、RAG 检索、记忆管理
+4. <strong>工具层</strong>：标准化工具接口（MCP 协议）、工具注册发现
+5. <strong>兜底机制</strong>：超时处理、错误恢复、人工介入触发</p>
+<hr>
+<h2 id="二大模型基础">二、大模型基础</h2>
+<h3 id="q-transformer-自注意力机制如何工作为什么比-rnn-更适合长序列">Q: Transformer 自注意力机制如何工作？为什么比 RNN 更适合长序列？</h3>
+<p><strong>参考答案：</strong>
+- Q/K/V 三个矩阵，通过 Attention(Q,K,V) = softmax(QK^T / √d_k) × V 计算
+- 每个 token 可直接关注任意位置的 token，路径长度 O(1)
+- RNN 需逐步传递，长距离依赖信息衰减，路径长度 O(n)
+- Transformer 支持并行计算，训练效率更高</p>
+<h3 id="q-rope旋转位置编码vs-绝对位置编码">Q: ROPE（旋转位置编码）vs 绝对位置编码？</h3>
+<p><strong>参考答案：</strong>
+- 绝对位置编码：为每个位置分配固定向量，难以泛化到训练时未见的长度
+- ROPE：通过旋转矩阵编码相对位置信息
+  - 优势：天然编码相对位置、可外推到更长序列、计算高效
+  - 实现：对 Q/K 向量按维度对做旋转变换</p>
+<h3 id="q-mhamqagqa-的区别">Q: MHA、MQA、GQA 的区别？</h3>
+<p><strong>参考答案：</strong>
+- <strong>MHA</strong>（Multi-Head Attention）：每个 head 独立的 Q/K/V
+- <strong>MQA</strong>（Multi-Query Attention）：所有 head 共享 K/V，大幅减少 KV Cache
+- <strong>GQA</strong>（Grouped-Query Attention）：折中方案，多个 head 分组共享 K/V
+- 趋势：GQA 成为主流（如 Llama 2/3），平衡效果和效率</p>
+<hr>
+<h2 id="三项目拷打重点">三、项目拷打（重点！）</h2>
+<h3 id="面试官会问的问题维度">面试官会问的问题维度：</h3>
+<ol>
+<li><strong>项目背景与目标</strong>：为什么做？解决什么问题？</li>
+<li><strong>技术选型</strong>：为什么选 X 不选 Y？有什么权衡？</li>
+<li><strong>具体实现</strong>：核心模块怎么设计的？数据怎么流转？</li>
+<li><strong>挑战与解决</strong>：遇到什么难题？怎么解决的？</li>
+<li><strong>质量保证</strong>：如何评估效果？指标是什么？</li>
+<li><strong>个人贡献</strong>：你具体做了什么？和团队的分工？</li>
+<li><strong>反思改进</strong>：如果重新做，会改什么？</li>
+</ol>
+<h3 id="准备建议">准备建议：</h3>
+<ul>
+<li>准备 1-2 个深度项目，每个项目能讲 15-20 分钟</li>
+<li>对每个技术选型都能说出 "为什么选它" 和 "有什么替代方案"</li>
+<li>准备好失败经验和从中学到的教训</li>
+</ul>
+<hr>
+<h2 id="四计算机基础仍然会考">四、计算机基础（仍然会考！）</h2>
+<ul>
+<li>ArrayList vs LinkedList 区别</li>
+<li>HashMap 原理，key 的要求（hashCode + equals）</li>
+<li>Redis 数据结构、持久化、集群</li>
+<li>MySQL 事务隔离级别</li>
+<li>CAP 定理</li>
+<li>LRU Cache 实现</li>
+<li>Kafka 消息不丢失保证</li>
+<li>设计模式（工厂、抽象工厂、策略等）</li>
+</ul>
+<hr>
+<h2 id="五算法题">五、算法题</h2>
+<ul>
+<li>LeetCode 中等/困难为主</li>
+<li>建议重点刷：动态规划、图、树、字符串处理</li>
+</ul></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

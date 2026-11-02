@@ -1,0 +1,561 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>🤖 Agent Interview Hub · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-006.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">README.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/README.md">GitHub 固定版本</a> · <a href="../../source/README.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E8%BF%99%E6%98%AF%E4%BB%80%E4%B9%88">📌 这是什么？</a><a href="#%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB">🧭 知识体系</a><a href="#%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%9B%BE">🗺️ 学习路线图</a><a href="#%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86">📚 通用知识</a><a href="#2026-%E5%B9%B4-10-%E6%9C%88%E4%B8%BB%E9%A2%98%E7%BB%83%E4%B9%A0%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88">🆕 2026 年 10 月主题练习与参考答案</a><a href="#%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF">🔧 核心技术</a><a href="#%E9%9D%A2%E8%AF%95%E9%A2%98%E5%BA%93">📝 面试题库</a><a href="#%E8%BF%9B%E9%98%B6%E9%9D%A2%E8%AF%95%E9%A2%98">🌐 进阶面试题</a><a href="#%E5%AE%9E%E6%93%8D%E8%80%83%E9%A2%98%E9%99%90%E6%97%B6%E6%8C%91%E6%88%98">🎯 实操考题（限时挑战）</a><a href="#%E5%9B%BD%E5%86%85%E5%A4%A7%E5%8E%82%E9%9D%A2%E7%BB%8F">🏢 国内大厂面经</a><a href="#%E6%B5%B7%E5%A4%96%E9%A1%B6%E7%BA%A7-ai-%E5%85%AC%E5%8F%B8%E9%9D%A2%E7%BB%8F">🌍 海外顶级 AI 公司面经</a><a href="#%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97">🚀 使用指南</a><a href="#%E5%9C%A8%E7%BA%BF%E9%98%85%E8%AF%BB%E6%8E%A8%E8%8D%90">在线阅读（推荐）</a><a href="#%E6%9C%AC%E5%9C%B0%E9%98%85%E8%AF%BB">本地阅读</a><a href="#%E6%9C%AC%E5%9C%B0%E6%9E%84%E5%BB%BA%E9%9D%99%E6%80%81%E7%AB%99">本地构建静态站</a><a href="#%E5%AE%89%E8%A3%85%E9%9D%A2%E7%BB%8F%E9%87%87%E9%9B%86-agent">安装面经采集 Agent</a><a href="#%E6%8E%A8%E8%8D%90%E9%98%85%E8%AF%BB%E9%A1%BA%E5%BA%8F">推荐阅读顺序</a><a href="#%E8%B4%A1%E7%8C%AE%E6%8C%87%E5%8D%97">🤝 贡献指南</a><a href="#%E8%B4%A1%E7%8C%AE%E6%AD%A5%E9%AA%A4">贡献步骤</a><a href="#star-history">Star History</a><a href="#license">📄 License</a></nav></details><article class="prose source-prose"><div align="center">
+
+# 🤖 Agent Interview Hub
+
+**国内最全的 AI Agent 工程师面试知识库**
+
+[![Stars](https://img.shields.io/github/stars/Zchary1106/agent-interview-hub?style=flat-square&logo;=github)](https://github.com/Zchary1106/agent-interview-hub/stargazers)
+[![Forks](https://img.shields.io/github/forks/Zchary1106/agent-interview-hub?style=flat-square&logo;=github)](https://github.com/Zchary1106/agent-interview-hub/network/members)
+[![License](https://img.shields.io/github/license/Zchary1106/agent-interview-hub?style=flat-square)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/Zchary1106/agent-interview-hub?style=flat-square)](https://github.com/Zchary1106/agent-interview-hub/commits/main)
+
+**300+ 面试题与参考答案 · 15 类公司/岗位资料（含 Anthropic 等海外顶级 AI 公司）· 6 道实操考题 · 16 周完整学习路线图**
+
+[📖 经典版](https://zchary1106.github.io/agent-interview-hub/index.html) · [✨ 新版](https://zchary1106.github.io/agent-interview-hub/new.html) · [🔥 高频题信号榜](https://zchary1106.github.io/agent-interview-hub/question-signals.html) · [⭐ Star 支持](https://github.com/Zchary1106/agent-interview-hub) · [🐛 提交面经](https://github.com/Zchary1106/agent-interview-hub/issues)
+
+</div>
+
+<hr>
+<h2 id="这是什么">📌 这是什么？</h2>
+<p>专为<strong>国内大厂 AI Agent 工程师</strong>跳槽/求职打造的一站式面试知识库。</p>
+<ul>
+<li>🎯 <strong>面向谁</strong> — 准备跳槽阿里、字节、腾讯、百度等大厂 Agent 岗位的工程师</li>
+<li>📚 <strong>包含什么</strong> — 300+ 高频问题与参考答案、15 类公司/岗位资料、6 道限时实操考题、35 篇通用知识文档</li>
+<li>🗺️ <strong>学习路线</strong> — 从零到 Offer 的 16 周完整学习计划</li>
+<li>✨ <strong>特色亮点</strong> — 题目全带答案、面经来自牛客真实分享、支持 GitHub Pages 在线浏览</li>
+</ul>
+<hr>
+<h2 id="知识体系">🧭 知识体系</h2>
+<pre><code>AI Agent 工程师知识体系
+│
+├── 🧱 基础层
+│   ├── Transformer 架构与注意力机制
+│   ├── LLM 原理 / Tokenization / Embedding
+│   └── Prompt Engineering 基础
+│
+├── 🔧 核心层
+│   ├── Agent 设计模式（ReAct / Plan-and-Execute / Multi-Agent）
+│   ├── RAG 全链路（检索 / 分块 / 重排 / 生成）
+│   ├── Function Calling / Tool Use 🆕
+│   ├── MCP（Model Context Protocol）🆕
+│   ├── 主流框架（LangChain / LangGraph / AutoGen）
+│   └── Context Engineering 上下文工程
+│
+├── 🚀 进阶层
+│   ├── Agentic RAG / GraphRAG
+│   ├── Agentic Coding 与 AI 编程工具 🆕
+│   ├── 模型微调 / 推理优化 / 量化部署
+│   └── Agent 安全、评估与对齐
+│
+└── 💼 实战层
+    ├── 系统设计与项目经验
+    ├── 大厂岗位要求解读
+    └── 面试技巧与真实面经
+</code></pre>
+<hr>
+<h2 id="学习路线图">🗺️ 学习路线图</h2>
+<blockquote>
+<p>16 周从基础到 Offer，每周有明确目标和推荐资料</p>
+</blockquote>
+<p>➡️ <a href="doc-001.html"><strong>Agent工程师学习路线图.md</strong></a></p>
+<hr>
+<h2 id="通用知识">📚 通用知识</h2>
+<h3 id="2026-年-10-月主题练习与参考答案">🆕 2026 年 10 月主题练习与参考答案</h3>
+<p><a href="doc-048.html"><strong>156 道题分类索引</strong></a> · <a href="doc-047.html">来源分级与答案资料</a></p>
+<p>覆盖 13 类：127 道通用技术题放入 <code>通用知识/</code>、15 道算法题及 Python 实现放入 <code>面试算法题/</code>、14 道项目题放入 <code>项目实战/</code>。每题附参考答案、得分点、追问与易错点，并接入新版交互题库的「2026-10 跨公司主题练习（非真题）」分组。</p>
+<blockquote>
+<p>来源快照为 <strong>2026-10-22</strong>，答案整理于 <strong>2026-10-23</strong>。题目按公开面经报道主题改写，<strong>不是公司官方真题或标准答案</strong>；63 条来源保留 B/C 证据状态，不将聚合线索、付费预览或编辑改写升级成真实面试。答案未经独立专家逐题复核，详见索引边界说明。</p>
+</blockquote>
+<h3 id="核心技术">🔧 核心技术</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>文档</th>
+<th>简介</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="doc-045.html">12 周 Agent 工程师进阶路线</a></td>
+<td>以周为单位交付 RAG、Agent、MCP、生产化作品集</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="doc-066.html">Agent 核心概念与设计模式</a></td>
+<td>ReAct、Plan-and-Execute、Multi-Agent 等核心范式</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="doc-068.html">Agent 框架全景</a></td>
+<td>LangChain、AutoGen、CrewAI 等主流框架横评</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="doc-075.html">LangChain 与 LangGraph 深度解析</a></td>
+<td>链式调用到图编排的演进与实战</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="doc-077.html">RAG 核心知识与面试题</a></td>
+<td>检索增强生成全链路：分块、检索、重排、生成</td>
+</tr>
+<tr>
+<td>6</td>
+<td><a href="doc-064.html">Agentic RAG 与 GraphRAG 深度解析</a></td>
+<td>从朴素 RAG 到 Agent 驱动的智能检索</td>
+</tr>
+<tr>
+<td>7</td>
+<td><a href="doc-072.html">Context Engineering 上下文工程</a></td>
+<td>上下文窗口管理、压缩与优化策略（含 Anthropic 最新实践）🔄</td>
+</tr>
+<tr>
+<td>8</td>
+<td><a href="doc-065.html">Agent 安全与评估体系</a></td>
+<td>Prompt 注入防御、幻觉检测、评估框架</td>
+</tr>
+<tr>
+<td>9</td>
+<td><a href="doc-082.html">大模型推理优化与部署</a></td>
+<td>量化、蒸馏、KV Cache、vLLM 等推理加速</td>
+</tr>
+<tr>
+<td>10</td>
+<td><a href="doc-073.html">Function Calling 与 Tool Use 专题</a></td>
+<td>三大厂商实现对比、调用模式、安全防御 🆕</td>
+</tr>
+<tr>
+<td>11</td>
+<td><a href="doc-076.html">MCP 与工具生态</a></td>
+<td>Model Context Protocol 架构、开发实战、企业应用 🆕</td>
+</tr>
+<tr>
+<td>12</td>
+<td><a href="doc-063.html">Agentic Coding 与 AI 编程工具</a></td>
+<td>Claude Code / Cursor / Copilot 对比、Hooks、人机协作 🆕</td>
+</tr>
+<tr>
+<td>13</td>
+<td><a href="doc-061.html">Agent Harness 与编码代理测评</a></td>
+<td>Codex CLI / Claude Code / OpenHands 等 Harness 深度测评与源码入口 🆕</td>
+</tr>
+<tr>
+<td>14</td>
+<td><a href="doc-059.html">2026 Agent 工程化新考点</a></td>
+<td>Runtime、可恢复执行、路径震荡、工具路由、Trace 与生产级评测 🆕</td>
+</tr>
+<tr>
+<td>15</td>
+<td><a href="doc-062.html">Agent Harness 评测与发布门禁</a></td>
+<td>Task/Environment/Outcome Spec、三层 Grading、Shadow 与 Canary</td>
+</tr>
+<tr>
+<td>16</td>
+<td><a href="doc-078.html">企业级 Agent 平台与 AgentOS</a></td>
+<td>控制面、Runtime、多租户、Registry、模型网关与平台治理</td>
+</tr>
+<tr>
+<td>17</td>
+<td><a href="doc-089.html">自进化 Agent 与 Skill 生命周期</a></td>
+<td>Trace 复盘、Curator、Skill 版本、灰度、回滚与防污染</td>
+</tr>
+</tbody>
+</table>
+<h3 id="面试题库">📝 面试题库</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>文档</th>
+<th>简介</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>18</td>
+<td><a href="doc-084.html">最新 AI Agent 面经索引（2026）</a></td>
+<td>牛客、小红书、知乎、CSDN、GitHub 等公开来源的最新面经入口</td>
+</tr>
+<tr>
+<td>19</td>
+<td><a href="doc-071.html">Agent 高频题证据模型</a></td>
+<td>公司、轮次、来源数、时效、一手/汇总与置信度</td>
+</tr>
+<tr>
+<td>20</td>
+<td><a href="doc-090.html">跨公司 Agent 岗位能力矩阵</a></td>
+<td>应用、算法、Runtime、Coding Agent 和平台岗位对比</td>
+</tr>
+<tr>
+<td>21</td>
+<td><a href="doc-069.html">Agent 项目深挖与压力面试</a></td>
+<td>九组连续追问链、回答证据和评分标准</td>
+</tr>
+<tr>
+<td>22</td>
+<td><a href="doc-070.html">Agent 项目简历与 STAR 表达</a></td>
+<td>1/3 分钟表达、技术难点、失败案例和指标写法</td>
+</tr>
+<tr>
+<td>23</td>
+<td><a href="doc-085.html">核心概念详解与参考答案</a></td>
+<td>高频概念题精讲与标准答案</td>
+</tr>
+<tr>
+<td>24</td>
+<td><a href="doc-079.html">八股文完整答案集</a></td>
+<td>69 道八股题，全部附详细解答</td>
+</tr>
+<tr>
+<td>25</td>
+<td><a href="doc-080.html">八股文题库 - DataWhale 开源</a></td>
+<td>DataWhale 社区精选题库</td>
+</tr>
+<tr>
+<td>26</td>
+<td><a href="doc-091.html">高频拷打题 - 牛客热帖</a></td>
+<td>牛客论坛高赞面试拷打合集</td>
+</tr>
+<tr>
+<td>27</td>
+<td><a href="doc-083.html">技术知识点汇总</a></td>
+<td>速查手册：关键知识点一网打尽</td>
+</tr>
+<tr>
+<td>28</td>
+<td><a href="doc-081.html">其他公司面经 - 快手携程等</a></td>
+<td>快手、携程等公司面经补充</td>
+</tr>
+</tbody>
+</table>
+<h3 id="进阶面试题">🌐 进阶面试题</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>文档</th>
+<th>简介</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>29</td>
+<td><a href="doc-067.html">Agent 核心概念面试题 - 进阶篇</a></td>
+<td>核心概念高频问答进阶版</td>
+</tr>
+<tr>
+<td>30</td>
+<td><a href="doc-088.html">系统设计面试题 - 进阶篇</a></td>
+<td>系统设计题与参考答案进阶版</td>
+</tr>
+<tr>
+<td>31</td>
+<td><a href="doc-060.html">AI 协作与工程化面试题 - 进阶篇</a></td>
+<td>AI 协作工程化问答进阶版</td>
+</tr>
+<tr>
+<td>32</td>
+<td><a href="doc-097.html">AI 模型与 Agent 手撕题</a></td>
+<td>Attention、LoRA、检索、RRF、Tool 校验与 Agent Loop</td>
+</tr>
+<tr>
+<td>33</td>
+<td><a href="https://zchary1106.github.io/agent-interview-hub/%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95%E9%A2%98/" rel="noreferrer">交互式面试算法题图谱</a></td>
+<td>近期公开 Agent / 大模型面经算法题，附可折叠 Java 解法</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="实操考题限时挑战">🎯 实操考题（限时挑战）</h2>
+<blockquote>
+<p>来自 <a href="https://github.com/Zchary1106/agent-interview-prep" rel="noreferrer">agent-interview-prep</a> 项目，模拟真实面试场景的限时编程题</p>
+<p>🗺️ 使用 Obsidian 的同学可以打开 <a href="../../source/Agent%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE.canvas">Agent 工程师知识地图</a>，从长期路线、核心知识、项目实战和公司面经四条线复习。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>题目</th>
+<th>难度</th>
+<th>限时</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="doc-104.html">智能文档问答 Agent</a></td>
+<td>⭐⭐</td>
+<td>4-6h</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="doc-105.html">多 Agent 团队协作</a></td>
+<td>⭐⭐</td>
+<td>4-6h</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="doc-106.html">ReAct 模式 Agent</a></td>
+<td>⭐⭐</td>
+<td>3-5h</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="doc-107.html">AI 限时全栈开发</a></td>
+<td>⭐⭐</td>
+<td>2-3h</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="doc-108.html">AI 调试挑战</a></td>
+<td>⭐⭐⭐</td>
+<td>1-2h</td>
+</tr>
+<tr>
+<td>6</td>
+<td><a href="doc-109.html">AI Code Review Agent</a></td>
+<td>⭐⭐⭐</td>
+<td>4-6h</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="国内大厂面经">🏢 国内大厂面经</h2>
+<table>
+<thead>
+<tr>
+<th>公司</th>
+<th>岗位要求</th>
+<th>面试题</th>
+<th>真实面经</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../coverage.html">阿里巴巴</a></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="../coverage.html">字节跳动</a></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="../coverage.html">小红书</a></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="../coverage.html">百度</a></td>
+<td>✅</td>
+<td>✅</td>
+<td>—</td>
+</tr>
+<tr>
+<td><a href="../coverage.html">腾讯</a></td>
+<td>✅</td>
+<td>✅</td>
+<td>—</td>
+</tr>
+<tr>
+<td><a href="../coverage.html">美团</a></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="../coverage.html">蚂蚁集团</a></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="../coverage.html">华为</a></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="../coverage.html">快手</a></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h2 id="海外顶级-ai-公司面经">🌍 海外顶级 AI 公司面经</h2>
+<table>
+<thead>
+<tr>
+<th>公司</th>
+<th>岗位要求</th>
+<th>面试题</th>
+<th>真实面经</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../coverage.html">OpenAI</a></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="../coverage.html">Anthropic</a> 🆕</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="../coverage.html">谷歌 (Google DeepMind)</a></td>
+<td>✅</td>
+<td>✅</td>
+<td>—</td>
+</tr>
+<tr>
+<td><a href="../coverage.html">微软 (Microsoft)</a></td>
+<td>✅</td>
+<td>✅</td>
+<td>—</td>
+</tr>
+<tr>
+<td><a href="../coverage.html">初创公司</a></td>
+<td>✅</td>
+<td>✅</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📖 海外公司综合攻略：<a href="doc-087.html">海外顶级AI公司面试攻略-2026</a> 🆕</p>
+</blockquote>
+<hr>
+<h2 id="使用指南">🚀 使用指南</h2>
+<h3 id="在线阅读推荐">在线阅读（推荐）</h3>
+<p>访问 GitHub Pages 站点，移动端友好：</p>
+<ul>
+<li><strong>经典版（原页面）</strong>：https://zchary1106.github.io/agent-interview-hub/index.html</li>
+<li><strong>新版（备考路径版）</strong>：https://zchary1106.github.io/agent-interview-hub/new.html</li>
+<li><strong>高频题信号榜</strong>：https://zchary1106.github.io/agent-interview-hub/question-signals.html</li>
+</ul>
+<p>经典版保持原有内容和默认地址，并在页面顶部提示切换新版；新版使用新的求职准备布局。</p>
+<h3 id="本地阅读">本地阅读</h3>
+<pre><code class="language-bash">git clone https://github.com/Zchary1106/agent-interview-hub.git
+cd agent-interview-hub
+# 用任意 Markdown 编辑器打开即可
+</code></pre>
+<h3 id="本地构建静态站">本地构建静态站</h3>
+<pre><code class="language-bash">python3 -m pip install -r requirements.txt
+python3 scripts/build_site.py
+python3 -m http.server 8000 -d dist
+</code></pre>
+<p>生成结果会输出到 <code>dist/</code>。GitHub Pages 通过 <code>.github/workflows/pages.yml</code> 在 <code>main</code> 分支 push 后自动构建并发布。</p>
+<h3 id="安装面经采集-agent">安装面经采集 Agent</h3>
+<p>本仓库内置 Interview Collector Agent，用于从牛客、小红书、知乎、CSDN、博客园、掘金、GitHub 等公开来源搜索面经，整理成结构化候选，再同步到索引和公司文档。</p>
+<pre><code class="language-bash">bash agents/interview-collector/install.sh --targets copilot,claude,cursor,generic
+</code></pre>
+<p>支持安装到：</p>
+<table>
+<thead>
+<tr>
+<th>平台</th>
+<th>写入位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GitHub Copilot CLI</td>
+<td><code>~/.copilot/instructions/interview-collector.instructions.md</code></td>
+</tr>
+<tr>
+<td>Claude Code</td>
+<td><code>~/.claude/skills/interview-collector/SKILL.md</code></td>
+</tr>
+<tr>
+<td>Cursor</td>
+<td><code>.cursor/rules/interview-collector.mdc</code></td>
+</tr>
+<tr>
+<td>通用/国内 Agent</td>
+<td><code>~/.agent-interview-hub/interview-collector/AGENT.md</code></td>
+</tr>
+</tbody>
+</table>
+<p>详见 <a href="doc-008.html">Interview Collector Agent 说明</a>。</p>
+<p>完整采集流程也可以用脚本跑：</p>
+<pre><code class="language-bash"># 1. 检查本机搜索/读取工具
+python3 scripts/collect_interviews.py doctor
+
+# 2. 搜索公开来源，生成候选 JSON 和 Markdown 报告
+python3 scripts/collect_interviews.py search \
+  --platform nowcoder \
+  --platform zhihu \
+  --platform blogs \
+  --platform github \
+  --query &quot;AI Agent 大模型 面经 2026&quot; \
+  --output data/interview_candidates.json \
+  --report data/interview_candidates.md
+
+# 3. 人工或 Agent 审核候选后，再整理进 data/interviews.json
+python3 -m json.tool data/interviews.json
+python3 scripts/build_site.py
+</code></pre>
+<p>如果本机已配置 OpenCLI，也可以追加小红书搜索：</p>
+<pre><code class="language-bash">python3 scripts/collect_interviews.py search \
+  --platform xiaohongshu \
+  --query &quot;AI Agent 面经&quot; \
+  --append
+</code></pre>
+<h3 id="推荐阅读顺序">推荐阅读顺序</h3>
+<ol>
+<li>📖 先看 <a href="doc-001.html">学习路线图</a>，了解全局</li>
+<li>🧱 通读 <a href="doc-066.html">Agent 核心概念与设计模式</a></li>
+<li>🔧 深入 <a href="doc-077.html">RAG</a> 和 <a href="doc-075.html">LangChain/LangGraph</a></li>
+<li>🆕 掌握 <a href="doc-073.html">Function Calling</a> 和 <a href="doc-076.html">MCP</a>（2025 高频新考点）</li>
+<li>📝 刷 <a href="doc-079.html">八股文完整答案集</a>（69 题）</li>
+<li>🏢 针对目标公司看对应面经</li>
+<li>🔥 最后用 <a href="doc-091.html">高频拷打题</a> 查漏补缺</li>
+</ol>
+<hr>
+<h2 id="贡献指南">🤝 贡献指南</h2>
+<p>欢迎一切形式的贡献！</p>
+<ul>
+<li><strong>📝 提交面经</strong> — 通过 <a href="https://github.com/Zchary1106/agent-interview-hub/issues" rel="noreferrer">Issue</a> 分享你的面试经历</li>
+<li><strong>🔧 提交 PR</strong> — 补充题目、修正答案、新增公司面经</li>
+<li><strong>⭐ Star</strong> — 最简单的支持方式，让更多人看到</li>
+</ul>
+<h3 id="贡献步骤">贡献步骤</h3>
+<pre><code class="language-bash"># 1. Fork 本仓库
+# 2. 创建分支
+git checkout -b feat/add-xxx-interview
+# 3. 提交更改
+git commit -m &quot;feat: 新增 xxx 面经&quot;
+# 4. 推送并创建 PR
+git push origin feat/add-xxx-interview
+</code></pre>
+<hr>
+<h2 id="star-history">Star History</h2>
+<p><a href="https://www.star-history.com/?repos=Zchary1106%2Fagent-interview-hub&amp;type=date&amp;legend=top-left" rel="noreferrer">
+ 
+   
+   
+   <span class="remote-asset">[在线图片：Star History Chart]</span>
+ 
+</a></p>
+<hr>
+<h2 id="license">📄 License</h2>
+<p>本项目采用 <a href="../../source/LICENSE">MIT License</a> 开源。</p>
+<hr>
+<div align="center">
+
+**如果这个项目对你有帮助，请给一个 ⭐ Star 支持！**
+
+Made with ❤️ for AI Agent Engineers
+
+</div></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

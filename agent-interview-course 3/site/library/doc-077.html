@@ -1,0 +1,181 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>RAG 核心知识与面试题 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-077.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/RAG核心知识与面试题.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/07-rag-basics.html">07 RAG 起点：从文档到有出处的回答</a> · <a href="../lessons/22-algorithms.html">22 算法与手写：检索、LRU缓存、堆与有界调度</a> · <a href="../lessons/24-document-agent-project.html">24 项目一：从简单检索到可验收的文档问答 Agent</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/RAG%E6%A0%B8%E5%BF%83%E7%9F%A5%E8%AF%86%E4%B8%8E%E9%9D%A2%E8%AF%95%E9%A2%98.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/RAG%E6%A0%B8%E5%BF%83%E7%9F%A5%E8%AF%86%E4%B8%8E%E9%9D%A2%E8%AF%95%E9%A2%98.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80rag-%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86">一、RAG 基础原理</a><a href="#%E4%BB%80%E4%B9%88%E6%98%AF-rag">什么是 RAG？</a><a href="#%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B">工作流程</a><a href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-rag">为什么需要 RAG？</a><a href="#%E4%BA%8Crag-%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6">二、RAG 核心组件</a><a href="#1-%E6%96%87%E6%A1%A3%E5%A4%84%E7%90%86document-processing">1. 文档处理（Document Processing）</a><a href="#2-%E5%B5%8C%E5%85%A5embedding">2. 嵌入（Embedding）</a><a href="#3-%E5%90%91%E9%87%8F%E5%AD%98%E5%82%A8%E4%B8%8E%E6%A3%80%E7%B4%A2">3. 向量存储与检索</a><a href="#4-%E4%B8%8A%E4%B8%8B%E6%96%87%E6%9E%84%E5%BB%BA%E4%B8%8E%E7%94%9F%E6%88%90">4. 上下文构建与生成</a><a href="#%E4%B8%89rag-%E9%AB%98%E7%BA%A7%E6%8A%80%E6%9C%AF">三、RAG 高级技术</a><a href="#1-query-%E6%94%B9%E5%86%99-%E6%89%A9%E5%B1%95">1. Query 改写 / 扩展</a><a href="#2-agentic-rag">2. Agentic RAG</a><a href="#3-graph-rag">3. Graph RAG</a><a href="#4-corrective-ragcrag">4. Corrective RAG（CRAG）</a><a href="#5-self-rag">5. Self-RAG</a><a href="#%E5%9B%9Brag-vs-fine-tuning">四、RAG vs Fine-tuning</a><a href="#%E4%BA%94%E9%AB%98%E9%A2%91%E9%9D%A2%E8%AF%95%E9%A2%98">五、高频面试题</a><a href="#%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5">基础概念</a><a href="#%E6%A3%80%E7%B4%A2%E4%BC%98%E5%8C%96">检索优化</a><a href="#%E9%AB%98%E7%BA%A7%E6%8A%80%E6%9C%AF">高级技术</a><a href="#%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5">工程实践</a><a href="#%E5%85%AD%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%E8%A6%81%E7%82%B9">六、参考答案要点</a><a href="#q1-rag-%E5%A6%82%E4%BD%95%E5%87%8F%E5%B0%91%E5%B9%BB%E8%A7%89">Q1: RAG 如何减少幻觉？</a><a href="#q6-chunking-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5">Q6: Chunking 最佳实践</a><a href="#q11-agentic-rag">Q11: Agentic RAG</a></nav></details><article class="prose source-prose"><h1 id="rag-核心知识与面试题">RAG 核心知识与面试题</h1>
+<h2 id="一rag-基础原理">一、RAG 基础原理</h2>
+<h3 id="什么是-rag">什么是 RAG？</h3>
+<p>RAG（Retrieval-Augmented Generation，检索增强生成）是一种让 LLM 在生成回答前，先从外部知识库检索相关信息的技术。</p>
+<h3 id="工作流程">工作流程</h3>
+<ol>
+<li><strong>用户查询</strong> → 2. <strong>Query 向量化</strong> → 3. <strong>向量数据库检索</strong> → 4. <strong>拼接上下文到 Prompt</strong> → 5. <strong>LLM 生成回答</strong></li>
+</ol>
+<h3 id="为什么需要-rag">为什么需要 RAG？</h3>
+<ul>
+<li><strong>减少幻觉</strong>：回答基于真实数据，而非模型"编造"</li>
+<li><strong>知识更新</strong>：无需重新训练模型就能访问最新数据</li>
+<li><strong>领域知识</strong>：接入企业内部数据、专业文档</li>
+<li><strong>成本低</strong>：比微调（Fine-tuning）便宜得多</li>
+<li><strong>可溯源</strong>：可以标注信息来源，便于验证</li>
+</ul>
+<hr>
+<h2 id="二rag-核心组件">二、RAG 核心组件</h2>
+<h3 id="1-文档处理document-processing">1. 文档处理（Document Processing）</h3>
+<ul>
+<li><strong>加载</strong>：PDF、Word、网页、数据库等多种数据源</li>
+<li><strong>分块（Chunking）</strong>：将长文档切分为适合检索的小块</li>
+<li><strong>固定大小分块</strong>：按字符/token 数切分</li>
+<li><strong>语义分块</strong>：按段落/章节等语义边界切分</li>
+<li><strong>递归分块</strong>：先按大边界分，不够再细分</li>
+<li>关键参数：<code>chunk_size</code>（块大小）、<code>chunk_overlap</code>（重叠区）</li>
+</ul>
+<h3 id="2-嵌入embedding">2. 嵌入（Embedding）</h3>
+<ul>
+<li>将文本转为高维向量，捕捉语义信息</li>
+<li>常用模型：OpenAI text-embedding-3-small/large、BGE、E5、Jina</li>
+<li>中文推荐：BGE-zh、M3E、text2vec-chinese</li>
+</ul>
+<h3 id="3-向量存储与检索">3. 向量存储与检索</h3>
+<ul>
+<li><strong>稀疏检索</strong>：BM25（关键词匹配），精确但无语义理解</li>
+<li><strong>密集检索</strong>：向量相似度（余弦/内积），理解语义但可能丢失精确匹配</li>
+<li><strong>混合检索</strong>：结合两者，效果最佳</li>
+<li><strong>重排序（Reranking）</strong>：用 Cross-Encoder 对检索结果二次排序</li>
+</ul>
+<h3 id="4-上下文构建与生成">4. 上下文构建与生成</h3>
+<ul>
+<li>将检索到的文档块拼入 Prompt</li>
+<li>注意 Context Window 限制</li>
+<li>Prompt 模板设计：指导 LLM 基于给定上下文回答</li>
+</ul>
+<hr>
+<h2 id="三rag-高级技术">三、RAG 高级技术</h2>
+<h3 id="1-query-改写-扩展">1. Query 改写 / 扩展</h3>
+<ul>
+<li><strong>HyDE</strong>：先让 LLM 生成假设性答案，再用该答案做检索</li>
+<li><strong>Multi-Query</strong>：将原始问题改写为多个变体，分别检索后合并</li>
+<li><strong>Step-back Prompting</strong>：先问更抽象的问题，获取背景知识</li>
+</ul>
+<h3 id="2-agentic-rag">2. Agentic RAG</h3>
+<ul>
+<li>将 AI Agent 整合到 RAG 管道中</li>
+<li>Agent 主动决定：是否需要检索、用哪个数据源、检索结果是否足够</li>
+<li>支持多数据源路由、迭代检索、自我反思</li>
+<li><strong>vs 传统 RAG</strong>：传统 RAG 是"查一次就回答"，Agentic RAG 是"边想边查"</li>
+</ul>
+<h3 id="3-graph-rag">3. Graph RAG</h3>
+<ul>
+<li>结合知识图谱，捕捉实体间关系</li>
+<li>适合需要推理和关系分析的场景</li>
+</ul>
+<h3 id="4-corrective-ragcrag">4. Corrective RAG（CRAG）</h3>
+<ul>
+<li>检索后先评估文档相关性</li>
+<li>不相关→触发 Web 搜索补充</li>
+<li>有相关→提取关键信息后生成</li>
+</ul>
+<h3 id="5-self-rag">5. Self-RAG</h3>
+<ul>
+<li>LLM 自己判断是否需要检索</li>
+<li>生成后自我评估答案质量</li>
+<li>必要时重新检索</li>
+</ul>
+<hr>
+<h2 id="四rag-vs-fine-tuning">四、RAG vs Fine-tuning</h2>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>RAG</th>
+<th>Fine-tuning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>成本</td>
+<td>低（只需向量库）</td>
+<td>高（需要训练）</td>
+</tr>
+<tr>
+<td>知识更新</td>
+<td>实时（更新文档即可）</td>
+<td>需重新训练</td>
+</tr>
+<tr>
+<td>幻觉控制</td>
+<td>好（有据可查）</td>
+<td>一般</td>
+</tr>
+<tr>
+<td>领域适应</td>
+<td>通过文档实现</td>
+<td>通过训练数据实现</td>
+</tr>
+<tr>
+<td>推理能力</td>
+<td>不增强</td>
+<td>可增强</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>知识问答、文档搜索</td>
+<td>风格/格式/推理定制</td>
+</tr>
+</tbody>
+</table>
+<p><strong>最佳实践</strong>：两者结合使用。Fine-tune 提升模型基础能力，RAG 提供实时知识。</p>
+<hr>
+<h2 id="五高频面试题">五、高频面试题</h2>
+<h3 id="基础概念">基础概念</h3>
+<ol>
+<li>什么是 RAG？与直接用 LLM 回答有什么区别？</li>
+<li>RAG 的端到端管道是怎样的？画出架构图并解释每个组件。</li>
+<li>RAG 如何减少 LLM 的幻觉？</li>
+<li>RAG vs Fine-tuning，各自适用场景？何时结合使用？</li>
+<li>向量数据库在 RAG 中的作用？你用过哪些？</li>
+</ol>
+<h3 id="检索优化">检索优化</h3>
+<ol start="6">
+<li>稀疏检索 vs 密集检索的优缺点？什么是混合检索？</li>
+<li>Chunking 策略有哪些？chunk_size 和 chunk_overlap 如何设置？</li>
+<li>如何处理检索到的不相关文档？</li>
+<li>什么是 Reranking？为什么需要它？</li>
+<li>如何评估检索质量（Precision@K, Recall@K, MRR, NDCG）？</li>
+</ol>
+<h3 id="高级技术">高级技术</h3>
+<ol start="11">
+<li>什么是 Agentic RAG？与传统 RAG 有何不同？</li>
+<li>解释 HyDE 的原理和适用场景</li>
+<li>Multi-Query RAG 如何工作？</li>
+<li>Graph RAG 解决什么问题？</li>
+<li>Self-RAG 和 CRAG 的区别？</li>
+</ol>
+<h3 id="工程实践">工程实践</h3>
+<ol start="16">
+<li>生产环境部署 RAG 有哪些挑战（延迟、成本、准确率）？</li>
+<li>如何评估 RAG 系统的整体性能？有哪些评测框架（RAGAS, TruLens）？</li>
+<li>如何处理多模态数据（图片、表格）的 RAG？</li>
+<li>大规模文档库（百万级）如何优化检索性能？</li>
+<li>RAG 系统的安全性问题（Prompt 注入、数据泄露）如何防范？</li>
+</ol>
+<hr>
+<h2 id="六参考答案要点">六、参考答案要点</h2>
+<h3 id="q1-rag-如何减少幻觉">Q1: RAG 如何减少幻觉？</h3>
+<ul>
+<li>LLM 回答基于检索到的真实文档，而非纯靠参数记忆</li>
+<li>Prompt 中明确指示"仅基于以下上下文回答"</li>
+<li>可以返回来源引用，用户可验证</li>
+<li>但不能完全消除：检索不准或文档本身有误仍可能产生幻觉</li>
+</ul>
+<h3 id="q6-chunking-最佳实践">Q6: Chunking 最佳实践</h3>
+<ul>
+<li>chunk_size 通常 256-1024 tokens，取决于文档类型</li>
+<li>chunk_overlap 通常 10-20%，防止语义断裂</li>
+<li>代码类文档：按函数/类分块</li>
+<li>对话类：按轮次分块</li>
+<li>表格类：保持表格完整性</li>
+<li><strong>实验调优</strong>：不同场景最优参数不同，需要评测验证</li>
+</ul>
+<h3 id="q11-agentic-rag">Q11: Agentic RAG</h3>
+<ul>
+<li>传统 RAG：Query → 检索 → 生成（一次性）</li>
+<li>Agentic RAG：Agent 判断→是否检索→选择数据源→评估结果→可能重新检索→最终生成</li>
+<li>优势：更灵活、更准确、支持复杂多步推理</li>
+<li>实现：用 LangGraph 构建，Agent 作为路由节点</li>
+</ul></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

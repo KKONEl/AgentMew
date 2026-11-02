@@ -1,0 +1,261 @@
+{
+  "id": "20",
+  "slug": "20-performance-serving",
+  "title": "性能、成本与推理服务原理",
+  "stage": "05 生产与可靠性",
+  "prerequisites": [
+    "17",
+    "19",
+    "Transformer注意力和token基本概念"
+  ],
+  "minutes": 60,
+  "goals": [
+    "区分端到端延迟、TTFT、TPOT与系统吞吐",
+    "解释prefill、decode、KV缓存与连续批处理的作用",
+    "根据质量门槛和容量假设计算每成功任务成本"
+  ],
+  "sources": [
+    "通用知识/2026-10-性能与成本面试题与参考答案.md",
+    "通用知识/大模型推理优化与部署.md"
+  ],
+  "body": "## 问题：每次模型更便宜，为什么整个任务反而更贵\n一个Agent把大模型替换为便宜模型，单次调用费用下降40%，但平均工具重试从1次增加到4次，人工接管也上升。真正关心的是每个合格完成任务的总成本，包含失败、重试、检索、工具、运行资源和人工接管。若总花费从100降到80，成功任务却从90降到50，单位成功成本从约1.11涨到1.60。降低单次token价格不能独立证明优化有效。\n\n优化首先保持质量与安全门槛，再用Trace定位关键路径。两个并行分支分别耗时2秒与3秒，汇总1秒，主链耗时约4秒而非6秒；端到端不能把所有重叠span直接相加。排队和实际执行也要分开，平均变快可能同时p99变差。按场景、输入/输出长度、模型和版本分桶，才能看见长任务被短任务平均数掩盖的问题。\n\n## 机制一：从用户等待拆到模型生成\nTTFT是请求开始到收到首个输出token的时间，通常包括网络、服务排队、prefill与首token生成；在Agent里还可能先有检索和前置工具。它不等于GPU纯prefill耗时。TPOT可按首token之后到最后token的时间除以其余输出token数估算，单token输出应单独处理。系统吞吐是单位时间完成请求或输出的token总量，不能和单请求token速度混为一谈。\n\nPrefill把输入序列送入模型，计算各层表示与KV；decode自回归地产生后续token，使用前文缓存而不从头重复全部计算。Prefill往往更偏计算密集，低batch的decode往往受权重/KV访存影响，但瓶颈会随硬件、模型、batch、上下文长度和并行策略变化，不能把“永远计算/带宽受限”当定律。输出越长通常要更多decode步骤，流式输出改善感知等待，却未必减少总计算量。\n\n## 机制二：KV缓存与分页管理\nKV缓存保存每层此前token的key和value，避免生成新token时重新计算所有前缀表示。简化显存估算为2 × 层数 × KV头数 × 头维度 × token数 × batch × 每元素字节数。这里KV头数在GQA/MQA中与query头数不同，不要直接套总注意力头数；实际服务还有块尾浪费、元数据、模型权重和运行工作区，公式不是整机显存预算。\n\n例如一个纯教学模型有8层、2个KV头、头维度64、上下文1024、batch为4、每元素2字节，KV约16MiB。上下文或batch翻倍，KV占用近似翻倍。它不缓存最终自然语言答案，也不会让新token的注意力免费；已有KV仍需要被访问。量化KV可减小内存，但要测质量和内核支持，不能直接假定无损。\n\nvLLM的PagedAttention原理是把KV按块管理，用逻辑块表映射到可不连续的物理块，按需增长和归还，减少为最大序列预分配连续空间造成的浪费。共享前缀可复用块，发生分支修改时需要正确引用计数与复制。它借用了操作系统分页的管理思想，不等于GPU显存会自动像磁盘虚拟内存一样无限扩展。块大小、调度与功能支持会随实现版本变化，本课不使用现行产品参数作为承诺。\n\n## 已解例：静态batch与连续batch怎样影响吞吐\n三个请求生成长度分别为2、2和8。静态batch把它们一起启动，若必须等最长请求结束才接受新请求，短请求结束后的槽位可能空闲。连续批处理在每个decode迭代边界移除结束请求、接纳新请求，提高资源利用；代价是调度更复杂，并要协调prefill与decode的资源争用。增大batch可能提升总吞吐，却使单请求TPOT和排队等待变差，不能把吞吐最大值直接当交互体验最优值。\n\n长prompt的prefill还可能阻塞已有decode，分块prefill可把工作切成更小调度单元，改善公平性与尾延迟，但调度和内核效率要实测。前缀缓存适合共享且完全匹配的前缀，命中依赖token内容、模型/适配配置和权限范围；它不是语义相似就能安全复用。不同租户共享敏感状态必须满足隔离约束。输出缓存同样要绑定来源与权限版本，不能为追求命中率绕过鉴权。\n\n## 容量、成本和调优顺序\n在稳定系统、平均口径一致的假设下，Little定律L=λW可估平均在途数。每秒2个任务，平均5秒，平均约10个在途任务；峰值、突发、长尾、工具配额和利用率余量要另算。平均在途不是机器数，也不是排队长度承诺。模型并发、工具并发与沙箱资源分别核算，避免把一个数字直接兑换成GPU张数。\n\n面试时先声明目标是降低p95等待、提高吞吐还是减少成本/成功任务，再给同数据和同质量门槛下的对照实验。按瓶颈选择缩短冗余上下文、减少不必要调用、并行独立工具、缓存、模型路由、批处理、量化或扩容。每次只改可归因的一组因素，检查准确性、安全和恢复指标，保留回滚。下面程序算KV、首token等待和成功成本，用确定性数值训练口径，不是GPU基准；真实服务需要在目标硬件和负载上测量。",
+  "diagram": {
+    "nodes": [
+      "定义KV与成功成本公式",
+      "断言batch4为16MiB",
+      "比较1.11与1.60成功成本",
+      "按时间戳算TTFT与TPOT",
+      "按均值估计在途10",
+      "打印六项教学账本结果"
+    ],
+    "caption": "对应纯Python算式；batch翻倍只验证理想KV字节翻倍，不表示吞吐翻倍。",
+    "walkthrough": {
+      "scenario": "沿《把便宜调用、成功成本和KV显存放在同一张账上》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "原实验逐步执行",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "定义两项账本公式",
+              "input": "层数、KV头、维度、长度、batch与精度；总成本与成功数",
+              "action": "定义kv_bytes乘积与cost_per_success；零成功返回inf。",
+              "output": "可计算的两项函数",
+              "state": "尚无GPU调用或实际测量",
+              "failure": false,
+              "section": "机制二：KV缓存与分页管理",
+              "why": "KV公式只计理想KV张量字节，成本分母必须是合格完成的任务数。",
+              "code_lines": [
+                1,
+                7
+              ]
+            },
+            {
+              "node": 1,
+              "title": "算batch4与batch8的KV",
+              "input": "8层、2个KV头、64维、1024token、2字节",
+              "action": "kv_bytes(...,4,2)=16777216字节；断言batch8结果为其两倍。",
+              "output": "kv=16MiB；batch8为32MiB",
+              "state": "仅显存估算，没有吞吐数值",
+              "failure": false,
+              "section": "机制二：KV缓存与分页管理",
+              "why": "线性的是该简化KV字节数，不是GPU时间或吞吐；模型权重和工作区没有计入。",
+              "code_lines": [
+                9,
+                11
+              ]
+            },
+            {
+              "node": 2,
+              "title": "比较每成功任务成本",
+              "input": "基线100成本/90成功；便宜版80成本/50成功",
+              "action": "base=100/90，cheap=80/50；断言cheap>base。",
+              "output": "base约1.11；cheap=1.60",
+              "state": "总花费下降，单位成功成本上升",
+              "failure": false,
+              "section": "问题：每次模型更便宜，为什么整个任务反而更贵",
+              "why": "减少总花费未补偿成功数大幅减少，分母变化决定最终成本方向。",
+              "code_lines": [
+                12,
+                15
+              ]
+            },
+            {
+              "node": 3,
+              "title": "用给定时间戳算TTFT与TPOT",
+              "input": "start=0.0，first=0.6，last=2.6，输出101token",
+              "action": "ttft=first-start；tpot=(last-first)/(101-1)。",
+              "output": "ttft=0.6秒；tpot=0.02秒",
+              "state": "时间戳是教学常量，不是新跑出的GPU基准",
+              "failure": false,
+              "section": "机制一：从用户等待拆到模型生成",
+              "why": "首token后还有100个间隔，所以TPOT分母排除第一个token。",
+              "code_lines": [
+                16,
+                19
+              ]
+            },
+            {
+              "node": 4,
+              "title": "估计平均在途数",
+              "input": "arrival_per_second=2；mean_task_seconds=5",
+              "action": "断言到达率乘平均时长为10。",
+              "output": "平均在途数10",
+              "state": "仅稳态平均估计，不是机器数量",
+              "failure": false,
+              "section": "容量、成本和调优顺序",
+              "why": "Little定律的平均口径不含峰值容量承诺；代码未模拟队列。",
+              "code_lines": [
+                20,
+                21
+              ]
+            },
+            {
+              "node": 5,
+              "title": "打印账本六项结果",
+              "input": "已计算kv/base/cheap/ttft/tpot；平均数已验",
+              "action": "按格式打印MiB、两项成功成本、两项时间与mean_inflight。",
+              "output": "kv_mib=16.0；baseline_cost_per_success=1.11；cheap_cost_per_success=1.60；ttft_seconds=0.60；tpot_seconds=0.020；mean_inflight=10",
+              "state": "所有原assert通过",
+              "failure": false,
+              "section": "容量、成本和调优顺序",
+              "why": "这些输出回答计算口径，不自动形成质量门禁、batch性能结论或上线决策。",
+              "code_lines": [
+                22,
+                27
+              ]
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "同一实验的失败变式",
+          "basis": "单因素变式把第7行返回值改为total_cost，实际运行在原第15行assert失败；此失败是成本定义丢失分母，不是服务性能退化。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "定义两项账本公式",
+              "input": "层数、KV头、维度、长度、batch与精度；总成本与成功数",
+              "action": "定义kv_bytes乘积与cost_per_success；零成功返回inf。",
+              "output": "可计算的两项函数",
+              "state": "尚无GPU调用或实际测量",
+              "failure": false,
+              "section": "机制二：KV缓存与分页管理",
+              "why": "KV公式只计理想KV张量字节，成本分母必须是合格完成的任务数。",
+              "code_lines": [
+                1,
+                7
+              ]
+            },
+            {
+              "node": 1,
+              "title": "算batch4与batch8的KV",
+              "input": "8层、2个KV头、64维、1024token、2字节",
+              "action": "kv_bytes(...,4,2)=16777216字节；断言batch8结果为其两倍。",
+              "output": "kv=16MiB；batch8为32MiB",
+              "state": "仅显存估算，没有吞吐数值",
+              "failure": false,
+              "section": "机制二：KV缓存与分页管理",
+              "why": "线性的是该简化KV字节数，不是GPU时间或吞吐；模型权重和工作区没有计入。",
+              "code_lines": [
+                9,
+                11
+              ]
+            },
+            {
+              "node": 2,
+              "title": "变式：误把总花费当成功成本",
+              "input": "同样输入100/90与80/50",
+              "action": "【变式已运行】把第7行改为return total_cost，遗漏除以successes。",
+              "output": "base=100；cheap=80",
+              "state": "两变量已失去每成功任务的含义",
+              "failure": true,
+              "section": "问题：每次模型更便宜，为什么整个任务反而更贵",
+              "why": "总费用虽然较低，但度量定义错了，不能用它支持优化结论。",
+              "code_lines": [
+                4,
+                7
+              ]
+            },
+            {
+              "node": 3,
+              "title": "原成本断言抓住口径变化",
+              "input": "cheap=80不大于base=100",
+              "action": "原第15行assert cheap>base失败，后面的时间和在途计算未执行。",
+              "output": "AssertionError；stdout为空",
+              "state": "停止于成本比较，不显示后续六行输出",
+              "failure": true,
+              "section": "问题：每次模型更便宜，为什么整个任务反而更贵",
+              "why": "这一断言保护的是给定样本的成功成本方向，不能把变式当成真实降本实验。",
+              "code_lines": [
+                13,
+                19
+              ]
+            }
+          ],
+          "code_overrides": {
+            "7": "    return total_cost  # 变式：遗漏成功任务数分母"
+          }
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "TTFT很高但TPOT正常，优先看什么？",
+      "a": "先分解网络、排队、检索/前置工具与prefill，检查长prompt、前缀命中和服务拥塞；TPOT正常只说明首token之后的生成间隔尚可。直接优化decode内核可能不影响用户最初等待。",
+      "rubric": "含端到端计时口径和首token前等待，不把TTFT等同prefill。"
+    },
+    {
+      "q": "KV缓存和答案缓存一样吗？",
+      "a": "KV缓存是模型各层前缀的中间key/value，供后续decode使用；答案缓存直接复用最终结果。KV仍占显存并需要读取，答案缓存还需处理数据新鲜度与权限。两者命中条件、生命周期和正确性边界都不同。",
+      "rubric": "中间表示/最终结果区别，显存和版本权限边界。"
+    },
+    {
+      "q": "PagedAttention为什么改善服务效率？",
+      "a": "按固定KV块分配，通过逻辑表映射非连续物理块，避免每个请求预留最大连续长度，支持按需增长与适当共享，从而提高可容纳的并发。它不是减少模型权重，也不保证所有工作负载固定倍数加速；块尾、调度和硬件仍影响效果。",
+      "rubric": "说明碎片和分配机制，避免神奇加速或无限显存误解。"
+    },
+    {
+      "q": "batch越大越好吗？",
+      "a": "更大batch可摊薄权重读取等开销并提高吞吐，但会占更多KV和运行内存，增加等待或每步时长，影响TTFT/TPOT和尾延迟。应在目标长度分布与SLA下搜索，连续batch也受调度公平性和prefill竞争限制。",
+      "rubric": "吞吐与延迟/显存的取舍，必须有负载和SLA。"
+    }
+  ],
+  "lab": {
+    "title": "把便宜调用、成功成本和KV显存放在同一张账上",
+    "task": "先手算KV MiB和两个版本的每成功任务成本。运行后改变batch为8，说明为什么这个变化不能直接预测吞吐翻倍。",
+    "code": "def kv_bytes(layers, kv_heads, head_dim, tokens, batch, element_bytes):\n    return 2 * layers * kv_heads * head_dim * tokens * batch * element_bytes\n\ndef cost_per_success(total_cost, successes):\n    if successes <= 0:\n        return float(\"inf\")\n    return total_cost / successes\n\nkv = kv_bytes(8, 2, 64, 1024, 4, 2)\nassert kv == 16 * 1024 * 1024\nassert kv_bytes(8, 2, 64, 1024, 8, 2) == kv * 2\n# 单位为教学中的统一成本单位，不是任何供应商报价\nbase = cost_per_success(100, 90)\ncheap = cost_per_success(80, 50)\nassert cheap > base\nstart, first, last, output_tokens = 0.0, 0.6, 2.6, 101\nttft = first - start\ntpot = (last - first) / (output_tokens - 1)\nassert round(tpot, 3) == 0.02\narrival_per_second, mean_task_seconds = 2, 5\nassert arrival_per_second * mean_task_seconds == 10\nprint(f\"kv_mib={kv / (1024 ** 2):.1f}\")\nprint(f\"baseline_cost_per_success={base:.2f}\")\nprint(f\"cheap_cost_per_success={cheap:.2f}\")\nprint(f\"ttft_seconds={ttft:.2f}\")\nprint(f\"tpot_seconds={tpot:.3f}\")\nprint(\"mean_inflight=10\")\n",
+    "expected": "kv_mib=16.0\nbaseline_cost_per_success=1.11\ncheap_cost_per_success=1.60\nttft_seconds=0.60\ntpot_seconds=0.020\nmean_inflight=10\n",
+    "explanation": "公式显示batch翻倍会让理想KV占用翻倍，却没有GPU时间模型，所以不能推出吞吐翻倍。成本分母使用成功任务，便宜版本因失败增多而更贵。TPOT排除首token，平均在途估算依赖稳态平均假设。",
+    "extensions": [
+      "若没有成功任务，成本指标应该如何展示？",
+      "给Trace添加两个并行工具2秒、3秒和汇总1秒，计算关键路径而非耗时总和。"
+    ],
+    "extension_answers": [
+      "返回不可用/无成功任务或正无穷，并同时报告总花费与失败数；不能除以0或把缺失值当成本0。代码用inf表达不可接受的成功成本。",
+      "两个独立工具同时开始，等待较慢的3秒，再汇总1秒，总计4秒；若存在依赖则需按DAG重新计算。全部span相加得到6秒是资源工作量口径，非端到端等待。"
+    ]
+  },
+  "pitfalls": [
+    "把TTFT直接当GPU prefill时间，忽略排队和前置工具",
+    "把单请求token速度当整个系统吞吐",
+    "只报告费用或token下降，不报告质量和成功任务分母"
+  ],
+  "checkpoint": "能实际运行公式实验、手算KV显存与成功成本；能从TTFT/TPOT/吞吐三种异常提出不同的可验证优化假设。",
+  "alignment": {
+    "case_title": "把便宜调用、成功成本和KV显存放在同一张账上",
+    "insert_after": "容量、成本和调优顺序",
+    "bridge": "读完容量与成本口径后，把下面实验当作一张教学账本，而不是一套已经部署的推理服务。演示、代码和输出都围绕同一组数：kv_bytes用8层、2个KV头、64维、1024token、batch4和每元素2字节算出16MiB，并用batch8断言理想KV占用翻倍。cost_per_success再把基线100/90与便宜版80/50分别算成约1.11和1.60，说明总花费少了，合格任务反而更贵。\n\n时间戳start=0、first=0.6、last=2.6和101个输出token给出TTFT=0.60秒、TPOT=0.020秒；到达率2乘平均时长5给出平均在途10。程序没有用batch大小来计算吞吐，也没有调用vLLM或真实模型，因此不能把公式输出读成性能测试结果。沿图逐项填账，再对照六行expected；失败分支只故意漏掉成功成本的分母，原断言会在打印之前停止。\n\n这样可以先学会用正确口径解释数字，再回到前文判断批处理、分页和缓存究竟需要测哪些额外指标。",
+    "coverage": "实现纯数值公式、教学时间戳与断言；未加载模型、未实现attention/KV分配、PagedAttention、连续batch、GPU计时、Trace采集、缓存、服务调度、真实成本报价、质量门禁、吞吐压测或容量扩缩。",
+    "question_sections": [
+      "机制一：从用户等待拆到模型生成",
+      "机制二：KV缓存与分页管理",
+      "机制二：KV缓存与分页管理",
+      "已解例：静态batch与连续batch怎样影响吞吐"
+    ],
+    "coverage_summary": "教学账本用于计算KV容量与成功任务成本，不代表真实服务压测。"
+  }
+}

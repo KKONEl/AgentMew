@@ -1,0 +1,444 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>快手 AI Agent/大模型岗位 - 真实面经网络实录 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-029.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">快手/真实面经-网络实录.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E5%BF%AB%E6%89%8B/%E7%9C%9F%E5%AE%9E%E9%9D%A2%E7%BB%8F-%E7%BD%91%E7%BB%9C%E5%AE%9E%E5%BD%95.md">GitHub 固定版本</a> · <a href="../../source/%E5%BF%AB%E6%89%8B/%E7%9C%9F%E5%AE%9E%E9%9D%A2%E7%BB%8F-%E7%BD%91%E7%BB%9C%E5%AE%9E%E5%BD%95.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E9%9D%A2%E7%BB%8F%E4%B8%80%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%AE%97%E6%B3%95%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%A4%BE%E6%8B%9B">面经一：大模型算法工程师（社招）</a><a href="#%E4%B8%80%E9%9D%A260%E5%88%86%E9%92%9F">一面（60分钟）</a><a href="#%E4%BA%8C%E9%9D%A250%E5%88%86%E9%92%9F">二面（50分钟）</a><a href="#%E4%B8%89%E9%9D%A240%E5%88%86%E9%92%9F%E4%B8%BB%E7%AE%A1%E9%9D%A2">三面（40分钟，主管面）</a><a href="#%E9%9D%A2%E7%BB%8F%E4%BA%8Cai-agent%E5%BC%80%E5%8F%91%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%A0%A1%E6%8B%9B">面经二：AI Agent开发工程师（校招）</a><a href="#%E4%B8%80%E9%9D%A270%E5%88%86%E9%92%9F">一面（70分钟）</a><a href="#%E4%BA%8C%E9%9D%A260%E5%88%86%E9%92%9F">二面（60分钟）</a><a href="#%E9%9D%A2%E7%BB%8F%E4%B8%89%E5%A4%A7%E6%A8%A1%E5%9E%8Bllm%E6%96%B9%E5%90%91%E5%AE%9E%E4%B9%A0">面经三：大模型LLM方向（实习）</a><a href="#%E4%B8%80%E9%9D%A250%E5%88%86%E9%92%9F">一面（50分钟）</a><a href="#%E4%BA%8C%E9%9D%A255%E5%88%86%E9%92%9F">二面（55分钟）</a><a href="#%E9%9D%A2%E7%BB%8F%E5%9B%9B%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%A4%BE%E6%8B%9B">面经四：大模型应用开发（社招）</a><a href="#%E4%B8%80%E9%9D%A255%E5%88%86%E9%92%9F">一面（55分钟）</a><a href="#%E4%BA%8C%E9%9D%A245%E5%88%86%E9%92%9F">二面（45分钟）</a><a href="#%E9%9D%A2%E7%BB%8F%E4%BA%94%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%AF%84%E6%B5%8B%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%A0%A1%E6%8B%9B">面经五：大模型评测工程师（校招）</a><a href="#%E4%B8%80%E9%9D%A240%E5%88%86%E9%92%9F">一面（40分钟）</a><a href="#%E9%9D%A2%E7%BB%8F%E5%85%ADai-agent-%E5%BC%80%E5%8F%912026-%E6%96%B0%E5%A2%9E%E5%85%AC%E5%BC%80%E6%9D%A5%E6%BA%90">面经六：AI Agent 开发（2026 新增公开来源）</a><a href="#2026-%E9%AB%98%E9%A2%91%E8%BF%BD%E9%97%AE">2026 高频追问</a><a href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E5%BB%BA%E8%AE%AE">总结与建议</a><a href="#%E5%BF%AB%E6%89%8B%E9%9D%A2%E8%AF%95%E7%89%B9%E7%82%B9">快手面试特点</a><a href="#%E5%87%86%E5%A4%87%E5%BB%BA%E8%AE%AE">准备建议</a></nav></details><article class="prose source-prose"><h1 id="快手-ai-agent大模型岗位-真实面经网络实录">快手 AI Agent/大模型岗位 - 真实面经网络实录</h1>
+<blockquote>
+<p>整理自牛客、脉脉、CSDN等平台的真实面试分享，2024-2025年</p>
+</blockquote>
+<hr>
+<h2 id="面经一大模型算法工程师社招">面经一：大模型算法工程师（社招）</h2>
+<p><strong>面试时间：</strong> 2024年10月<br>
+<strong>岗位：</strong> 大模型算法工程师 - 推荐与LLM结合方向<br>
+<strong>结果：</strong> 已offer  </p>
+<h3 id="一面60分钟">一面（60分钟）</h3>
+<p><strong>Q1：自我介绍，讲讲你做过的大模型相关项目</strong></p>
+<blockquote>
+<p>回答思路：介绍了在上家公司做的RAG系统，从数据处理、向量化、检索、重排到生成的完整链路，重点讲了在检索阶段做的混合检索优化。</p>
+</blockquote>
+<p><strong>Q2：合成数据的优缺点是什么？你们项目里用了合成数据吗？</strong></p>
+<blockquote>
+<p>回答思路：
+- 优点：低成本获取大量标注数据、可控制数据分布、覆盖长尾场景
+- 缺点：可能存在分布偏移、质量不可控、"model collapse"风险
+- 项目中用GPT-4生成了部分QA对作为SFT训练数据，通过人工抽检+自动过滤保证质量</p>
+</blockquote>
+<p><strong>Q3：如何评估LLM的效果？人工评估和自动化评估各有什么指标？</strong></p>
+<blockquote>
+<p>回答思路：
+- 人工评估：相关性、流畅性、有害性、事实准确性，常用Likert量表或对比评测
+- 自动评估：BLEU/ROUGE（生成质量）、Perplexity（模型困惑度）、MTBench/AlpacaEval（综合能力）
+- 离线指标（准确率等）vs 在线指标（点击率、停留时长、用户满意度）
+- 强调了LLM-as-Judge的方法及其局限性</p>
+</blockquote>
+<p><strong>Q4：推荐系统和LLM怎么结合？从召回和精排两个阶段说说</strong></p>
+<blockquote>
+<p>回答思路：
+- 召回阶段：用LLM做query理解和改写、利用LLM的embedding做语义召回、知识增强的协同过滤
+- 精排阶段：LLM做用户兴趣建模、特征交叉的语义增强、LLM生成推荐理由辅助精排打分
+- 提到了快手在短视频推荐中可能的应用场景</p>
+</blockquote>
+<p><strong>Q5：算法题 - 最长回文子串（LeetCode 5）</strong></p>
+<blockquote>
+<p>回答思路：中心扩展法，O(n²)时间复杂度，分奇偶两种情况讨论。面试官追问了Manacher算法的思路。</p>
+</blockquote>
+<h3 id="二面50分钟">二面（50分钟）</h3>
+<p><strong>Q1：讲讲你对RAG系统的理解，你们的RAG系统是怎么做的？</strong></p>
+<blockquote>
+<p>回答思路：详细讲了文档解析→分块→向量化→索引构建→检索→重排→生成的完整流程，重点讲了在分块策略上做的优化（语义分块vs固定长度分块）。</p>
+</blockquote>
+<p><strong>Q2：RAG召回不准怎么优化？</strong></p>
+<blockquote>
+<p>回答思路：
+1. 查询改写/扩展（Query Rewriting）
+2. 混合检索（BM25 + Dense Retrieval）
+3. 多路召回+重排序（Cross-Encoder Reranker）
+4. 知识图谱增强检索
+5. 优化分块策略（递归分块、父文档检索）
+6. 元数据过滤</p>
+</blockquote>
+<p><strong>Q3：SFT的核心流程是什么？数据集怎么构建？</strong></p>
+<blockquote>
+<p>回答思路：
+- 流程：数据准备→格式化（instruction/input/output）→选择基座模型→设置超参→训练→评估
+- 数据构建：人工标注+合成数据+开源数据集，强调数据质量&gt;数据量，多样性很重要
+- 提到了数据去重、去毒、难度分级等数据清洗步骤</p>
+</blockquote>
+<p><strong>Q4：PPO和DPO的区别？各自的优缺点？</strong></p>
+<blockquote>
+<p>回答思路：
+- PPO需要Reward Model + Critic Model，训练流程复杂但效果天花板更高
+- DPO直接从偏好对学习，不需要额外RM，更简单高效
+- DPO通过重参数化技巧把RM目标转化为策略优化
+- 讨论了GRPO（DeepSeek用的）作为两者的折中方案</p>
+</blockquote>
+<p><strong>Q5：快手的短视频场景下，你觉得大模型能怎么用？</strong></p>
+<blockquote>
+<p>回答思路：视频理解（多模态LLM做内容分析）、智能创作助手、个性化推荐增强、智能客服、内容审核辅助等。</p>
+</blockquote>
+<h3 id="三面40分钟主管面">三面（40分钟，主管面）</h3>
+<p><strong>Q1：你为什么想来快手？对快手AI团队有什么了解？</strong></p>
+<blockquote>
+<p>回答思路：讲了对快手在推荐系统和AIGC方面的技术积累的认可，提到了快手的可灵大模型等产品。</p>
+</blockquote>
+<p><strong>Q2：你觉得当前大模型应用落地最大的挑战是什么？</strong></p>
+<blockquote>
+<p>回答思路：成本（推理成本高）、延迟（用户体验）、幻觉（准确性）、安全（内容合规）、评估（缺乏标准化评估体系）。</p>
+</blockquote>
+<p><strong>Q3：你对未来3年的职业规划是什么？</strong></p>
+<blockquote>
+<p>回答思路：短期深耕大模型应用开发，中期拓展到多模态和Agent系统设计，长期希望能带领团队。</p>
+</blockquote>
+<p><strong>面试体验：</strong>
+整体体验很好，面试官都很专业，会顺着你的回答深挖。二面比一面更注重项目细节和系统设计能力。建议重点准备RAG和推荐系统结合LLM的方案。</p>
+<hr>
+<h2 id="面经二ai-agent开发工程师校招">面经二：AI Agent开发工程师（校招）</h2>
+<p><strong>面试时间：</strong> 2025年1月<br>
+<strong>岗位：</strong> AI Agent开发工程师<br>
+<strong>结果：</strong> 二面挂  </p>
+<h3 id="一面70分钟">一面（70分钟）</h3>
+<p><strong>Q1：全程围绕AI Agent展开。先说说你理解的AI Agent是什么？</strong></p>
+<blockquote>
+<p>回答思路：具备感知、规划、决策、执行和记忆能力的自主AI系统。区别于传统chatbot的核心在于自主性和工具使用能力。列举了ReAct、Plan-and-Execute、Multi-Agent等常见范式。</p>
+</blockquote>
+<p><strong>Q2：你的项目中长期记忆是怎么实现的？</strong></p>
+<blockquote>
+<p>回答思路：
+- 使用向量数据库（Milvus）存储历史对话的embedding
+- 实体记忆：从对话中抽取实体关系存入知识图谱
+- 摘要记忆：定期对历史对话做摘要压缩
+- 检索时结合时间衰减因子和相关性得分</p>
+</blockquote>
+<p><strong>Q3：Agent在多轮对话中，Attention机制有什么局限性？</strong></p>
+<blockquote>
+<p>回答思路：
+- 上下文窗口有限，长对话会超出限制
+- 注意力分散，关键信息可能被淹没
+- 位置偏差（lost-in-the-middle问题）
+- 解决方案：滑动窗口、摘要压缩、重要信息前置</p>
+</blockquote>
+<p><strong>Q4：Modular Agent中的多步规划与调度策略怎么设计？</strong></p>
+<blockquote>
+<p>回答思路：
+- 规划：将复杂任务分解为子任务DAG图
+- 调度：拓扑排序确定执行顺序，可并行的步骤并发执行
+- 动态调整：执行过程中根据中间结果re-plan
+- 错误恢复：重试、回退、人工介入三级策略</p>
+</blockquote>
+<p><strong>Q5：Agent评估体系怎么设计？如何量化Planning能力和Hallucination Rate？</strong></p>
+<blockquote>
+<p>回答思路：
+- Planning评估：任务完成率、步骤效率（vs最优路径）、工具选择准确率
+- Hallucination Rate：事实核查（对比知识库）、自洽性检查、人工抽样评估
+- 整体评估：端到端任务成功率、用户满意度、响应延迟、token消耗成本</p>
+</blockquote>
+<p><strong>Q6：RoPE位置编码的原理？它解决了什么问题？</strong></p>
+<blockquote>
+<p>回答思路：
+- 旋转位置编码，通过在复数空间对Q/K做旋转来编码相对位置信息
+- 相比绝对位置编码，RoPE能更好地捕捉相对位置关系
+- 具有外推性，理论上支持任意长度序列
+- 详细推导了旋转矩阵的构造</p>
+</blockquote>
+<p><strong>Q7：算法题 - 二叉树的最近公共祖先（LeetCode 236）</strong></p>
+<blockquote>
+<p>回答思路：递归解法，O(n)时间复杂度。面试官追问了如果是BST的情况怎么优化。</p>
+</blockquote>
+<h3 id="二面60分钟">二面（60分钟）</h3>
+<p><strong>Q1：详细讲讲你的Agent项目架构</strong></p>
+<blockquote>
+<p>回答思路：画了完整的架构图，从用户输入→意图识别→任务规划→工具调用→结果整合→输出的完整流程。讲了使用LangGraph做工作流编排的细节。</p>
+</blockquote>
+<p><strong>Q2：Qwen模型微调的经验？训练阶段是怎么设计的？Loss Function怎么确定？</strong></p>
+<blockquote>
+<p>回答思路：
+- 用Qwen-7B做基座，用LoRA微调
+- 两阶段训练：先SFT做指令跟随，再用DPO做偏好对齐
+- SFT用标准的next-token-prediction交叉熵损失
+- DPO用Bradley-Terry模型的偏好损失
+- 讲了一些训练trick：学习率warmup、梯度累积、混合精度</p>
+</blockquote>
+<p><strong>Q3：Prompt优化策略有哪些？如何压缩Prompt？</strong></p>
+<blockquote>
+<p>回答思路：
+- 结构化Prompt（角色/任务/约束/示例）
+- Few-shot选择优化（相似度检索最相关的示例）
+- Prompt压缩：LLMLingua、删除冗余token、用摘要替代原文
+- Embedding层面的Prompt Tuning（P-Tuning v2）</p>
+</blockquote>
+<p><strong>Q4：系统延迟优化怎么做？</strong></p>
+<blockquote>
+<p>回答思路：
+- 模型层面：量化（INT8/INT4）、KV Cache优化、投机解码
+- 系统层面：异步处理、流式输出、并行工具调用
+- 架构层面：语义缓存、路由到不同大小模型、预计算</p>
+</blockquote>
+<p><strong>Q5：设计一个短视频平台的智能客服Agent</strong></p>
+<blockquote>
+<p>回答思路：设计了多Agent协作架构，包括意图识别Agent、知识检索Agent、工单处理Agent、情感分析Agent，用Router Agent做分发。讲了如何处理复杂查询和多轮对话。</p>
+</blockquote>
+<p><strong>面试体验：</strong>
+面试非常硬核，全程围绕Agent深挖。一面偏理论，二面偏工程实践和系统设计。挂在二面，反馈是系统设计经验不够。建议多准备Agent的完整项目经验，不只是用过框架，要能从0到1设计系统。</p>
+<hr>
+<h2 id="面经三大模型llm方向实习">面经三：大模型LLM方向（实习）</h2>
+<p><strong>面试时间：</strong> 2025年3月<br>
+<strong>岗位：</strong> 大模型算法实习生<br>
+<strong>结果：</strong> 进入终面  </p>
+<h3 id="一面50分钟">一面（50分钟）</h3>
+<p><strong>Q1：介绍一下你对Attention机制的理解，QKV变换的作用是什么？</strong></p>
+<blockquote>
+<p>回答思路：
+- Q(Query)代表查询、K(Key)代表键、V(Value)代表值
+- QKV通过线性变换将输入投影到不同子空间
+- Q·K^T计算相似度，Softmax归一化后加权V
+- Scaling（除以√d_k）防止点积过大导致梯度消失</p>
+</blockquote>
+<p><strong>Q2：Multi-Head Attention有什么问题？有什么改进方案？</strong></p>
+<blockquote>
+<p>回答思路：
+- 问题：计算量大（头数×注意力计算）、KV Cache显存占用大
+- MQA（Multi-Query Attention）：所有头共享K/V
+- GQA（Grouped-Query Attention）：分组共享K/V，MHA和MQA的折中
+- MLA（Multi-head Latent Attention）：DeepSeek V2提出的低秩压缩方案</p>
+</blockquote>
+<p><strong>Q3：长文本处理有什么策略？</strong></p>
+<blockquote>
+<p>回答思路：
+- 位置编码外推（YaRN、NTK-aware）
+- 滑动窗口注意力
+- 分块处理+摘要
+- RAG方式：检索相关片段而非全文输入
+- 层次化注意力（Longformer/BigBird的稀疏注意力）</p>
+</blockquote>
+<p><strong>Q4：记忆系统中的意图识别怎么做？</strong></p>
+<blockquote>
+<p>回答思路：
+- 分类器做意图分类（预定义意图集）
+- LLM做开放域意图理解（few-shot prompting）
+- 结合上下文的多轮意图跟踪
+- 意图消歧：当识别到多个可能意图时让用户确认</p>
+</blockquote>
+<p><strong>Q5：Embedding维度怎么选择？Qwen-4B的Embedding是怎么实现的？</strong></p>
+<blockquote>
+<p>回答思路：
+- 维度选择取决于任务复杂度、模型大小、计算资源
+- 一般768/1024/2048/4096
+- Qwen-4B使用Tied Embedding（输入输出共享）
+- 讨论了维度和性能的trade-off</p>
+</blockquote>
+<p><strong>Q6：算法题 - 合并K个有序链表（LeetCode 23）</strong></p>
+<blockquote>
+<p>回答思路：用最小堆，O(NlogK)时间复杂度。面试官追问了分治法的解法。</p>
+</blockquote>
+<h3 id="二面55分钟">二面（55分钟）</h3>
+<p><strong>Q1：Qwen-34B做Rerank是怎么做的？</strong></p>
+<blockquote>
+<p>回答思路：
+- 把query和document拼接作为输入，让模型输出相关性得分
+- Cross-Encoder方式，比Bi-Encoder更准确但更慢
+- 用LoRA微调Qwen-34B作为Reranker
+- 训练数据：正负样本对，用交叉熵或margin loss</p>
+</blockquote>
+<p><strong>Q2：SFT后的Post-Training技术有哪些？</strong></p>
+<blockquote>
+<p>回答思路：
+- RLHF/DPO/GRPO做偏好对齐
+- Self-Play（让模型自我博弈提升）
+- Rejection Sampling
+- Constitutional AI
+- 知识蒸馏（大模型→小模型）</p>
+</blockquote>
+<p><strong>Q3：项目深挖 - 你的RAG系统中，检索和生成的评估分别怎么做？</strong></p>
+<blockquote>
+<p>回答思路：
+- 检索评估：Recall@K、MRR、NDCG
+- 生成评估：Faithfulness（答案是否忠于检索内容）、Relevance（是否回答了问题）
+- 端到端评估：用RAGAS框架，覆盖Context Precision/Recall、Answer Relevance、Faithfulness
+- 人工评估：定期抽样评测</p>
+</blockquote>
+<p><strong>Q4：MoE模型的原理？专家负载均衡怎么做？</strong></p>
+<blockquote>
+<p>回答思路：
+- 多个Expert FFN + Router网络
+- 每次只激活top-k个Expert（如2/8）
+- 负载均衡loss：辅助损失函数惩罚不均匀分配
+- Expert坍缩问题：部分专家从不被选中</p>
+</blockquote>
+<p><strong>Q5：算法题 - LRU Cache（LeetCode 146）</strong></p>
+<blockquote>
+<p>回答思路：HashMap + 双向链表，O(1)的get/put操作。</p>
+</blockquote>
+<p><strong>面试体验：</strong>
+快手LLM方向面试涵盖面很广，从底层Attention到上层应用都会考。面试官人很好，会引导你思考。建议熟悉至少一个开源大模型的架构细节（Qwen/LLaMA/DeepSeek），能说出具体的实现细节会加分很多。</p>
+<hr>
+<h2 id="面经四大模型应用开发社招">面经四：大模型应用开发（社招）</h2>
+<p><strong>面试时间：</strong> 2024年12月<br>
+<strong>岗位：</strong> AI应用开发工程师<br>
+<strong>结果：</strong> 已offer  </p>
+<h3 id="一面55分钟">一面（55分钟）</h3>
+<p><strong>Q1：RAG系统的评估你怎么做？评测维度和指标有哪些？</strong></p>
+<blockquote>
+<p>回答思路：
+- 维度：检索质量、生成质量、端到端效果
+- 检索指标：Hit Rate、MRR、Recall@K
+- 生成指标：BLEU、ROUGE、BERTScore、人工评分
+- 端到端：任务完成率、用户满意度
+- 用RAGAS和LlamaIndex的评估模块做自动化评测</p>
+</blockquote>
+<p><strong>Q2：幻觉问题怎么解决？</strong></p>
+<blockquote>
+<p>回答思路：
+- 检索增强（RAG引入外部知识做事实基座）
+- 思维链推理（CoT让模型展示推理过程）
+- 自我一致性（多次采样取多数一致的答案）
+- 输出校验Agent（生成后做事实核查）
+- 微调高质量数据、降低temperature</p>
+</blockquote>
+<p><strong>Q3：你有微调经验吗？用的什么框架？</strong></p>
+<blockquote>
+<p>回答思路：
+- 用LLaMA Factory做LoRA微调
+- 数据准备：Alpaca格式，大约5000条高质量QA
+- 训练配置：rank=16, alpha=32, 3个epoch
+- 评估：在holdout测试集上用GPT-4做评判
+- 讲了遇到的问题：学习率过大导致loss震荡，解决方案是cosine scheduler</p>
+</blockquote>
+<p><strong>Q4：大模型部署你了解多少？</strong></p>
+<blockquote>
+<p>回答思路：
+- vLLM做推理引擎，支持Continuous Batching和PagedAttention
+- 量化：GPTQ/AWQ做INT4量化减少显存
+- 服务化：FastAPI + 流式输出（SSE）
+- 监控：Prometheus + Grafana看QPS、延迟、GPU利用率</p>
+</blockquote>
+<p><strong>Q5：算法题 - 岛屿数量（LeetCode 200）</strong></p>
+<blockquote>
+<p>回答思路：BFS/DFS遍历，标记已访问。选了DFS实现。</p>
+</blockquote>
+<h3 id="二面45分钟">二面（45分钟）</h3>
+<p><strong>Q1：你觉得大模型应用开发中最难的部分是什么？</strong></p>
+<blockquote>
+<p>回答思路：不是技术本身，而是如何在成本、延迟、效果之间取得平衡。举了具体项目中的例子：用小模型做简单query路由，复杂query才走大模型。</p>
+</blockquote>
+<p><strong>Q2：如何设计一个快手电商场景的AI客服系统？</strong></p>
+<blockquote>
+<p>回答思路：
+- 意图识别→知识检索→回答生成→安全审核
+- 多轮对话管理：状态机+LLM结合
+- 知识库：商品信息、售后政策、常见问题
+- 转人工策略：情感检测到愤怒/复杂问题自动升级
+- SLA保证：p99延迟&lt;2s，准确率&gt;95%</p>
+</blockquote>
+<p><strong>Q3：技术方案选型 - 你怎么决定用RAG还是微调？</strong></p>
+<blockquote>
+<p>回答思路：
+- RAG：知识频繁更新、需要可溯源、数据量有限
+- 微调：需要特定风格/格式、推理时不想额外检索开销、任务相对固定
+- 混合方案：先微调提升基础能力，再用RAG补充实时知识</p>
+</blockquote>
+<p><strong>面试体验：</strong>
+快手应用开发岗位不会考太深的模型底层原理，更看重工程能力和系统设计。如果你有完整的RAG或Agent项目经验，一定要能讲清楚数据怎么来的、评测怎么做的、线上效果如何。快手面试效率很高，基本一周内出结果。</p>
+<hr>
+<h2 id="面经五大模型评测工程师校招">面经五：大模型评测工程师（校招）</h2>
+<p><strong>面试时间：</strong> 2024年9月<br>
+<strong>岗位：</strong> 大模型评测<br>
+<strong>结果：</strong> 一面挂  </p>
+<h3 id="一面40分钟">一面（40分钟）</h3>
+<p><strong>Q1：如何设计一套LLM评测指标体系？</strong></p>
+<blockquote>
+<p>回答思路：这道题比较开放，没给具体场景。我从通用能力评测和领域能力评测两个维度展开：
+- 通用：语言理解、生成质量、推理能力、知识覆盖度
+- 领域：任务完成率、专业知识准确率
+- 安全性：毒性、偏见、隐私泄露检测
+- 效率：延迟、吞吐、成本
+面试官追问了具体怎么量化"推理能力"，我回答用GSM8K、MATH等benchmark。</p>
+</blockquote>
+<p><strong>Q2：自动评估和人工评估各有什么优缺点？</strong></p>
+<blockquote>
+<p>回答思路：
+- 自动评估：可复现、低成本、大规模，但可能与人类偏好不一致
+- 人工评估：更贴近真实需求，但成本高、主观性强、难以大规模
+- 折中方案：LLM-as-Judge（用GPT-4做评判）+人工抽检</p>
+</blockquote>
+<p><strong>Q3：BPE分词原理</strong></p>
+<blockquote>
+<p>回答思路：贪心地合并高频字符对，直到达到目标词表大小。和WordPiece的区别在于合并策略（频率 vs 似然）。</p>
+</blockquote>
+<p><strong>Q4：算法题 - 有效括号（LeetCode 20）</strong></p>
+<blockquote>
+<p>回答思路：栈匹配，O(n)。</p>
+</blockquote>
+<p><strong>面试体验：</strong>
+评测岗面试偏宏观设计能力，面试官期望你能独立设计评测方案而不是等他给场景。我的回答太套路化了，没有展现独立思考。建议准备这类岗位时，多想想"如果你是负责人，怎么从0建评测体系"。</p>
+<hr>
+<h2 id="面经六ai-agent-开发2026-新增公开来源">面经六：AI Agent 开发（2026 新增公开来源）</h2>
+<blockquote>
+<p>来源：小红书公开页面；以下为摘要索引，完整内容请查看来源链接。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>标题</th>
+<th>核心考点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>小红书</td>
+<td>快手AI Agent开发一面（小红书站内搜索原标题）</td>
+<td>父子索引、BM25、Rerank、Memory、Function Calling、Prompt 注入防御、RAG 评测</td>
+</tr>
+<tr>
+<td>小红书</td>
+<td>快手AI Agent开发实习生面经2026.6.12（小红书站内搜索原标题）</td>
+<td>Agent 基础、ReAct、多模型 API、单/多 Agent、RAG 优化、算法题</td>
+</tr>
+<tr>
+<td>小红书</td>
+<td>快手 AI Agent研发实习 日常实习 一面（小红书站内搜索原标题）</td>
+<td>Agent 研发实习一面、项目和 RAG 追问</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/926274020192841728" rel="noreferrer">快手 AI 全栈开发二面凉经（Agent 应用方向，2026-09）</a></td>
+<td>Agent 项目深挖、Skill、Tool Use、全栈工程和端到端交付</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/925163549431742464" rel="noreferrer">快手 AI 应用开发 / Agent 开发一面（2026-09）</a></td>
+<td>AI Coding 质量、工具结果缓存、长期偏好、敏感信息保护、并发基础</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/904419777614049280" rel="noreferrer">快手 Data Agent 开发一面（2026-06）</a></td>
+<td>LLM 与 Agent 边界、ReAct、Agent 框架模块设计、项目深挖</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2026-高频追问">2026 高频追问</h3>
+<ol>
+<li>为什么引入父子索引和 BM25？如何与 dense retrieval 融合？</li>
+<li>Rerank TopK 如何截断？截断策略如何影响延迟和准确率？</li>
+<li>工具调用如何做安全控制，如何防 Prompt 注入？</li>
+<li>如何统一 OpenAI / Anthropic / Gemini 等多模型 API？</li>
+<li>为什么不用 Milvus 或 Elasticsearch？向量库选型如何解释？</li>
+<li>Skill 开发和完整 Agent 工程的边界是什么？只写 Prompt 为什么不等于完成了 Agent？</li>
+<li>如何证明 Agent 项目真正上线：任务成功率、首次成功率、延迟、成本和人工接管率分别是多少？</li>
+<li>Tool 返回结果是否应该缓存？如何设计缓存键、TTL、权限隔离和数据更新策略？</li>
+<li>长期用户偏好应保存在 Prompt、Memory、关系数据库还是向量库？敏感字段如何脱敏和删除？</li>
+</ol>
+<hr>
+<h2 id="总结与建议">总结与建议</h2>
+<h3 id="快手面试特点">快手面试特点</h3>
+<ol>
+<li><strong>非常重视项目经验</strong>：会深挖项目细节，不只是用了什么框架，而是为什么这么做</li>
+<li><strong>Agent方向是重点</strong>：2025年Agent开发是快手招聘热点</li>
+<li><strong>实践&gt;八股</strong>：面试官更看重你是否真的动手做过微调、部署</li>
+<li><strong>场景设计题常见</strong>：会结合快手业务出开放性设计题</li>
+<li><strong>算法题中等难度</strong>：LeetCode Easy~Medium为主</li>
+</ol>
+<h3 id="准备建议">准备建议</h3>
+<ol>
+<li>至少有一个完整的RAG或Agent项目，能讲清楚每个环节</li>
+<li>了解快手的业务场景（短视频、直播、电商），想想大模型能怎么结合</li>
+<li>重点准备RAG评估、微调实践、Agent设计等热门方向</li>
+<li>算法题不用刷太难的，Medium级别刷够100题就够了</li>
+<li>关注最新的开源大模型（Qwen、DeepSeek）的架构和使用经验</li>
+</ol></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

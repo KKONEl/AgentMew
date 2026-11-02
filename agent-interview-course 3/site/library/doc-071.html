@@ -1,0 +1,152 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>Agent 高频题证据模型：从“题库”升级为可追溯信号 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-071.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/Agent高频题证据模型.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/26-interview-preparation.html">26 面试准备：证据、STAR、压力追问与阶段模拟</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/Agent%E9%AB%98%E9%A2%91%E9%A2%98%E8%AF%81%E6%8D%AE%E6%A8%A1%E5%9E%8B.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/Agent%E9%AB%98%E9%A2%91%E9%A2%98%E8%AF%81%E6%8D%AE%E6%A8%A1%E5%9E%8B.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E5%8F%AA%E7%BB%B4%E6%8A%A4%E9%A2%98%E7%9B%AE%E5%88%97%E8%A1%A8">一、为什么不能只维护题目列表</a><a href="#%E4%BA%8C%E5%AD%97%E6%AE%B5%E8%AF%B4%E6%98%8E">二、字段说明</a><a href="#%E4%B8%89%E5%BD%93%E5%89%8D%E9%AB%98%E9%A2%91%E4%BF%A1%E5%8F%B7">三、当前高频信号</a><a href="#%E5%9B%9B%E6%9D%A5%E6%BA%90%E5%8E%BB%E9%87%8D%E8%A7%84%E5%88%99">四、来源去重规则</a><a href="#41-%E5%90%8C%E4%B8%80%E4%BA%8B%E4%BB%B6">4.1 同一事件</a><a href="#42-%E6%B1%87%E6%80%BB%E6%96%87%E7%AB%A0">4.2 汇总文章</a><a href="#%E4%BA%94%E6%8E%92%E5%BA%8F%E5%BB%BA%E8%AE%AE">五、排序建议</a><a href="#%E5%85%AD%E9%A1%B5%E9%9D%A2%E5%BA%94%E8%AF%A5%E6%94%AF%E6%8C%81%E7%9A%84%E7%AD%9B%E9%80%89">六、页面应该支持的筛选</a><a href="#%E4%B8%83%E7%BB%B4%E6%8A%A4%E6%B5%81%E7%A8%8B">七、维护流程</a><a href="#%E5%85%AB%E8%BE%B9%E7%95%8C">八、边界</a></nav></details><article class="prose source-prose"><h1 id="agent-高频题证据模型从题库升级为可追溯信号">Agent 高频题证据模型：从“题库”升级为可追溯信号</h1>
+<blockquote>
+<p>更新时间：2026-09-11。结构化数据位于 <a href="../../source/data/question_signals.json"><code>data/question_signals.json</code></a>。</p>
+</blockquote>
+<h2 id="一为什么不能只维护题目列表">一、为什么不能只维护题目列表</h2>
+<p>一道题是否值得优先复习，不能只看它是否出现过。至少要同时回答：在哪些公司出现、处于哪轮、由多少独立来源支持、最近何时出现、来源是一手复盘还是汇总文章。</p>
+<p>因此，本项目把“题目”与“证据”分开：</p>
+<pre><code class="language-text">Question Signal
+  ├─ source_ids → data/interviews.json
+  ├─ companies / rounds
+  ├─ source_count / last_seen_at
+  ├─ source_types / confidence
+  ├─ answer_outline
+  └─ evaluation_points
+</code></pre>
+<h2 id="二字段说明">二、字段说明</h2>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+<th>使用原则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>companies</code></td>
+<td>出现过该问题的公司</td>
+<td>不能由一家公司外推整个行业</td>
+</tr>
+<tr>
+<td><code>rounds</code></td>
+<td>一面、二面、算法面、系统设计等</td>
+<td>汇总帖无法确认时不强行填写</td>
+</tr>
+<tr>
+<td><code>source_ids</code></td>
+<td>支撑该题的来源记录</td>
+<td>必须指向 <code>data/interviews.json</code> 中真实存在的 ID</td>
+</tr>
+<tr>
+<td><code>source_count</code></td>
+<td>去重后的来源数量</td>
+<td>转载不能重复计数</td>
+</tr>
+<tr>
+<td><code>last_seen_at</code></td>
+<td>最近一次公开出现日期</td>
+<td>面试日期优先于发帖日期</td>
+</tr>
+<tr>
+<td><code>source_types</code></td>
+<td>一手、汇总或参考资料</td>
+<td><code>reference</code> 不计为真实面试</td>
+</tr>
+<tr>
+<td><code>confidence</code></td>
+<td>high / medium / low</td>
+<td>由来源完整度决定，不由答案质量决定</td>
+</tr>
+<tr>
+<td><code>answer_outline</code></td>
+<td>回答骨架</td>
+<td>不把唯一实现包装成标准答案</td>
+</tr>
+<tr>
+<td><code>evaluation_points</code></td>
+<td>面试官可能关注的判断点</td>
+<td>用于自测和评分 Rubric</td>
+</tr>
+</tbody>
+</table>
+<h2 id="三当前高频信号">三、当前高频信号</h2>
+<p>当前数据中优先级较高的主题包括：</p>
+<ol>
+<li>Agent 离线评测、线上指标与失败样本回流；</li>
+<li>Context、Session、Working State 与 Memory 分层；</li>
+<li>Tool、Function Calling、MCP 与 Skill 的边界；</li>
+<li>Agent、Orchestrator、Harness 与 Runtime 的边界；</li>
+<li>RAG 失败分层诊断；</li>
+<li>为什么需要 Multi-Agent；</li>
+<li>工具超时后的幂等重试；</li>
+<li>AI Coding 代码质量验证；</li>
+<li>Agent 链路的延迟和成本优化；</li>
+<li>多步工具轨迹的 Reward 与信用分配。</li>
+</ol>
+<h2 id="四来源去重规则">四、来源去重规则</h2>
+<h3 id="41-同一事件">4.1 同一事件</h3>
+<p>满足以下大部分条件时，应放入同一个 <code>duplicate_group_id</code>：</p>
+<ul>
+<li>公司和业务线一致；</li>
+<li>面试日期一致；</li>
+<li>面试轮次一致；</li>
+<li>题目顺序高度相似；</li>
+<li>项目背景和结果一致。</li>
+</ul>
+<h3 id="42-汇总文章">4.2 汇总文章</h3>
+<p>汇总文章可以提升“趋势置信度”，但不能把文章中的每道题都当作独立一手样本。正确关系是：</p>
+<pre><code class="language-text">Aggregation Source
+  ├─ Original Interview A
+  ├─ Original Interview B
+  └─ Unresolved Claim C
+</code></pre>
+<p>找不到原帖的条目保留为 <code>aggregation</code>，置信度不得自动升级为 <code>high</code>。</p>
+<h2 id="五排序建议">五、排序建议</h2>
+<p>推荐分数不是简单累计：</p>
+<pre><code class="language-text">priority =
+  0.30 × recency
++ 0.25 × independent_source_count
++ 0.20 × company_coverage
++ 0.15 × source_quality
++ 0.10 × role_relevance
+</code></pre>
+<p>需要额外施加：</p>
+<ul>
+<li>重复来源惩罚；</li>
+<li>营销内容惩罚；</li>
+<li>无日期内容惩罚；</li>
+<li>已过时框架 API 惩罚；</li>
+<li>与目标岗位无关的题目降权。</li>
+</ul>
+<h2 id="六页面应该支持的筛选">六、页面应该支持的筛选</h2>
+<ul>
+<li>最近 30 / 90 / 180 天；</li>
+<li>公司；</li>
+<li>岗位类型；</li>
+<li>一面 / 二面 / 系统设计 / 算法面；</li>
+<li>一手来源；</li>
+<li>来源数量；</li>
+<li>置信度；</li>
+<li>技术主题。</li>
+</ul>
+<h2 id="七维护流程">七、维护流程</h2>
+<ol>
+<li>新来源进入 <code>data/interviews.json</code>；</li>
+<li>判断是否为同一场面试的转载；</li>
+<li>抽取问题信号，不复制原文；</li>
+<li>关联已有 Question Signal；</li>
+<li>更新来源数、公司、轮次和最近日期；</li>
+<li>人工确认置信度；</li>
+<li>运行 <code>python3 scripts/validate_data.py</code>；</li>
+<li>构建站点并检查筛选结果。</li>
+</ol>
+<h2 id="八边界">八、边界</h2>
+<p>频次只能说明“公开样本中出现较多”，不能证明：</p>
+<ul>
+<li>公司统一使用这套题；</li>
+<li>某题一定会再次出现；</li>
+<li>没有公开记录的题不重要；</li>
+<li>汇总文章中的每条记录都真实独立。</li>
+</ul>
+<p>面试准备应使用频次确定顺序，再结合目标岗位 JD、个人项目和基础能力调整。</p></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

@@ -1,0 +1,245 @@
+{
+  "id": "16",
+  "slug": "16-multi-agent",
+  "title": "多 Agent 协作、交接与隔离",
+  "stage": "05 生产与可靠性",
+  "prerequisites": [
+    "15",
+    "单 Agent 工具循环与任务验收"
+  ],
+  "minutes": 60,
+  "goals": [
+    "依据可验证交付物而非角色名拆分任务",
+    "设计Supervisor、handoff、共享写入与终止契约",
+    "在相同预算下判断多Agent是否胜过单Agent"
+  ],
+  "sources": [
+    "通用知识/2026-10-多Agent协作面试题与参考答案.md",
+    "项目实战/02-多Agent协作系统.md"
+  ],
+  "body": "## 问题：三个“专家”为什么比一个 Agent 更容易失败\n假设要为一次产品变更写上线报告。研究员收集资料，分析员评估风险，审校员生成结论。若三者收到相同的全部聊天、拥有同样的工具、都能编辑最终报告，结果可能是重复检索、覆盖文件、彼此相信未经验证的结论。角色提示词增加了，交付责任却更模糊。多 Agent 的收益应来自独立上下文、不同权限、可并行推理或独立验证，而不是把每个函数换成一个“专家”。\n\n先设单 Agent 基线：一个 Agent 调用检索函数，按固定 schema 输出证据，再由确定性程序检查引用。只有这条路径在上下文负担、并行探索或权限隔离上出现可测瓶颈，才讨论拆分。格式转换、排序、校验字段通常直接用函数；把这些动作交给模型会引入随机性和额外延迟。\n\n## 机制：调度、交接和群聊是不同控制关系\nSupervisor 模式由中心调度子任务，子 Agent 返回结构化结果，中心负责验收与下一步。它适合输入输出边界清晰、需要统一约束的流程；代价是调度与汇总调用成为关键路径，中心也可能失败。中心应检查证据、预算和冲突，而非把每个子任务全部再做一遍。可以让低风险子任务局部验收，高风险结果集中复核。\n\nHandoff 是把某段任务控制权交给另一个 Agent，例如通用客服将退款问题交给受限的退款专员。需要明确谁当前拥有任务、用户应该等待谁、交接失败如何回滚，不能只把全部聊天转发后让双方都继续写。群聊或去中心讨论适合探索，但必须有主持、轮数上限和验收规则，否则“再讨论一下”会消耗无限预算。拓扑名称不能替代执行协议。\n\n每个子任务契约应定义 task_id、目标、输入版本、禁止事项、允许工具、输出 schema、证据引用、截止时间、成本预算和失败码。结果还要区分成功、部分成功、需要补充资料和失败。若只返回“已完成”，父 Agent 无法知道实际得到什么；若原文引用没有来源和版本，汇总后也无法复核。\n\n## 已解例：两个资料分支如何安全汇总\n把上线报告的输入验收拆成容量与权限两个结果，来源都要求发布候选v3。下方实验用research()返回Result(\"capacity\", 3, (\"load-test-v3\",), \"capacity_ok\")，用review()返回Result(\"permission\", 3, (\"acl-test-v3\",), \"permission_ok\")。Result的四个字段就是任务身份、来源版本、证据引用和结论；这比只返回“完成了”更容易做机械检查。两个函数按顺序执行，并没有真正并行调用模型。\n\nSupervisor从budget=2开始，每调一个工作者先扣一次预算。validate只检查来源版本等于3、证据元组非空，通过后才按task_id放入results。两项结束时results有capacity和permission，预算为0；代码再构造来源v2的stale结果，断言它不被接受，并用预算判断禁止新增一轮。注意，非空证据不是证据真实性验证，capacity_ok也不是一次真实负载测试通过。若要处理相反结论，还需检查引用内容、定义和来源，不能把此处字段检查或多数投票当作语义仲裁。\n\n## 故障：超时、重复结果与共享文件\n子任务失联后，先区分只读推理与外部写入。只读任务在剩余预算内可重试；创建工单等副作用若结果未知，需沿上一课的幂等键对账。父 Agent 接管前先撤销旧写权限或提升所有权世代，不能父子同时执行同一写操作。结果按task_id和attempt/epoch去重，过期结果保留审计但不进入最终汇总。\n\n共享文件最简单的策略是划分所有权或独立工作区，汇总时三方合并。不同文件也可能破坏同一接口，因此没有文本冲突不等于集成正确；需要契约检查和集成验证。共享数据库采用事务、版本条件更新或单一写入者。角色提示中的“请勿修改别人文件”是协作提醒，不是运行时隔离；真正的隔离依靠目录权限、凭据作用域、进程/沙箱和工具网关。\n\n终止条件应是确定性程序能判的规则：所有必需产物通过验收、关键安全失败、预算耗尽、达到截止时间、用户取消，或连续无进展达到阈值。取消向子任务传播，收集已完成部分并清理资源，同时对尚在执行的外部副作用做确认。不能让模型一句“我觉得够了”成为唯一终止条件，也不能把超时子任务悄悄丢掉后宣称全部完成。\n\n## 如何证明协作值得成本\n固定任务、模型能力、工具、数据和总时间/token预算，给单 Agent合理调优，再比较最终业务验收率、首轮成功率、成本/成功任务、尾延迟和违规次数。多次运行并按任务复杂度分桶。把调度、消息压缩、重复检索和汇总费用全部计入；多 Agent多花三倍token得到高分，只能说明预算与架构的混合收益。做去角色、去通信、改串行等消融才能定位收益来自哪里。\n\n面试回答可以从“这个子任务能否独立验收”开始，说明为什么需要独立上下文和权限，然后展示输入输出契约、超时接管和终止规则，最后给单Agent对照结果。本课实验没有接入模型，而是用函数扮演工作者，故意验证版本不符和预算终止。它教的是协作运行时，而非用角色数量模拟智能水平。工程上先把确定性边界做好，模型才有稳定的协作环境。",
+  "diagram": {
+    "nodes": [
+      "定义Result与v3验收规则",
+      "预算2开始调用research",
+      "验收并保存capacity",
+      "调用review后预算归零",
+      "验证v2旧结果被拒绝",
+      "停止调度并打印结果"
+    ],
+    "caption": "演示只展示本实验顺序Supervisor；版本合格不等于证据内容已经人工复核。",
+    "walkthrough": {
+      "scenario": "沿《一个有预算和结果验收的Supervisor》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "原实验逐步执行",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "建立结果契约与验收函数",
+              "input": "Result四字段；来源要求v3",
+              "action": "定义research/review及validate。",
+              "output": "capacity与permission各有固定v3证据",
+              "state": "尚未调用；预算尚未初始化",
+              "failure": false,
+              "section": "机制：调度、交接和群聊是不同控制关系",
+              "why": "先约定结果字段，Supervisor才有可检查输入；validate只核版本和非空证据。",
+              "code_lines": [
+                3,
+                16
+              ]
+            },
+            {
+              "node": 1,
+              "title": "初始化两次调度预算",
+              "input": "budget=2；results={}",
+              "action": "进入for循环，先断言预算大于0，再扣减并调用research。",
+              "output": "Result(capacity,3,(load-test-v3,),capacity_ok)",
+              "state": "budget=1；results仍空",
+              "failure": false,
+              "section": "已解例：两个资料分支如何安全汇总",
+              "why": "预算由外层统一控制，工作者不能靠请求再讨论自行扩张调用次数。",
+              "code_lines": [
+                18,
+                23
+              ]
+            },
+            {
+              "node": 2,
+              "title": "接纳容量结果",
+              "input": "capacity来源版本3、证据非空",
+              "action": "validate通过，按task_id执行setdefault。",
+              "output": "results含capacity",
+              "state": "budget=1；accepted=1",
+              "failure": false,
+              "section": "已解例：两个资料分支如何安全汇总",
+              "why": "先验证再入表；setdefault表达同一任务ID不重复增加完成项。",
+              "code_lines": [
+                24,
+                25
+              ]
+            },
+            {
+              "node": 3,
+              "title": "接纳权限结果并验数量",
+              "input": "第二轮review返回permission/v3/acl-test-v3",
+              "action": "循环再次扣预算、验证并写入，随后断言两项结果与零预算。",
+              "output": "results含capacity和permission",
+              "state": "budget=0；len(results)=2",
+              "failure": false,
+              "section": "已解例：两个资料分支如何安全汇总",
+              "why": "每轮消耗一次预算，与实际调用次数一致；没有额外的汇总模型调用。",
+              "code_lines": [
+                20,
+                26
+              ]
+            },
+            {
+              "node": 4,
+              "title": "拒绝v2旧结果",
+              "input": "stale=Result(capacity,2,(old-test,),capacity_ok)",
+              "action": "assert not validate(stale,3)通过，不把stale写入results。",
+              "output": "stale校验返回False",
+              "state": "原v3结果保持不变",
+              "failure": false,
+              "section": "故障：超时、重复结果与共享文件",
+              "why": "同一个任务ID不代表可混用旧来源；此处是来源版本而非所有权epoch。",
+              "code_lines": [
+                27,
+                28
+              ]
+            },
+            {
+              "node": 5,
+              "title": "停止调度并打印",
+              "input": "budget=0；已有两项通过字段验收的结果",
+              "action": "can_dispatch_again计算为False，断言停止并打印。",
+              "output": "accepted=capacity,permission；stale_rejected=True；remaining_budget=0；terminated=all_required_results_verified",
+              "state": "原assert全部通过",
+              "failure": false,
+              "section": "故障：超时、重复结果与共享文件",
+              "why": "终止由预算与已验数量决定；输出中的verified仅指本例有限字段规则。",
+              "code_lines": [
+                29,
+                35
+              ]
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "同一实验的失败变式",
+          "basis": "单独把research返回版本由3改2运行，原第24行断言失败且stdout为空；此变式不虚构超时或接管实现。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "建立结果契约与验收函数",
+              "input": "Result四字段；来源要求v3",
+              "action": "定义research/review及validate。",
+              "output": "capacity与permission各有固定v3证据",
+              "state": "尚未调用；预算尚未初始化",
+              "failure": false,
+              "section": "机制：调度、交接和群聊是不同控制关系",
+              "why": "先约定结果字段，Supervisor才有可检查输入；validate只核版本和非空证据。",
+              "code_lines": [
+                3,
+                16
+              ]
+            },
+            {
+              "node": 1,
+              "title": "变式：容量工作者返回v2",
+              "input": "仍为budget=2，results为空",
+              "action": "【变式已运行】仅把research的source_version由3改2；扣预算后取得旧结果。",
+              "output": "result.source_version=2",
+              "state": "budget=1；results={}",
+              "failure": true,
+              "section": "已解例：两个资料分支如何安全汇总",
+              "why": "相同任务与证据名称不能覆盖来源版本不匹配这一事实。",
+              "code_lines": [
+                10,
+                11
+              ]
+            },
+            {
+              "node": 2,
+              "title": "在接纳之前失败",
+              "input": "validate(result,3)返回False",
+              "action": "原第24行assert抛AssertionError，setdefault与review均未执行。",
+              "output": "AssertionError: stale or ungrounded result",
+              "state": "accepted=0；没有stdout",
+              "failure": true,
+              "section": "已解例：两个资料分支如何安全汇总",
+              "why": "错误在提交结果前被拦截，不能显示后续全部结果完成。",
+              "code_lines": [
+                23,
+                25
+              ]
+            }
+          ],
+          "code_overrides": {
+            "11": "    return Result(\"capacity\", 2, (\"load-test-v3\",), \"capacity_ok\")"
+          }
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "什么时候不用多Agent？",
+      "a": "子任务只是格式转换、固定计算或工具转发时，函数更便宜且可预测。若单Agent已能在预算内满足验收，多Agent增加调用和失败面未必值得。只有独立上下文、推理探索或权限隔离带来可测收益时再拆分。",
+      "rubric": "有单Agent/函数基线、拆分收益与协作成本的因果。"
+    },
+    {
+      "q": "Supervisor 和 handoff 有什么差别？",
+      "a": "Supervisor保留控制权，子Agent返回结果供其验收；handoff转移当前任务控制权，需要明确新的责任主体和回退路径。若只是发消息却双方继续写，就不是清晰交接。前者集中一致但可能瓶颈，后者可专业分流但更需所有权协议。",
+      "rubric": "解释控制权、责任主体、失败与瓶颈。"
+    },
+    {
+      "q": "两个Agent对结论相反，投票可以吗？",
+      "a": "先核对来源版本、目标定义和证据链，判断是否在回答同一问题。多个Agent可能使用同一错误材料，票数不代表独立证据。高风险冲突应由规则、实验或人工复核裁决，必要时输出不确定和缺少的证据。",
+      "rubric": "不能仅多数决，要有同源错误反例与证据验证。"
+    },
+    {
+      "q": "子Agent超时后父Agent如何接管？",
+      "a": "查询持久化进度和工具意图，判断副作用是否未知；只读计算可预算内重试，写操作先对账。通过epoch、写权限或唯一提交者避免旧子Agent迟到后同时提交，从已验证检查点接管。",
+      "rubric": "包括未知效果、持久化边界、旧执行者隔离和预算。"
+    }
+  ],
+  "lab": {
+    "title": "一个有预算和结果验收的Supervisor",
+    "task": "运行后把research的source_version改为2，预测门禁会怎样拒绝。说明为何子任务函数并不必然需要模型。",
+    "code": "from dataclasses import dataclass\n\n@dataclass(frozen=True)\nclass Result:\n    task_id: str\n    source_version: int\n    evidence: tuple\n    finding: str\n\ndef research():\n    return Result(\"capacity\", 3, (\"load-test-v3\",), \"capacity_ok\")\ndef review():\n    return Result(\"permission\", 3, (\"acl-test-v3\",), \"permission_ok\")\n\ndef validate(result, expected_version):\n    return result.source_version == expected_version and bool(result.evidence)\n\nbudget = 2\nresults = {}\nfor worker in (research, review):\n    assert budget > 0\n    budget -= 1\n    result = worker()\n    assert validate(result, 3), \"stale or ungrounded result\"\n    results.setdefault(result.task_id, result)  # 重复消息不增加完成数\nassert len(results) == 2 and budget == 0\nstale = Result(\"capacity\", 2, (\"old-test\",), \"capacity_ok\")\nassert not validate(stale, 3)\n# 确定性终止：预算耗尽后不允许新增一轮“专家讨论”\ncan_dispatch_again = budget > 0\nassert not can_dispatch_again\nprint(\"accepted=\" + \",\".join(sorted(results)))\nprint(\"stale_rejected=True\")\nprint(\"remaining_budget=\" + str(budget))\nprint(\"terminated=all_required_results_verified\")\n",
+    "expected": "accepted=capacity,permission\nstale_rejected=True\nremaining_budget=0\nterminated=all_required_results_verified\n",
+    "explanation": "Supervisor只接纳版本匹配且含证据的结果，task_id去重，统一预算阻止无限讨论。示例不包含真实并发和沙箱，函数是可替换的工作者接口；运行时隔离需要另行实现。",
+    "extensions": [
+      "为每个Result加epoch，拒绝接管之前的迟到结果。",
+      "允许一个任务失败时输出部分结果，但禁止声称全部成功。"
+    ],
+    "extension_answers": [
+      "在任务所有权表保存current_epoch，validate同时要求result.epoch==current_epoch[task_id]；接管时原子递增，旧epoch只记审计。",
+      "记录required_ids与accepted_ids的差集，最终状态用partial或failed，返回missing_ids和failure_reason；只有差集为空且验收通过才success。"
+    ]
+  },
+  "pitfalls": [
+    "把角色提示词当作权限或文件隔离",
+    "没给单Agent同等预算就宣称多Agent更强",
+    "超时后父子同时拥有副作用提交权"
+  ],
+  "checkpoint": "能运行监督器，解释过期结果为何被拒绝，并为一个真实任务写出可验收的分工、共享写入策略与终止条件。",
+  "alignment": {
+    "case_title": "一个有预算和结果验收的Supervisor",
+    "insert_after": "已解例：两个资料分支如何安全汇总",
+    "bridge": "“两个分支安全汇总”在实验中就是四个字段和一个循环。research与review分别代表capacity与permission工作者。Result.task_id决定结果放在哪个槽位，source_version要等于3，evidence只要求非空，finding保存capacity_ok或permission_ok。\n\nSupervisor就是for worker循环：budget从2减到1，再减到0；每次先validate，才把结果交给results.setdefault。所以下面的accepted输出按排序得到capacity,permission，而不是模型临时生成的报告。\n\n接着同一程序专门造一个source_version=2的stale对象，断言validate返回False；它不会覆盖先前v3结果。最后can_dispatch_again因预算为0而为False。再看失败变式：如果第一次research直接返回v2，第24行就中止，第二个工作者不会运行，四行预期输出也不会出现。\n\n这个小例先练可检查的协作边界，再回到正文理解真正并行、交接和语义争议还需要哪些机制。",
+    "coverage": "实现顺序函数调度、调用预算、版本/非空证据校验、task_id入表和停止断言；未接模型、未并发、未检查证据内容、未实现真正handoff、权限隔离、文件合并、超时、epoch接管或单多Agent对照实验。",
+    "question_sections": [
+      "问题：三个“专家”为什么比一个 Agent 更容易失败",
+      "机制：调度、交接和群聊是不同控制关系",
+      "已解例：两个资料分支如何安全汇总",
+      "故障：超时、重复结果与共享文件"
+    ],
+    "coverage_summary": "固定返回值模拟两个工作者，重点验证任务身份、来源版本和总预算。"
+  }
+}

@@ -1,0 +1,297 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>2026-10 RAG与检索面试题与参考答案 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-049.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/2026-10-RAG与检索面试题与参考答案.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/08-hybrid-retrieval.html">08 检索工程：切块、BM25、向量、RRF 与重排</a> · <a href="../lessons/09-rag-evaluation.html">09 RAG 质量与更新：把“回答错了”拆成可定位问题</a> · <a href="../lessons/10-agentic-rag.html">10 Agentic RAG：用证据缺口驱动有界决策</a> · <a href="../lessons/11-self-corrective-adaptive.html">11 Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a> · <a href="../lessons/12-graph-index.html">12 GraphRAG 离线索引：实体、关系、社区与来源</a> · <a href="../lessons/13-graph-query.html">13 GraphRAG 查询：Local、Global 与混合检索</a> · <a href="../lessons/14-advanced-rag.html">14 高级 RAG：HyDE、RAPTOR、多模态与工程选择</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-RAG%E4%B8%8E%E6%A3%80%E7%B4%A2%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-RAG%E4%B8%8E%E6%A3%80%E7%B4%A2%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F">使用方式</a><a href="#49-%E6%96%87%E6%A1%A3%E5%88%87%E5%9D%97%E8%BF%87%E5%A4%A7%E5%92%8C%E8%BF%87%E5%B0%8F%E5%88%86%E5%88%AB%E4%BC%9A%E5%B8%A6%E6%9D%A5%E4%BB%80%E4%B9%88%E5%8F%AF%E8%A7%82%E6%B5%8B%E9%97%AE%E9%A2%98">49. 文档切块过大和过小分别会带来什么可观测问题？</a><a href="#50-markdown-%E6%B2%A1%E6%9C%89%E6%A0%87%E9%A2%98%E6%97%B6%E8%AF%B7%E7%BB%99%E5%87%BA%E5%8F%AF%E6%89%A7%E8%A1%8C%E7%9A%84%E5%88%87%E5%9D%97%E7%AD%96%E7%95%A5%E5%8F%8A%E8%AF%84%E6%B5%8B%E5%8A%9E%E6%B3%95">50. Markdown 没有标题时，请给出可执行的切块策略及评测办法。</a><a href="#51-%E5%AF%B9-pdf%E7%BA%AF%E6%96%87%E6%9C%AC%E5%92%8C-markdown%E4%BD%A0%E4%BC%9A%E4%BF%9D%E7%95%99%E5%93%AA%E4%BA%9B%E7%BB%93%E6%9E%84%E5%85%83%E6%95%B0%E6%8D%AE%E7%94%A8%E4%BA%8E%E5%88%87%E5%88%86%E4%B8%8E%E6%A3%80%E7%B4%A2">51. 对 PDF、纯文本和 Markdown，你会保留哪些结构元数据用于切分与检索？</a><a href="#52-%E6%8C%89%E6%A0%87%E9%A2%98%E5%88%87%E5%9D%97%E5%90%8E%E5%A4%A7%E5%B0%8F%E6%9E%81%E4%B8%8D%E5%9D%87%E5%8C%80%E6%97%B6%E5%A6%82%E4%BD%95%E7%BB%A7%E7%BB%AD%E5%A4%84%E7%90%86%E8%80%8C%E4%B8%8D%E4%B8%A2%E5%A4%B1%E7%AB%A0%E8%8A%82%E8%AF%AD%E4%B9%89">52. 按标题切块后大小极不均匀时，如何继续处理而不丢失章节语义？</a><a href="#53-%E4%BB%80%E4%B9%88%E6%9F%A5%E8%AF%A2%E4%BC%9A%E6%9A%B4%E9%9C%B2%E7%BA%AF%E5%90%91%E9%87%8F%E5%8F%AC%E5%9B%9E%E7%9A%84%E4%B8%8D%E8%B6%B3%E4%B8%BA%E4%BB%80%E4%B9%88%E8%80%83%E8%99%91%E5%8A%A0%E5%85%A5%E5%85%B3%E9%94%AE%E8%AF%8D%E5%8F%AC%E5%9B%9E">53. 什么查询会暴露纯向量召回的不足，为什么考虑加入关键词召回？</a><a href="#54-%E8%AF%B7%E4%BB%8E%E6%8E%92%E5%BA%8F%E4%BE%9D%E6%8D%AE%E8%A7%A3%E9%87%8A-bm25%E5%B9%B6%E8%AF%B4%E6%98%8E%E5%AE%83%E5%9C%A8%E4%BD%A0%E7%9A%84%E9%A1%B9%E7%9B%AE%E9%87%8C%E8%A7%A3%E5%86%B3%E4%BA%86%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98">54. 请从排序依据解释 BM25，并说明它在你的项目里解决了什么问题。</a><a href="#55-%E8%9E%8D%E5%90%88%E7%A8%80%E7%96%8F%E4%B8%8E%E7%A8%A0%E5%AF%86%E5%8F%AC%E5%9B%9E%E7%BB%93%E6%9E%9C%E6%97%B6%E5%A6%82%E4%BD%95%E8%A7%A3%E9%87%8A-rrf-%E7%9A%84%E9%80%89%E6%8B%A9%E5%8F%8A%E5%8F%82%E6%95%B0%E5%BD%B1%E5%93%8D">55. 融合稀疏与稠密召回结果时，如何解释 RRF 的选择及参数影响？</a><a href="#56-%E9%87%8D%E6%8E%92%E6%A8%A1%E5%9E%8B%E5%A2%9E%E5%8A%A0%E4%BA%86%E5%BB%B6%E8%BF%9F%E6%80%8E%E6%A0%B7%E8%AF%81%E6%98%8E%E5%AE%83%E5%B8%A6%E6%9D%A5%E7%9A%84%E8%B4%A8%E9%87%8F%E6%94%B6%E7%9B%8A%E5%80%BC%E5%BE%97%E6%88%90%E6%9C%AC">56. 重排模型增加了延迟，怎样证明它带来的质量收益值得成本？</a><a href="#57-top-k-%E7%BB%93%E6%9E%9C%E5%99%AA%E5%A3%B0%E8%BE%83%E5%A4%A7%E6%97%B6%E5%A6%82%E4%BD%95%E5%8C%BA%E5%88%86%E9%97%AE%E9%A2%98%E6%9D%A5%E8%87%AA%E5%88%87%E5%9D%97%E5%8F%AC%E5%9B%9E%E8%BF%98%E6%98%AF%E9%87%8D%E6%8E%92">57. Top-K 结果噪声较大时，如何区分问题来自切块、召回还是重排？</a><a href="#58-%E6%A3%80%E7%B4%A2%E5%88%B0%E4%BA%92%E7%9B%B8%E5%86%B2%E7%AA%81%E7%9A%84%E6%9D%90%E6%96%99%E6%97%B6%E5%A6%82%E4%BD%95%E7%BB%84%E7%BB%87%E7%AD%94%E6%A1%88%E5%B9%B6%E4%BA%A4%E4%BB%A3%E4%BE%9D%E6%8D%AE">58. 检索到互相冲突的材料时，如何组织答案并交代依据？</a><a href="#59-%E7%9F%A5%E8%AF%86%E5%BA%93%E6%96%87%E6%A1%A3%E8%A2%AB%E6%9B%B4%E6%96%B0%E6%88%96%E5%88%A0%E9%99%A4%E5%90%8E%E5%A6%82%E4%BD%95%E8%AE%A9%E6%97%A7%E5%90%91%E9%87%8F%E5%92%8C%E6%97%A7%E5%BC%95%E7%94%A8%E5%A4%B1%E6%95%88">59. 知识库文档被更新或删除后，如何让旧向量和旧引用失效？</a><a href="#60-%E7%88%B6%E5%AD%90%E6%96%87%E6%A1%A3%E7%B4%A2%E5%BC%95%E9%92%88%E5%AF%B9%E4%BB%80%E4%B9%88%E6%A3%80%E7%B4%A2%E7%97%9B%E7%82%B9%E5%A6%82%E4%BD%95%E9%AA%8C%E8%AF%81%E6%98%AF%E5%90%A6%E6%94%B9%E5%96%84%E5%9B%9E%E7%AD%94">60. 父子文档索引针对什么检索痛点，如何验证是否改善回答？</a><a href="#61-%E5%8F%A3%E8%AF%AD%E5%8C%96%E9%94%99%E5%88%AB%E5%AD%97%E5%92%8C%E4%B8%8D%E5%AE%8C%E6%95%B4%E6%84%8F%E5%9B%BE%E4%BC%9A%E6%80%8E%E6%A0%B7%E5%BD%B1%E5%93%8D%E5%8F%AC%E5%9B%9E%E4%BD%A0%E5%87%86%E5%A4%87%E5%A6%82%E4%BD%95%E8%AF%8A%E6%96%AD">61. 口语化、错别字和不完整意图会怎样影响召回，你准备如何诊断？</a><a href="#62-%E5%A4%9A%E7%A7%9F%E6%88%B7%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%E5%A6%82%E4%BD%95%E5%81%9A%E5%88%B0%E7%94%A8%E6%88%B7%E9%9A%94%E7%A6%BB%E5%B9%B6%E7%94%A8%E6%B5%8B%E8%AF%95%E8%AF%81%E6%98%8E%E4%B8%8D%E4%BC%9A%E4%B8%B2%E5%BA%93">62. 多租户向量检索如何做到用户隔离，并用测试证明不会串库？</a><a href="#63-%E7%9F%AD%E6%9F%A5%E8%AF%A2%E4%B8%8E%E9%95%BF%E6%96%87%E5%9D%97%E7%9A%84%E8%A1%A8%E7%A4%BA%E5%B7%AE%E5%BC%82%E4%BC%9A%E9%80%A0%E6%88%90%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E5%AF%B9%E7%85%A7%E5%AE%9E%E9%AA%8C">63. 短查询与长文块的表示差异会造成什么问题，如何设计对照实验？</a><a href="#64-%E5%A6%82%E4%BD%95%E6%8A%8A%E6%9C%80%E7%BB%88%E5%BC%95%E7%94%A8%E6%98%A0%E5%B0%84%E5%9B%9E%E5%8E%9F%E6%96%87%E7%9A%84%E9%A1%B5%E7%A0%81%E6%96%87%E6%9C%AC%E5%8C%BA%E9%97%B4%E5%B9%B6%E6%94%AF%E6%8C%81%E9%A1%B5%E9%9D%A2%E9%AB%98%E4%BA%AE">64. 如何把最终引用映射回原文的页码、文本区间并支持页面高亮？</a><a href="#65-%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E6%A3%80%E7%B4%A2%E7%9B%B8%E5%AF%B9%E7%8E%B0%E6%9C%89-rag-%E5%A2%9E%E5%8A%A0%E4%BA%86%E4%BB%80%E4%B9%88%E8%83%BD%E5%8A%9B%E6%80%8E%E6%A0%B7%E6%A3%80%E9%AA%8C%E5%AE%9E%E9%99%85%E5%A2%9E%E7%9B%8A">65. 知识图谱检索相对现有 RAG 增加了什么能力，怎样检验实际增益？</a><a href="#66-%E4%BB%80%E4%B9%88%E5%9C%BA%E6%99%AF%E5%80%BC%E5%BE%97%E6%A3%80%E7%B4%A2%E4%BB%80%E4%B9%88%E5%9C%BA%E6%99%AF%E9%80%82%E5%90%88%E7%B2%BE%E7%A1%AE%E6%9F%A5%E6%89%BE%E6%88%96%E7%9B%B4%E6%8E%A5%E5%88%A9%E7%94%A8%E5%B7%B2%E6%9C%89%E4%B8%8A%E4%B8%8B%E6%96%87">66. 什么场景值得检索，什么场景适合精确查找或直接利用已有上下文？</a></nav></details><article class="prose source-prose"><h1 id="2026-10-rag与检索面试题与参考答案">2026-10 RAG与检索面试题与参考答案</h1>
+<blockquote>
+<p>来源快照：2026-10-22；答案整理：2026-10-23。此次迁入不代表重新抓取。
+本批题目按公开面经报道主题改写，是练习题，不是公司官方真题；答案为编辑综合参考，未经独立专家逐题复核，不是公司标准答案。</p>
+</blockquote>
+<p><a href="doc-048.html">返回本批索引</a> · <a href="doc-047.html">来源分级与资料</a></p>
+<h2 id="使用方式">使用方式</h2>
+<p>先独立回答，再对照得分点、追问和易错点。难度为编辑估计，非公司定级。
+公司标签只表示来源报道过相关主题，不证明逐字问过本题。B 仅代表曾找到原帖，不保证全文可读、作者亲历或题目真实；C 为待核验聚合线索。</p>
+<p><a id="Q-a8509ef76a1b"></a></p>
+<h2 id="49-文档切块过大和过小分别会带来什么可观测问题">49. 文档切块过大和过小分别会带来什么可观测问题？</h2>
+<p><strong>题目 ID</strong>：<code>Q-a8509ef76a1b</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动、拼多多</p>
+<p><strong>参考答案</strong></p>
+<p>块过大会引入噪声、挤占上下文并稀释匹配信号；过小会切断定义、条件和指代。固定检索预算，对比分块方案的证据覆盖、排序质量、回答正确率与延迟。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>同时观察跨块证据丢失和重复召回</li>
+<li>不要只调 chunk size</li>
+</ul>
+<p><strong>追问</strong>：重叠比例变大是否一定更好？</p>
+<p><strong>易错点</strong>：不存在对所有文档都最优的固定长度。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932295617999622144?sourceSSR=post" rel="noreferrer">INT-1c8ef39841</a>（B：曾定位公开原帖）；<a href="https://mj.mianlingai.com/interview/pdd-agent-first-round-2923332/" rel="noreferrer">INT-a896abf415</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity" rel="noreferrer">BM25：Elasticsearch similarity settings: BM25</a></p>
+<hr>
+<p><a id="Q-be81734af45d"></a></p>
+<h2 id="50-markdown-没有标题时请给出可执行的切块策略及评测办法">50. Markdown 没有标题时，请给出可执行的切块策略及评测办法。</h2>
+<p><strong>题目 ID</strong>：<code>Q-be81734af45d</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：美团</p>
+<p><strong>参考答案</strong></p>
+<p>先解析段落、列表、代码和表格边界，再按 token 上限组合；超长段按句子或有界窗口继续切，保留适当重叠和原文偏移。语义切分作为可比较的方案而非必选项。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>给块附文档版本和定位</li>
+<li>用真实查询与答案证据回归</li>
+</ul>
+<p><strong>追问</strong>：代码块或大表格超过上限怎么办？</p>
+<p><strong>易错点</strong>：不能因为没有标题就把整篇文档作为一个块。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938539937836683264?sourceSSR=post" rel="noreferrer">INT-49f4a7b7c0</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity" rel="noreferrer">BM25：Elasticsearch similarity settings: BM25</a></p>
+<hr>
+<p><a id="Q-40d256b2923c"></a></p>
+<h2 id="51-对-pdf纯文本和-markdown你会保留哪些结构元数据用于切分与检索">51. 对 PDF、纯文本和 Markdown，你会保留哪些结构元数据用于切分与检索？</h2>
+<p><strong>题目 ID</strong>：<code>Q-40d256b2923c</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>保留文档 ID、版本、章节路径、页码、文本/字符偏移、段落类型与访问权限；PDF 还应保存版面坐标及 OCR 映射。纯文本没有的结构不应伪造。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>解析顺序影响表格和多栏</li>
+<li>存原文及可回溯清洗映射</li>
+</ul>
+<p><strong>追问</strong>：解析器升级后旧引用如何保持稳定？</p>
+<p><strong>易错点</strong>：只保存清洗后的字符串会丢失可靠溯源位置。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932295617999622144?sourceSSR=post" rel="noreferrer">INT-1c8ef39841</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-71b2bf676f03"></a></p>
+<h2 id="52-按标题切块后大小极不均匀时如何继续处理而不丢失章节语义">52. 按标题切块后大小极不均匀时，如何继续处理而不丢失章节语义？</h2>
+<p><strong>题目 ID</strong>：<code>Q-71b2bf676f03</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：九方智投</p>
+<p><strong>参考答案</strong></p>
+<p>小节可在不跨越语义边界的前提下合并；大节按段、句或结构元素再分，并把章节路径作为元数据或短前缀。检索时按需要扩展相邻块或父节。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>限制重复父标题开销</li>
+<li>用证据命中与上下文占用共同评测</li>
+</ul>
+<p><strong>追问</strong>：相邻块合并会不会混入无关内容？</p>
+<p><strong>易错点</strong>：按标题切完并不意味着无需再控制长度。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/jiufangzhitou-agent-dev-first-round-2916834/" rel="noreferrer">INT-fef75911f3</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity" rel="noreferrer">BM25：Elasticsearch similarity settings: BM25</a></p>
+<hr>
+<p><a id="Q-d85082238aa8"></a></p>
+<h2 id="53-什么查询会暴露纯向量召回的不足为什么考虑加入关键词召回">53. 什么查询会暴露纯向量召回的不足，为什么考虑加入关键词召回？</h2>
+<p><strong>题目 ID</strong>：<code>Q-d85082238aa8</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：长鑫存储</p>
+<p><strong>参考答案</strong></p>
+<p>精确编号、型号、姓名、错误码和少见术语容易暴露纯语义检索的盲点；关键词检索保留精确命中，向量检索补同义和概念匹配。是否混合要看查询分桶后的收益。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>控制分词与字段</li>
+<li>按相同语料和预算对照</li>
+</ul>
+<p><strong>追问</strong>：数字字符相差一位，如何避免误召回？</p>
+<p><strong>易错点</strong>：向量相似不等于事实或实体相同。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939580601693229056?sourceSSR=post" rel="noreferrer">INT-9e5f65a93e</a>（B：曾定位公开原帖）；<a href="https://mj.mianlingai.com/interview/changxin-agent-development-intern-first-round-2927060/" rel="noreferrer">INT-6d396c411c</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity" rel="noreferrer">BM25：Elasticsearch similarity settings: BM25</a>；<a href="https://learn.microsoft.com/en-us/azure/search/hybrid-search-ranking" rel="noreferrer">RRF：Reciprocal rank fusion in hybrid search</a></p>
+<hr>
+<p><a id="Q-259defb1c29f"></a></p>
+<h2 id="54-请从排序依据解释-bm25并说明它在你的项目里解决了什么问题">54. 请从排序依据解释 BM25，并说明它在你的项目里解决了什么问题。</h2>
+<p><strong>题目 ID</strong>：<code>Q-259defb1c29f</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：拼多多、长鑫存储</p>
+<p><strong>参考答案</strong></p>
+<p>BM25 利用查询词匹配、逆文档频率、词频饱和与文档长度归一化排序。k1 控制词频饱和，b 控制长度归一化强度；参数要结合分词、字段和验证集调。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>说明为何适合专名/编号检索</li>
+<li>检查停用词与字段长度</li>
+</ul>
+<p><strong>追问</strong>：同一词重复多次，分数是否线性增加？</p>
+<p><strong>易错点</strong>：BM25 不是向量相似度，默认参数也不是最佳答案。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/changxin-agent-development-intern-first-round-2927060/" rel="noreferrer">INT-6d396c411c</a>（C：仅聚合线索）；<a href="https://mj.mianlingai.com/interview/pdd-agent-first-round-2923332/" rel="noreferrer">INT-a896abf415</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity" rel="noreferrer">BM25：Elasticsearch similarity settings: BM25</a></p>
+<hr>
+<p><a id="Q-2239cbb0dafd"></a></p>
+<h2 id="55-融合稀疏与稠密召回结果时如何解释-rrf-的选择及参数影响">55. 融合稀疏与稠密召回结果时，如何解释 RRF 的选择及参数影响？</h2>
+<p><strong>题目 ID</strong>：<code>Q-2239cbb0dafd</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：九方智投、字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>RRF 对每个候选累加 1/(k+rank)，融合排名而不是直接相加不可比的分数。k 小时更偏重头部；还需设每路召回深度、去重与缺失处理，并用验证集选配置。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>区分平滑常数 k 与召回 Top-K</li>
+<li>用相关性和延迟一起选型</li>
+</ul>
+<p><strong>追问</strong>：一路召回深度远大于另一路会怎样？</p>
+<p><strong>易错点</strong>：60 是常见配置，不是数学上必然最优。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932295617999622144?sourceSSR=post" rel="noreferrer">INT-1c8ef39841</a>（B：曾定位公开原帖）；<a href="https://mj.mianlingai.com/interview/jiufangzhitou-agent-dev-first-round-2916834/" rel="noreferrer">INT-fef75911f3</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://learn.microsoft.com/en-us/azure/search/hybrid-search-ranking" rel="noreferrer">RRF：Reciprocal rank fusion in hybrid search</a></p>
+<hr>
+<p><a id="Q-41cc17b9984f"></a></p>
+<h2 id="56-重排模型增加了延迟怎样证明它带来的质量收益值得成本">56. 重排模型增加了延迟，怎样证明它带来的质量收益值得成本？</h2>
+<p><strong>题目 ID</strong>：<code>Q-41cc17b9984f</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动、长鑫存储</p>
+<p><strong>参考答案</strong></p>
+<p>固定第一阶段候选与最终上下文预算，对比无重排、不同重排器和候选规模的证据排序、回答正确率及尾延迟。按任务难度决定是否条件式启用。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>记录单位成功任务成本</li>
+<li>评估截断是否丢掉答案证据</li>
+</ul>
+<p><strong>追问</strong>：重排模型只见到局部文本会有什么问题？</p>
+<p><strong>易错点</strong>：检索指标提升不必然转化为最终业务提升。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932295617999622144?sourceSSR=post" rel="noreferrer">INT-1c8ef39841</a>（B：曾定位公开原帖）；<a href="https://mj.mianlingai.com/interview/changxin-agent-development-intern-first-round-2927060/" rel="noreferrer">INT-6d396c411c</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-013afac9507d"></a></p>
+<h2 id="57-top-k-结果噪声较大时如何区分问题来自切块召回还是重排">57. Top-K 结果噪声较大时，如何区分问题来自切块、召回还是重排？</h2>
+<p><strong>题目 ID</strong>：<code>Q-013afac9507d</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：拼多多</p>
+<p><strong>参考答案</strong></p>
+<p>先检查正确证据是否存在且被正确解析，再看它是否进入召回候选，随后看融合/重排是否保留，最后检查生成引用。每层保存候选 ID、版本、分数与标签。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>逐层建立可复现失败集</li>
+<li>控制一次只改一个环节</li>
+</ul>
+<p><strong>追问</strong>：召回正确而回答错误时还应继续调 Top-K 吗？</p>
+<p><strong>易错点</strong>：不能看到回答差就一律扩大召回数量。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/pdd-agent-first-round-2923332/" rel="noreferrer">INT-a896abf415</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity" rel="noreferrer">BM25：Elasticsearch similarity settings: BM25</a>；<a href="https://learn.microsoft.com/en-us/azure/search/hybrid-search-ranking" rel="noreferrer">RRF：Reciprocal rank fusion in hybrid search</a></p>
+<hr>
+<p><a id="Q-b6739fae4d39"></a></p>
+<h2 id="58-检索到互相冲突的材料时如何组织答案并交代依据">58. 检索到互相冲突的材料时，如何组织答案并交代依据？</h2>
+<p><strong>题目 ID</strong>：<code>Q-b6739fae4d39</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：</p>
+<p><strong>参考答案</strong></p>
+<p>先判断材料是否讨论相同实体、版本和生效条件，再按权威性与适用时间查证；确实冲突时并列说明不同依据及不确定性，必要时拒绝下确定结论并请求核验。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>引用具体版本与片段</li>
+<li>高风险结论不靠多数片段投票</li>
+</ul>
+<p><strong>追问</strong>：新材料来源不可靠时如何处理？</p>
+<p><strong>易错点</strong>：检索分数高不代表来源更真实。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939580601693229056?sourceSSR=post" rel="noreferrer">INT-9e5f65a93e</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-769da7221f1a"></a></p>
+<h2 id="59-知识库文档被更新或删除后如何让旧向量和旧引用失效">59. 知识库文档被更新或删除后，如何让旧向量和旧引用失效？</h2>
+<p><strong>题目 ID</strong>：<code>Q-769da7221f1a</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：</p>
+<p><strong>参考答案</strong></p>
+<p>按文档 ID 和版本维护 chunk 映射，新版本构建成功后切换可见版本；删除传播到向量、全文索引、缓存及引用状态。以幂等增量任务和对账检查漏删。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>权限过滤在召回时仍生效</li>
+<li>旧引用标失效而不是静默指向新内容</li>
+</ul>
+<p><strong>追问</strong>：异步索引短暂不一致时返回什么？</p>
+<p><strong>易错点</strong>：只更新正文而不删旧向量会留下过期答案。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939580601693229056?sourceSSR=post" rel="noreferrer">INT-9e5f65a93e</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-35b90828dec3"></a></p>
+<h2 id="60-父子文档索引针对什么检索痛点如何验证是否改善回答">60. 父子文档索引针对什么检索痛点，如何验证是否改善回答？</h2>
+<p><strong>题目 ID</strong>：<code>Q-35b90828dec3</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>小子块利于精确匹配，命中后加载相应父块补足定义和上下文。限制父块扩展、去重并保留引用位置；相同预算下比较证据覆盖和回答质量。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>保持父子版本绑定</li>
+<li>避免一次扩展塞入整篇长文</li>
+</ul>
+<p><strong>追问</strong>：多个子块属于同一个父块怎样处理？</p>
+<p><strong>易错点</strong>：扩大上下文并不必然提高准确率。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932407145864130560?sourceSSR=post" rel="noreferrer">INT-bfd0fa0cf9</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-41474d62bd7b"></a></p>
+<h2 id="61-口语化错别字和不完整意图会怎样影响召回你准备如何诊断">61. 口语化、错别字和不完整意图会怎样影响召回，你准备如何诊断？</h2>
+<p><strong>题目 ID</strong>：<code>Q-41474d62bd7b</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>用真实输入建立错别字、同义口语、指代和歧义分桶，分别查看召回与答案变化。可做规范化、查询改写或多路检索，意图不明时优先澄清并保留原始查询。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>改写要防止实体和数值被改变</li>
+<li>将澄清成本计入评测</li>
+</ul>
+<p><strong>追问</strong>：用户短句“那个怎么办”如何检索？</p>
+<p><strong>易错点</strong>：不能把所有陌生查询都强行改写成已知意图。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932295617999622144?sourceSSR=post" rel="noreferrer">INT-1c8ef39841</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity" rel="noreferrer">BM25：Elasticsearch similarity settings: BM25</a></p>
+<hr>
+<p><a id="Q-17ae171c362d"></a></p>
+<h2 id="62-多租户向量检索如何做到用户隔离并用测试证明不会串库">62. 多租户向量检索如何做到用户隔离，并用测试证明不会串库？</h2>
+<p><strong>题目 ID</strong>：<code>Q-17ae171c362d</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>从可信身份导出 tenant/ACL，并在向量与全文检索、父块扩展、缓存和引用读取各层强制过滤。敏感场景可再做索引或资源隔离；测试伪造租户、缓存串读与权限撤销。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>不能接受模型自报租户</li>
+<li>记录负向测试与撤权传播</li>
+</ul>
+<p><strong>追问</strong>：跨租户同文档 ID 会不会命中同一缓存？</p>
+<p><strong>易错点</strong>：在模型回答后过滤文本，已经太晚。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/bytedance-agent-2928966/" rel="noreferrer">INT-340e4aa1be</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a>；<a href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/" rel="noreferrer">INJECTION：OWASP LLM01: Prompt Injection</a></p>
+<hr>
+<p><a id="Q-0f613a472055"></a></p>
+<h2 id="63-短查询与长文块的表示差异会造成什么问题如何设计对照实验">63. 短查询与长文块的表示差异会造成什么问题，如何设计对照实验？</h2>
+<p><strong>题目 ID</strong>：<code>Q-0f613a472055</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：美团</p>
+<p><strong>参考答案</strong></p>
+<p>长块可能混合多个主题，短 query 的表示又缺少上下文；需遵守所选 embedding 的 query/document 编码约定。固定评测集比较块长、前缀/双塔设置和证据粒度。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>先看模型是否支持非对称编码</li>
+<li>测召回再测最终答案</li>
+</ul>
+<p><strong>追问</strong>：改写查询能否解决所有长短差异？</p>
+<p><strong>易错点</strong>：不同模型的向量不能直接混在同一索引中比较距离。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938539937836683264?sourceSSR=post" rel="noreferrer">INT-49f4a7b7c0</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-728b751dfc7b"></a></p>
+<h2 id="64-如何把最终引用映射回原文的页码文本区间并支持页面高亮">64. 如何把最终引用映射回原文的页码、文本区间并支持页面高亮？</h2>
+<p><strong>题目 ID</strong>：<code>Q-728b751dfc7b</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：金蝶</p>
+<p><strong>参考答案</strong></p>
+<p>检索块保存 doc/version、页码、字符区间及版面坐标，生成时引用稳定 chunk ID；展示层根据原文映射高亮。OCR、清洗和文本拼接要保留偏移转换，失效版本可提示不可定位。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>引用必须来自实际给模型的证据</li>
+<li>校验引用和结论是否相符</li>
+</ul>
+<p><strong>追问</strong>：多页表格的一条结论如何高亮？</p>
+<p><strong>易错点</strong>：让模型自由生成页码通常不能保证位置正确。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/kingdee-agent-dev-first-round-2914937/" rel="noreferrer">INT-85c5706c08</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-9acb306b9dbd"></a></p>
+<h2 id="65-知识图谱检索相对现有-rag-增加了什么能力怎样检验实际增益">65. 知识图谱检索相对现有 RAG 增加了什么能力，怎样检验实际增益？</h2>
+<p><strong>题目 ID</strong>：<code>Q-9acb306b9dbd</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：携程、水滴公司</p>
+<p><strong>参考答案</strong></p>
+<p>图检索适合实体关系、路径和跨文档连接问题，但依赖抽取准确性和图更新成本。先从业务查询中找多跳需求，与纯 RAG 在相同数据与预算下比较，不能因能画图就宣称增益。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>分别测实体链接、关系正确率和端到端效果</li>
+<li>评估过期边</li>
+</ul>
+<p><strong>追问</strong>：图中找不到路径是否能推出关系不存在？</p>
+<p><strong>易错点</strong>：图谱不会自动修复错误来源或幻觉。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/ctrip-agent-dev-first-round-2916102/" rel="noreferrer">INT-5906c726ec</a>（C：仅聚合线索）；<a href="https://mj.mianlingai.com/interview/shuidi-ai-fullstack-first-round-2930334/" rel="noreferrer">INT-2599a140bd</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-ea90a8e11958"></a></p>
+<h2 id="66-什么场景值得检索什么场景适合精确查找或直接利用已有上下文">66. 什么场景值得检索，什么场景适合精确查找或直接利用已有上下文？</h2>
+<p><strong>题目 ID</strong>：<code>Q-ea90a8e11958</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：美团</p>
+<p><strong>参考答案</strong></p>
+<p>对精确 ID、确定字段和状态查询优先用结构化接口；已在当前上下文的足够证据可直接使用；开放知识与跨文档证据需要检索。路由要可解释，并对不确定场景澄清或补查。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>区分事实查找与推理</li>
+<li>比较误路由率和总成本</li>
+</ul>
+<p><strong>追问</strong>：直接 grep 命中了文字就足够回答吗？</p>
+<p><strong>易错点</strong>：不是每个问题都需要向量数据库，也不是长上下文能替代所有检索。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/meituan-fullstack-intern-first-round-2924710/" rel="noreferrer">INT-77ca6f4ba2</a>（C：仅聚合线索）；<a href="https://www.nowcoder.com/discuss/938539937836683264?sourceSSR=post" rel="noreferrer">INT-49f4a7b7c0</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

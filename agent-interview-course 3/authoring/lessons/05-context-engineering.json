@@ -1,0 +1,258 @@
+{
+  "id": "05",
+  "slug": "05-context-engineering",
+  "title": "Prompt 与上下文工程：选择、预算、压缩与回放",
+  "stage": "02 工具、上下文与记忆",
+  "prerequisites": [
+    "04"
+  ],
+  "minutes": 75,
+  "goals": [
+    "将提示词写作扩展为上下文构建流程",
+    "按优先级分配预算并保留行动必需信息",
+    "用字段检查与任务回放验证压缩"
+  ],
+  "sources": [
+    "通用知识/Context Engineering上下文工程.md",
+    "通用知识/2026-10-上下文与记忆面试题与参考答案.md"
+  ],
+  "body": "## 场景：对话越来越长，助手却忘了“只生成草稿”\n用户第一轮说：“帮我整理邮件，但只生成草稿，不要发送。”二十轮之后，工具返回了大量邮件正文，系统为了节省空间只保留最近十条消息。模型看到新的邮件内容，决定调用发送工具。这不是简单的“提示词不够强”，而是上下文构建删除了决定下一步行动的约束。上下文工程要解决的，是每次决策前到底给模型看什么、从哪里来、怎样组织，以及哪些边界由代码持续执行。\n\nPrompt Engineering 关注指令、示例与输出格式等设计；Context Engineering 的范围还包括检索、工具 schema、对话历史、工作状态、长期记忆和工具结果处理。两者不是互斥路线，写好提示只是整个信息管道的一部分。即使上下文明确写着不要发送，运行时也应限制发送权限，避免把安全完全押在模型服从性上。本课教学例是教练补充，原文中的框架和面经主题不是无条件适用的生产定律。\n\n## 先定义一次决策的最小充分材料\n针对邮件任务，先列出目标、约束、当前进度、候选操作所需证据。目标是“生成回复草稿”，约束包括“不可发送”和“不得承诺未确认日期”，当前进度可能是“已读取邮件 E7，尚未核对库存”，证据是客户要求与库存查询。与此无关的旧寒暄、重复工具日志和整篇历史文章可以不进本次上下文。\n\n材料要分层。受信规则与当前用户指令、结构化状态、必要历史、外部观察应有清楚来源和边界。检索文档、邮件正文、网页等都是数据，不应因为它们“看起来像命令”就获得系统级权威。角色分层和明确引用可以降低歧义，但不能单独消灭提示注入；涉及权限的字段必须由运行时绑定，外部文本不能改写授权。\n\n## 一个可计算的预算例子\n设教学预算为 200 个单位，预留输出 40，输入上限 160。固定规则与任务目标占 30，工具描述占 35，当前状态占 20，剩下 75 分配给近期对话和检索证据。若单个工具结果就有 300，不能先塞进模型再让模型摘要；应该在结果进入模型前截取必要字段、聚合、分页或存成可引用产物。原始数据需要有权限与生命周期，避免摘要引用了已经被删除或无权读取的内容。\n\n生产系统的预算使用实际模型计量，考虑消息封装、工具 schema 和预计输出；本课实验用字符串长度作可观察代理，不声称一个字符就是一个 token。还应记录每类材料占用与被丢弃原因，这样发现某类任务经常因证据挤出而失败时，能调整分配而不是反复修改一句提示词。\n\n## 压缩不是任意缩短\n常见方法是保留近期原文，对较早历史生成摘要，将可检索原始材料外置。重要的是摘要必须保留决定行动的字段：资源 ID、用户否定约束、审批范围、已完成动作、待确认项和证据引用。把“没有授权发送”缩成“处理邮件”，文字更短，却改变了行为边界。把“订单状态未确认”缩成“订单正常”，则把未知改成了肯定。\n\n可以为任务设计稳定的结构化摘要：goal、constraints、completed、pending、evidence_refs、version。每次压缩保存版本与原文范围，避免不断对旧摘要再摘要却失去恢复路径。遇到冲突时记录两个候选事实、各自来源与时间，不要让摘要模型为了流畅擅自选择一方。某些关键承诺或原始条款需要逐字保留，另一些背景可以概括，压缩策略应依任务损失函数决定。\n\n## 已解例：压缩一段邮件工作记录\n原记录包含：“目标是回复客户；只做草稿；客户问 E7；已经查库存但服务超时；上次活动文案用活泼语气；未确认库存前不能承诺明天发货。”一个可用摘要保留 goal=生成 E7 草稿，constraints=[不可发送，不承诺未确认发货日期]，pending=[重新核实库存]，evidence_refs=[E7, inventory-call-3]，status=库存未知。旧活动语气是否保留，要看它是否是本次任务仍然有效的偏好。\n\n收到“继续”时，下一步是补查库存或生成含不确定说明的草稿，不能跳到发送或承诺日期。这说明压缩质量应与决策连续性相关，而非只评文字相似。两份摘要用词不同，只要保留必需字段、产生同样合规行动，可能同样好；一份摘要语言漂亮但改变授权范围，就不合格。\n\n## 怎样验证上下文工程\n先做字段级检查，确认资源 ID、否定约束、待办与引用没有丢。再做任务级回放：用相同工具环境与验收标准，比较压缩前后的下一步动作、最终产物、费用与失败率。测试集要覆盖长对话、否定表达、用户纠正、工具结果超时和相互冲突资料。不能只请同一个摘要模型评价“摘要是否完整”，这容易重复它自身的盲点。\n\n面试时可以这样表达：“我把上下文当受预算约束的工作集，先保护目标、授权和状态，再按任务相关性装配证据。长结果在工具边界处理，摘要保留可恢复引用和未知状态，压缩版本用字段检查加任务回放验收。提示词、检索与记忆都是管道组件，运行时权限仍独立执行。”这样的回答把提示词设计连接到了可测系统行为。\n",
+  "diagram": {
+    "nodes": [
+      "写入E7保护状态",
+      "序列化并设124预算",
+      "依次尝试三段材料",
+      "检查选择与恢复状态",
+      "验证约束待办并打印"
+    ],
+    "caption": "本实验的机制轨迹：构造受保护字段的预算装配器。节点只追踪代码实际状态；变式边界另行标明。",
+    "walkthrough": {
+      "scenario": "沿《构造受保护字段的预算装配器》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "原实验代码对照",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "定义已有工作状态",
+              "input": "邮件E7，仅草稿，库存待查",
+              "action": "设置goal/constraints/pending/refs",
+              "output": "state含never send与verify stock",
+              "state": "refs=[mail:E7]",
+              "failure": false,
+              "section": "已解例：压缩一段邮件工作记录",
+              "why": "这些字段是人工给定的压缩产物，本例不负责从历史提取它们。",
+              "code_lines": [
+                3,
+                4
+              ]
+            },
+            {
+              "node": 1,
+              "title": "序列化与预算",
+              "input": "state四项字段",
+              "action": "紧凑序列化，budget=len(protected)+30",
+              "output": "protected长94；budget=124",
+              "state": "selected=[state]；used=94",
+              "failure": false,
+              "section": "一个可计算的预算例子",
+              "why": "先为关键状态保留位置，候选只竞争剩余30字符。",
+              "code_lines": [
+                5,
+                10
+              ]
+            },
+            {
+              "node": 2,
+              "title": "装配候选",
+              "input": "evidence长13、recent长13、old_history长100",
+              "action": "依次检查：94+13=107，107+13=120，120+100>124",
+              "output": "保留evidence和recent，跳过old_history",
+              "state": "used=120；余量4",
+              "failure": false,
+              "section": "已解例：压缩一段邮件工作记录",
+              "why": "相同预算下低优先级大材料不会挤出先放的保护状态。",
+              "code_lines": [
+                11,
+                14
+              ]
+            },
+            {
+              "node": 3,
+              "title": "校验与恢复",
+              "input": "selected=[state,evidence,recent]；used=120",
+              "action": "检查预算与名称，读取第一项JSON",
+              "output": "restored含原四项字段",
+              "state": "used<=124；names符合预期",
+              "failure": false,
+              "section": "怎样验证上下文工程",
+              "why": "字节装配完成后仍需恢复字段检查，避免只看长度。",
+              "code_lines": [
+                15,
+                18
+              ]
+            },
+            {
+              "node": 4,
+              "title": "核对语义字段并输出",
+              "input": "restored.constraints=[never send]；pending=[verify stock]",
+              "action": "执行两条必保字段断言，再打印",
+              "output": "selected: state,evidence,recent\nconstraint: never send\nnext step: verify stock",
+              "state": "字段校验通过；未执行发信或查库存",
+              "failure": false,
+              "section": "怎样验证上下文工程",
+              "why": "打印下一步是展示待办，不等于已经执行它。",
+              "code_lines": [
+                19,
+                23
+              ]
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "边界与故障分支",
+          "basis": "已验证变式：只将第3行constraints列表改为空，protected=82、budget=112、used=108，第19行AssertionError；stdout为空。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "变式：源状态丢约束",
+              "input": "第3行仅constraints改[]；goal仍draft E7",
+              "action": "创建已经缺失never send的状态",
+              "output": "constraints=[]；pending不变",
+              "state": "源状态缺一项关键约束",
+              "failure": false,
+              "section": "压缩不是任意缩短",
+              "why": "此变式模拟压缩前一环节漏掉否定条件。",
+              "code_lines": [
+                3,
+                4
+              ]
+            },
+            {
+              "node": 1,
+              "title": "按变式长度重新预算",
+              "input": "变式protected长82",
+              "action": "同样加30，得到budget=112",
+              "output": "selected从state开始",
+              "state": "used=82",
+              "failure": false,
+              "section": "一个可计算的预算例子",
+              "why": "预算随状态长度变化，不能继续沿用正常分支的124。",
+              "code_lines": [
+                5,
+                10
+              ]
+            },
+            {
+              "node": 2,
+              "title": "仍可装下两段候选",
+              "input": "82+13+13=108；旧历史100",
+              "action": "执行同样循环",
+              "output": "names仍state,evidence,recent；used=108",
+              "state": "预算112内；旧历史跳过",
+              "failure": false,
+              "section": "已解例：压缩一段邮件工作记录",
+              "why": "长度检查不会发现状态语义缺失。",
+              "code_lines": [
+                11,
+                17
+              ]
+            },
+            {
+              "node": 3,
+              "title": "恢复变式状态",
+              "input": "所选state中的constraints=[]",
+              "action": "JSON解码成功",
+              "output": "restored.constraints=[]",
+              "state": "pending仍verify stock",
+              "failure": false,
+              "section": "怎样验证上下文工程",
+              "why": "序列化忠实保存了错误输入，本身不修复约束。",
+              "code_lines": [
+                18,
+                18
+              ]
+            },
+            {
+              "node": 4,
+              "title": "必保字段断言拦截",
+              "input": "never send不在空列表中",
+              "action": "执行第19行assert",
+              "output": "AssertionError；stdout为空",
+              "state": "程序在print之前停止",
+              "failure": true,
+              "section": "怎样验证上下文工程",
+              "why": "字段验收独立于预算验收，能抓住已定义的必保约束缺失。",
+              "code_lines": [
+                19,
+                20
+              ]
+            }
+          ],
+          "code_overrides": {
+            "3": "state = {\"goal\": \"draft E7\", \"constraints\": [],"
+          }
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "为什么按最近十条消息截断可能破坏任务？",
+      "a": "消息长度差异很大，条数不是 token 预算；旧消息可能含目标、否定约束和授权。应将关键状态提取到受保护工作集，按真实计量选择近期原文并保留旧文引用。",
+      "rubric": "长度与语义两种风险都要说到。"
+    },
+    {
+      "q": "把“状态未确认”压成“状态正常”错在哪里？",
+      "a": "把认识上的未知变成业务上的肯定，改变下一步决策。摘要必须保留未知与待确认项，不能为了短或流畅补全事实。需要字段规则和回放验证发现这种错误。",
+      "rubric": "区分未知与正常，说明行动后果。"
+    },
+    {
+      "q": "如何处理单次 20MB 的查询结果？",
+      "a": "在工具或执行边界限体积，原始数据存为带权限与生命周期的产物，返回 schema、计数、摘要和引用；按需分页、过滤、聚合，再做 token 预算。不先把原始数据塞给模型。",
+      "rubric": "边界处理、原文引用、按需读取三个层次。"
+    },
+    {
+      "q": "两份压缩摘要字面差异很大，怎样比较质量？",
+      "a": "检查必需字段、来源和约束，再在同一环境回放任务，比较行动合规、验收成功率与资源成本。字面相似只是辅助，不能替代行为一致性和证据保真。",
+      "rubric": "字段检查加行为回放，不只文本相似。"
+    }
+  ],
+  "lab": {
+    "title": "构造受保护字段的预算装配器",
+    "task": "运行装配器，观察必需字段不被挤出，低优先级历史在预算不足时跳过。长度计量仅作教学代理。",
+    "code": "import json\n\nstate = {\"goal\": \"draft E7\", \"constraints\": [\"never send\"],\n         \"pending\": [\"verify stock\"], \"refs\": [\"mail:E7\"]}\nprotected = json.dumps(state, sort_keys=True, separators=(\",\", \":\"))\ncandidates = [(\"evidence\", \"stock=unknown\"),\n              (\"recent\", \"user:continue\"), (\"old_history\", \"x\" * 100)]\nbudget = len(protected) + 30\nselected = [(\"state\", protected)]\nused = len(protected)\nfor name, text in candidates:\n    if used + len(text) <= budget:\n        selected.append((name, text))\n        used += len(text)\nassert used <= budget\nnames = [name for name, _ in selected]\nassert names == [\"state\", \"evidence\", \"recent\"]\nrestored = json.loads(selected[0][1])\nassert \"never send\" in restored[\"constraints\"]\nassert restored[\"pending\"] == [\"verify stock\"]\nprint(\"selected:\", \",\".join(names))\nprint(\"constraint:\", restored[\"constraints\"][0])\nprint(\"next step:\", restored[\"pending\"][0])\n",
+    "expected": "selected: state,evidence,recent\nconstraint: never send\nnext step: verify stock\n",
+    "explanation": "受保护状态先占预算，证据与近期消息再按顺序进入；100 字符旧历史没有空间，被跳过。恢复 JSON 后检查否定约束与待办，验证装配未丢行动必需信息。真实系统应替换长度函数并对带消息包装的完整输入计量。",
+    "extensions": [
+      "预算比 protected 长度更小应怎样处理？",
+      "给 evidence 增加 refs，如何防止引用悬空？"
+    ],
+    "extension_answers": [
+      "先断言必需状态自身可容纳，否则明确返回 budget_insufficient，缩减工具定义、切换分阶段决策或调整产品策略；不能静默截断 JSON。",
+      "维护引用到原始产物的映射，在装配前校验引用存在、当前身份有权限、未过期；失败就补读或把证据标记不可用。"
+    ]
+  },
+  "pitfalls": [
+    "只按消息条数控预算",
+    "摘要丢掉否定约束或把未知写成已确认",
+    "用外部网页内容覆盖受信指令和运行时身份"
+  ],
+  "checkpoint": "能给邮件任务写出受保护状态 schema，并证明压缩前后“继续”不会触发越权发送或编造库存。",
+  "alignment": {
+    "case_title": "构造受保护字段的预算装配器",
+    "insert_after": "已解例：压缩一段邮件工作记录",
+    "bridge": "把正文的邮件 E7 案例与下方代码逐一对齐：state.goal 是 draft E7，constraints 只有 never send，pending 是 verify stock，refs 是 mail:E7。程序不会生成摘要，而是把已经整理好的这四项状态序列化成 protected；它长94个字符，budget 再加30得到124。\n\n候选 evidence 的内容 stock=unknown 长13，recent 的 user:continue 长13，old_history 是100个 x；先放94字符的状态，再依次放两段13字符，used 最终为120，剩4，旧历史因此放不下。selected 的名称必须恰好是 state、evidence、recent。\n\n接着恢复 JSON，分别检查 never send 和 verify stock，三行 stdout 就在报告选择结果、保留的约束与下一步。边界演示把原始 constraints 改成空列表，装配本身仍可能通过，但恢复后第19行会断言失败，说明不超预算与语义完整是两个独立验收条件；程序并不会自动找回漏掉的原文。",
+    "coverage": "仅做已写好状态的JSON序列化、字符预算选择与字段断言；未自动摘要、检索邮件、查询库存、调用分词器/LLM、发送邮件或执行任务级模型回放。",
+    "question_sections": [
+      "压缩不是任意缩短",
+      "压缩不是任意缩短",
+      "一个可计算的预算例子",
+      "怎样验证上下文工程"
+    ],
+    "coverage_summary": "用字符数观察上下文预算和约束保留，不等同于真实token计量。"
+  }
+}

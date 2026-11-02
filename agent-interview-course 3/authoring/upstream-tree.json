@@ -1,0 +1,875 @@
+{
+  "sha": "e5b92617455e5ecc105162a22a42796c3041162d",
+  "files": [
+    {
+      "path": ".github/workflows/pages.yml",
+      "sha": "a685c5781f6a1f00e31684c04cbccc185906e010",
+      "size": 1038
+    },
+    {
+      "path": ".github/workflows/validate.yml",
+      "sha": "ea4426e31a6095f8bcd9f2de9a057aee4a349b33",
+      "size": 1692
+    },
+    {
+      "path": ".gitignore",
+      "sha": "dd7ed68aabea364f65c49937a3d755856fcd0b52",
+      "size": 98
+    },
+    {
+      "path": "Agent工程师学习路线图.md",
+      "sha": "c38a74e1488259b8bfd329177ffc3e86ae7287ac",
+      "size": 66409
+    },
+    {
+      "path": "Agent工程师知识地图.canvas",
+      "sha": "324a3e0fd2f1e2c62ea2d8ea29a3657c7a6d6317",
+      "size": 3816
+    },
+    {
+      "path": "Anthropic/岗位要求.md",
+      "sha": "cb52438e03ded514c0e4cbb476d4995559c8446a",
+      "size": 6650
+    },
+    {
+      "path": "Anthropic/面试题与面经.md",
+      "sha": "4001f9b73bbbac7de2043d9b2d6e669a9b3fb2cd",
+      "size": 9163
+    },
+    {
+      "path": "LICENSE",
+      "sha": "68d80e9968f7c9ff8c05e8b319c45d839779c5a1",
+      "size": 1067
+    },
+    {
+      "path": "OpenAI/岗位要求.md",
+      "sha": "77f649cedc402ccc27af7759e8060b36dce0fc81",
+      "size": 5823
+    },
+    {
+      "path": "OpenAI/面试题与面经.md",
+      "sha": "b99e4971771b880ee6560485b39a0e6299a94bf6",
+      "size": 5756
+    },
+    {
+      "path": "README.md",
+      "sha": "32f9b16c454d06e7df793d4ff7fbb3a3be621bcd",
+      "size": 16556
+    },
+    {
+      "path": "agents/interview-collector/AGENT.md",
+      "sha": "a8d074b47473ddf52ab166aeeab4c01fe2cda9b2",
+      "size": 4439
+    },
+    {
+      "path": "agents/interview-collector/README.md",
+      "sha": "14a8e6dc4837b3feb576903718d8ddb2a1aaeeaa",
+      "size": 4983
+    },
+    {
+      "path": "agents/interview-collector/install.sh",
+      "sha": "1311680e32249fc0d657a8e716c0b0c1fec8f680",
+      "size": 3308
+    },
+    {
+      "path": "agents/interview-collector/templates/claude/SKILL.md",
+      "sha": "ea64d1dc199331bd17a6641835b1a274fd9f4a1c",
+      "size": 2011
+    },
+    {
+      "path": "agents/interview-collector/templates/copilot/interview-collector.instructions.md",
+      "sha": "783dc4ec5d288d5ea947a4aa48e066a2c4ae3414",
+      "size": 1853
+    },
+    {
+      "path": "agents/interview-collector/templates/cursor/interview-collector.mdc",
+      "sha": "e4552e59da2178253f180d3e77e9281d8a26caa4",
+      "size": 1231
+    },
+    {
+      "path": "agents/interview-collector/templates/generic/AGENT.md",
+      "sha": "2df5593cae2a73ad40d03132a99d24c15f1c8fe8",
+      "size": 1769
+    },
+    {
+      "path": "data.json",
+      "sha": "1a0cc1ca0697cf5aa5f2756e52eb15c10673db6b",
+      "size": 279768
+    },
+    {
+      "path": "data/interviews.json",
+      "sha": "25fddf54ee47141d161881db39eaa7aa48d2e96e",
+      "size": 164455
+    },
+    {
+      "path": "data/practice-2026-10/README.md",
+      "sha": "f8e4f4f6cd7f91ac7fe14b83c7c0d1a85282aad1",
+      "size": 2509
+    },
+    {
+      "path": "data/practice-2026-10/answer-references.json",
+      "sha": "97a1807b927f6740a4fc5a4c326262f45fee2220",
+      "size": 5410
+    },
+    {
+      "path": "data/practice-2026-10/questions.json",
+      "sha": "59d91e60c8a93265e4ce2aaf68339b7784bb574d",
+      "size": 280127
+    },
+    {
+      "path": "data/question_signals.json",
+      "sha": "2b09dcec3b949833bb484e97d60df98b3d81c164",
+      "size": 10853
+    },
+    {
+      "path": "diagrams/agent-architecture.svg",
+      "sha": "309684a4b0d81afd95afcb648726b92575594bbb",
+      "size": 6566
+    },
+    {
+      "path": "diagrams/agent-engineer-competency-model.svg",
+      "sha": "4b60680022b09ac1f7799d566dc451d48599c1c3",
+      "size": 2638
+    },
+    {
+      "path": "diagrams/agent-framework-selection-tree.svg",
+      "sha": "568133f379d018a16447927f174a94c9a4e6809c",
+      "size": 4556
+    },
+    {
+      "path": "diagrams/agent-loop-cycle.svg",
+      "sha": "7397d026c56e0faa5c28a2abde7cf0089b89a204",
+      "size": 2133
+    },
+    {
+      "path": "diagrams/agentic-coding-stack.svg",
+      "sha": "48a74519198ea953736ba25c31ebe1e6537b1d51",
+      "size": 2505
+    },
+    {
+      "path": "diagrams/agentic-rag-loop-flow.svg",
+      "sha": "c05a8e2131d68415ba666095607454a46314679f",
+      "size": 4708
+    },
+    {
+      "path": "diagrams/autogen-group-chat.svg",
+      "sha": "049e525722a64c4da17092e6e32397715be5485f",
+      "size": 2601
+    },
+    {
+      "path": "diagrams/customer-service-agent-architecture.svg",
+      "sha": "ca92b9235d203820e4c418de85b4d648ebd56b05",
+      "size": 2251
+    },
+    {
+      "path": "diagrams/deepspeed-zero-stages.svg",
+      "sha": "b91964b803be679ee5f364b7a142d57d49e6c23f",
+      "size": 6677
+    },
+    {
+      "path": "diagrams/dify-platform-overview.svg",
+      "sha": "837e0b70825468261aa29bd4dbe885e7e69b9dcc",
+      "size": 2469
+    },
+    {
+      "path": "diagrams/document-ingestion-pipeline.svg",
+      "sha": "566b5e3506ed98105145145cfe018219a5db405c",
+      "size": 3357
+    },
+    {
+      "path": "diagrams/finetune-memory-estimation.svg",
+      "sha": "20d94a349aabeead017ab74910510d24d9cd29bc",
+      "size": 3437
+    },
+    {
+      "path": "diagrams/finetune-method-comparison.svg",
+      "sha": "c3b3892a89addb82dff1c189e033429fb0580ffd",
+      "size": 7044
+    },
+    {
+      "path": "diagrams/finetuning-evolution-timeline.svg",
+      "sha": "1aea0e7f6b130d384c1d14708388b589f4cabea9",
+      "size": 2769
+    },
+    {
+      "path": "diagrams/framework-decision-tree.svg",
+      "sha": "6dce5e451dda2175f6e165854c9ecd0e45467f6d",
+      "size": 6004
+    },
+    {
+      "path": "diagrams/langchain-core-architecture.svg",
+      "sha": "5979408ae2f77ae2174645bf768970933bd9e0fd",
+      "size": 4078
+    },
+    {
+      "path": "diagrams/langgraph-architecture.svg",
+      "sha": "52c58c446fa9a1c643fac2a60eb0edec2320e110",
+      "size": 7271
+    },
+    {
+      "path": "diagrams/langgraph-stategraph-flow.svg",
+      "sha": "600c4bd4735487fadbbf96e31a4ec84298248eeb",
+      "size": 3198
+    },
+    {
+      "path": "diagrams/learning-rate-warmup-cosine.svg",
+      "sha": "2f5cc0a0ee5d2a42422d87b7565f0ab8293ea2a1",
+      "size": 1522
+    },
+    {
+      "path": "diagrams/llm-serving-topology.svg",
+      "sha": "89e08530d023e1f4f97d150e2ed5a38232cd6243",
+      "size": 3442
+    },
+    {
+      "path": "diagrams/lora-adapter-flow.svg",
+      "sha": "667111d9601c22d8ff6319c0e6475c339d3f6294",
+      "size": 2791
+    },
+    {
+      "path": "diagrams/mcp-architecture.svg",
+      "sha": "d1ec154adfd3bc1cfe87ed28fb7aeda84badf3d7",
+      "size": 3582
+    },
+    {
+      "path": "diagrams/mcp-integration-comparison.svg",
+      "sha": "02de98301ada7977e1aa8c0c78f0843e006ed2e1",
+      "size": 3034
+    },
+    {
+      "path": "diagrams/multi-agent-langgraph.svg",
+      "sha": "8f12fdeec01dba426034d0ab395d1fe8f33fc9f5",
+      "size": 4435
+    },
+    {
+      "path": "diagrams/multi-agent-patterns.svg",
+      "sha": "c557d4af53231028b90ee1061498fbdaf6e1a3e4",
+      "size": 9237
+    },
+    {
+      "path": "diagrams/openai-agents-loop.svg",
+      "sha": "dead4d5863b3052bcc9aded57bbed5d594b0726b",
+      "size": 3089
+    },
+    {
+      "path": "diagrams/personalized-rag-flow.svg",
+      "sha": "2c9564c4d28816960980052692430d9efbd3bcde",
+      "size": 3266
+    },
+    {
+      "path": "diagrams/plan-and-execute.svg",
+      "sha": "e19ccd86d9b2c1ec06302c3d20fee60827b8485c",
+      "size": 2972
+    },
+    {
+      "path": "diagrams/ppo-training-loop.svg",
+      "sha": "8fe9171bb941bf115849bef1f82ec15aab384f83",
+      "size": 2843
+    },
+    {
+      "path": "diagrams/production-agent-pipeline.svg",
+      "sha": "86b399ec406fd8f8304708fe619c14aee2d55571",
+      "size": 6229
+    },
+    {
+      "path": "diagrams/qlora-training-stack.svg",
+      "sha": "7e68eb74e68bc1dd4e9159179cfc6053a918ee4f",
+      "size": 2343
+    },
+    {
+      "path": "diagrams/rag-deployment-topology.svg",
+      "sha": "7c3e7512e5ec4b9fadf7e68adc45fc63311a155a",
+      "size": 3047
+    },
+    {
+      "path": "diagrams/rag-hybrid-retrieval-flow.svg",
+      "sha": "c640d92f961d825ded6ed6461537cfd6f46c79f9",
+      "size": 3934
+    },
+    {
+      "path": "diagrams/rag-pipeline.svg",
+      "sha": "bc4e63bfd893319103d76fba0fc41c76bdbe0530",
+      "size": 7205
+    },
+    {
+      "path": "diagrams/rag-vs-finetune.svg",
+      "sha": "967f97823343b0ef0ce63d465dc8d4e64f73acec",
+      "size": 7260
+    },
+    {
+      "path": "diagrams/react-loop.svg",
+      "sha": "58c2d6be2fb1bdca7b612945d98c6d8ee4e08285",
+      "size": 5419
+    },
+    {
+      "path": "diagrams/rlhf-three-stage-flow.svg",
+      "sha": "399cf51a1f7f5082cccfc15534e8afc2f090caea",
+      "size": 2035
+    },
+    {
+      "path": "diagrams/supervisor-agent-team.svg",
+      "sha": "e1d6289c3821ccba5f070678601a9af26b5841fd",
+      "size": 2820
+    },
+    {
+      "path": "diagrams/supervisor-multi-agent-simple.svg",
+      "sha": "d3263cd75b4dc302b0bb3e4d35d3864b00073252",
+      "size": 2020
+    },
+    {
+      "path": "diagrams/tool-permission-layers.svg",
+      "sha": "44fa24707bfab62e384a41b785b5908a00352220",
+      "size": 3153
+    },
+    {
+      "path": "diagrams/training-scale-playbook.svg",
+      "sha": "8ec23a6b3dae28f058210c79346607d4920a26ab",
+      "size": 6748
+    },
+    {
+      "path": "legacy/index.html",
+      "sha": "b58848d6f4a76b858c65b416da5b61b7768bef04",
+      "size": 1356052
+    },
+    {
+      "path": "legacy/interview-questions.html",
+      "sha": "1bde2e0225e5e17e6699f9b090d1aa83256c9983",
+      "size": 85277
+    },
+    {
+      "path": "requirements.txt",
+      "sha": "014b9d1206adb278a2521f96da33e314350bf88e",
+      "size": 47
+    },
+    {
+      "path": "scripts/build_site.py",
+      "sha": "a3cf001381e2f247f03c0ea4ff6150e6dce28110",
+      "size": 68875
+    },
+    {
+      "path": "scripts/collect_interviews.py",
+      "sha": "4218d054ed74687fe5097ed718a195ffedd0fa10",
+      "size": 22668
+    },
+    {
+      "path": "scripts/sync_practice_2026_10.py",
+      "sha": "06951110a7e5d1aea0b6786d001461b0f3384901",
+      "size": 15596
+    },
+    {
+      "path": "scripts/test_practice_2026_10.py",
+      "sha": "c54f5d6403da35f56a7aa99ae3b1f09482bfdac5",
+      "size": 2711
+    },
+    {
+      "path": "scripts/validate_data.py",
+      "sha": "1bc4268f1ded43478e5066fd1e5e37cecd40ac59",
+      "size": 8323
+    },
+    {
+      "path": "scripts/validate_practice_2026_10.py",
+      "sha": "cadd60229be8289ee15ec57c499d2baca6009cb7",
+      "size": 8123
+    },
+    {
+      "path": "初创公司/岗位要求.md",
+      "sha": "b579bd65ed461c81a2403bf199bc0b1a48407993",
+      "size": 68
+    },
+    {
+      "path": "初创公司/面试题与面经.md",
+      "sha": "140b2a77821e6bcd6864870b92bb368c9231b1d9",
+      "size": 5588
+    },
+    {
+      "path": "华为/岗位要求.md",
+      "sha": "812059811f0f1936f1a6bc2fba547fe00e71c835",
+      "size": 4109
+    },
+    {
+      "path": "华为/真实面经-网络实录.md",
+      "sha": "a1dc5be9f38e4f7bc0dc27cce93106f6156fb52d",
+      "size": 16469
+    },
+    {
+      "path": "华为/面试题与面经.md",
+      "sha": "b6319117127b707bd672a35358b1224f44a3f517",
+      "size": 6210
+    },
+    {
+      "path": "商汤科技/岗位要求.md",
+      "sha": "ca6643eba7b5cf6458a2b9f4bcad4d816b306d21",
+      "size": 68
+    },
+    {
+      "path": "商汤科技/面试题与面经.md",
+      "sha": "e4ff5216f921ce47fee5a6b0eda2f35a31c9909b",
+      "size": 5678
+    },
+    {
+      "path": "字节跳动/岗位要求.md",
+      "sha": "aeecda9ac3d37cc42fe066b582a45b6a318c1176",
+      "size": 1251
+    },
+    {
+      "path": "字节跳动/真实面经-牛客实录.md",
+      "sha": "52f1e74038cbd7afe07048e53fbc2b3b13dd5741",
+      "size": 7619
+    },
+    {
+      "path": "字节跳动/面试题与面经.md",
+      "sha": "b1cd8a11bbe555de5d0d9a8e6b875db814179dd8",
+      "size": 4477
+    },
+    {
+      "path": "小红书/岗位要求.md",
+      "sha": "9e0a80836436122656514ca4d9e6139c287355f6",
+      "size": 1391
+    },
+    {
+      "path": "小红书/真实面经-牛客实录.md",
+      "sha": "557783e787b10a6dc597d774ff345c63f278ce95",
+      "size": 4550
+    },
+    {
+      "path": "小红书/面试题与面经.md",
+      "sha": "fb5b23fb0ff228ef25172a9d781001d374338b04",
+      "size": 4183
+    },
+    {
+      "path": "微软/岗位要求.md",
+      "sha": "59fc7716c8dab95720e37a09ec41ce2b344669d6",
+      "size": 62
+    },
+    {
+      "path": "微软/面试题与面经.md",
+      "sha": "31d73b6be4b98b5bcbddef57fd7e2677d011773f",
+      "size": 5642
+    },
+    {
+      "path": "快手/岗位要求.md",
+      "sha": "f6c314257426140dc01b01b7d87020837ff5e272",
+      "size": 4008
+    },
+    {
+      "path": "快手/真实面经-网络实录.md",
+      "sha": "a0e57f35ce75702cecc53c797e1c1c0c9a106caa",
+      "size": 19839
+    },
+    {
+      "path": "快手/面试题与面经.md",
+      "sha": "9b53c9eb8f22172b6c4081229e5fd555f3838fb3",
+      "size": 5424
+    },
+    {
+      "path": "百度/岗位要求.md",
+      "sha": "81e9d3bb103d64ebb55bd4fc4a76a82be13309d7",
+      "size": 833
+    },
+    {
+      "path": "百度/真实面经-网络实录.md",
+      "sha": "601c650a5120d97043352f5f2af0a940ef0ac666",
+      "size": 18071
+    },
+    {
+      "path": "百度/面试题与面经.md",
+      "sha": "fffbd85bce9d6ed9290348ea1dc318424b636783",
+      "size": 6467
+    },
+    {
+      "path": "美团/岗位要求.md",
+      "sha": "69cc6a52acb162829dfabf79ff4f668e47db5bd3",
+      "size": 3734
+    },
+    {
+      "path": "美团/真实面经-网络实录.md",
+      "sha": "e52395abdc8286a70bb09f5420ad4b9039b98dea",
+      "size": 14827
+    },
+    {
+      "path": "美团/面试题与面经.md",
+      "sha": "4d30c89eb360cf5dd1e4bb54be7973e723f5a0d8",
+      "size": 5453
+    },
+    {
+      "path": "腾讯/岗位要求.md",
+      "sha": "fc42917387aaaadbe957530ba2ed742a0bc4bf00",
+      "size": 1470
+    },
+    {
+      "path": "腾讯/真实面经-网络实录.md",
+      "sha": "cd3bf9d2025e53e11dec10ab0a2f58248cbc165c",
+      "size": 16353
+    },
+    {
+      "path": "腾讯/面试题与面经.md",
+      "sha": "662b6aee82ee44a5ecb448c12181dbe3c149b22e",
+      "size": 6434
+    },
+    {
+      "path": "蚂蚁集团/岗位要求.md",
+      "sha": "5381f154996b7fe8703b03f8226e1b35ba2e2398",
+      "size": 3927
+    },
+    {
+      "path": "蚂蚁集团/真实面经-网络实录.md",
+      "sha": "da7f88cc94449aa1f33feea951f368049ab42141",
+      "size": 17376
+    },
+    {
+      "path": "蚂蚁集团/面试题与面经.md",
+      "sha": "f1d6b63918d7f0bfc3997bb0eb36b771405315f7",
+      "size": 5614
+    },
+    {
+      "path": "谷歌/岗位要求.md",
+      "sha": "7abd94d0e65a528f63ff838f0b6abda87651ec11",
+      "size": 62
+    },
+    {
+      "path": "谷歌/面试题与面经.md",
+      "sha": "3c26dba67c3234e3a66fb5b0fedbcae793a0a79b",
+      "size": 5625
+    },
+    {
+      "path": "通用知识/12周Agent工程师进阶路线.md",
+      "sha": "1542cd95087419e1521f51125697930022f37f72",
+      "size": 8719
+    },
+    {
+      "path": "通用知识/2026-10-Agent架构面试题与参考答案.md",
+      "sha": "092693d9226e9bfe87ff34a4f666511fc838e20a",
+      "size": 14987
+    },
+    {
+      "path": "通用知识/2026-10-Agent面经来源与答案资料.md",
+      "sha": "1535fa2e39b74078edea174fa3b76f14c2c66fcd",
+      "size": 54754
+    },
+    {
+      "path": "通用知识/2026-10-Agent面试题索引.md",
+      "sha": "d2929ad92b3713f77bdecedb73fbadf71dea3bf0",
+      "size": 4625
+    },
+    {
+      "path": "通用知识/2026-10-RAG与检索面试题与参考答案.md",
+      "sha": "7e5dc7f79d6c21f5d40cfb60db7c533ee722cc4f",
+      "size": 19700
+    },
+    {
+      "path": "通用知识/2026-10-上下文与记忆面试题与参考答案.md",
+      "sha": "de6f9a3011bc2f014e6bf4b22f2d845da59b7109",
+      "size": 13807
+    },
+    {
+      "path": "通用知识/2026-10-后端基础面试题与参考答案.md",
+      "sha": "bc35a310ad16579fbaeb9af96d1b396afb6688ae",
+      "size": 15131
+    },
+    {
+      "path": "通用知识/2026-10-多Agent协作面试题与参考答案.md",
+      "sha": "2f0ff86b2c4f729f8431aaed120eded6374ccffa",
+      "size": 11597
+    },
+    {
+      "path": "通用知识/2026-10-安全与治理面试题与参考答案.md",
+      "sha": "bf2e71648a6e1945d98e418071366f8dfa0845b3",
+      "size": 11561
+    },
+    {
+      "path": "通用知识/2026-10-工具与MCP面试题与参考答案.md",
+      "sha": "d9b79c47253ec2140b24db683d97652673f012c5",
+      "size": 14706
+    },
+    {
+      "path": "通用知识/2026-10-性能与成本面试题与参考答案.md",
+      "sha": "6226aeb0abf4b1a30aafff1265b9397e5906a542",
+      "size": 10873
+    },
+    {
+      "path": "通用知识/2026-10-模型与算法面试题与参考答案.md",
+      "sha": "55728a3f33754d776081e1669012b16398f0c99d",
+      "size": 7097
+    },
+    {
+      "path": "通用知识/2026-10-状态与恢复面试题与参考答案.md",
+      "sha": "8acd12a94265d4234d3ab63d7ca468248e4d70f0",
+      "size": 14310
+    },
+    {
+      "path": "通用知识/2026-10-评测与归因面试题与参考答案.md",
+      "sha": "ee8ec116610575159994bdaf0abff5423ed83ddc",
+      "size": 13047
+    },
+    {
+      "path": "通用知识/2026-Agent工程化新考点.md",
+      "sha": "6077e5c6bbb3f8fccc44507dba3115ae244a6bff",
+      "size": 16399
+    },
+    {
+      "path": "通用知识/AI协作与工程化面试题-进阶篇.md",
+      "sha": "d8519c1003aa007dbe470db4a3fc7c8e477f83fb",
+      "size": 1937
+    },
+    {
+      "path": "通用知识/Agent Harness与编码代理测评.md",
+      "sha": "fef504a1f72cf2d61366b38a8a2884f4951add95",
+      "size": 25829
+    },
+    {
+      "path": "通用知识/Agent-Harness评测与发布门禁.md",
+      "sha": "0c1dd2955466cc90676496bcd94a99ecb3f92688",
+      "size": 6684
+    },
+    {
+      "path": "通用知识/Agentic Coding与AI编程工具.md",
+      "sha": "7116ea9e3f8a164a4de079b6e62e2e90c2acc0c0",
+      "size": 14267
+    },
+    {
+      "path": "通用知识/Agentic RAG与GraphRAG深度解析.md",
+      "sha": "d4fb532e869a876f65e260492ec829e0418c1f93",
+      "size": 61717
+    },
+    {
+      "path": "通用知识/Agent安全与评估体系.md",
+      "sha": "406bb6812ccc1b867fe031fa7d1f8507b007c93a",
+      "size": 43053
+    },
+    {
+      "path": "通用知识/Agent核心概念与设计模式.md",
+      "sha": "7d8be91c29bf18c8ab3bdaf0511d57371046d87c",
+      "size": 39628
+    },
+    {
+      "path": "通用知识/Agent核心概念面试题-进阶篇.md",
+      "sha": "e8c9effb0da147c01a2e9fe2121163527053fd56",
+      "size": 3058
+    },
+    {
+      "path": "通用知识/Agent框架全景.md",
+      "sha": "0dc3cafbf45c4c73522a8de564c284b10b27c5b3",
+      "size": 34499
+    },
+    {
+      "path": "通用知识/Agent项目深挖与压力面试.md",
+      "sha": "75f6f3c530685e27f278a8c43b1d239a2b791c2f",
+      "size": 5118
+    },
+    {
+      "path": "通用知识/Agent项目简历与STAR表达.md",
+      "sha": "952486b670ec4250406ebaa452d44c10cba00cfa",
+      "size": 5450
+    },
+    {
+      "path": "通用知识/Agent高频题证据模型.md",
+      "sha": "5ccbe9a16f1ab212c46b52f2bf7349c545a079b0",
+      "size": 4126
+    },
+    {
+      "path": "通用知识/Context Engineering上下文工程.md",
+      "sha": "b344ec38c18a93eefdc937f5e7eab22b0cc16422",
+      "size": 65855
+    },
+    {
+      "path": "通用知识/Function Calling与Tool Use专题.md",
+      "sha": "259f302e08b7b398eca2c4f5b6ffddb1ec25d3bb",
+      "size": 16289
+    },
+    {
+      "path": "通用知识/GitHub热门Agent资源整理.md",
+      "sha": "2dabf7fb844ef6db7948a60c7ca9125f0d16446b",
+      "size": 6453
+    },
+    {
+      "path": "通用知识/LangChain与LangGraph深度解析.md",
+      "sha": "b392e548d4e724b07c9832895d5ec1aca9adb613",
+      "size": 6198
+    },
+    {
+      "path": "通用知识/MCP与工具生态.md",
+      "sha": "de8251505deafa2d42f4ee0d54c308adbec93b93",
+      "size": 14474
+    },
+    {
+      "path": "通用知识/RAG核心知识与面试题.md",
+      "sha": "8364206f4ca6410502041a5ae9da4deef6e50223",
+      "size": 5679
+    },
+    {
+      "path": "通用知识/企业级Agent平台与AgentOS.md",
+      "sha": "59b9fc6d8cf90f325379f289395f990f34a90d6c",
+      "size": 4795
+    },
+    {
+      "path": "通用知识/八股文完整答案集.md",
+      "sha": "62810fe48ca9ab313111c5ad1c067b4d545c4d6a",
+      "size": 67307
+    },
+    {
+      "path": "通用知识/八股文题库-DataWhale开源.md",
+      "sha": "4bfb1678d785d3fcaedd90210ef751ce3b8ad889",
+      "size": 4028
+    },
+    {
+      "path": "通用知识/其他公司面经-快手携程等.md",
+      "sha": "d540b6d0a49ed68a9df7feacff799565a384cb08",
+      "size": 3243
+    },
+    {
+      "path": "通用知识/大模型推理优化与部署.md",
+      "sha": "be5c672b4c55d1b2b60bb375ec71df7ebc49eb5e",
+      "size": 53276
+    },
+    {
+      "path": "通用知识/技术知识点汇总.md",
+      "sha": "acfd6a54c878e6a1f67b2ac4323ab063ad0e2129",
+      "size": 3803
+    },
+    {
+      "path": "通用知识/最新AI-Agent面经索引.md",
+      "sha": "3821620ad466a6c3cb13fe1f6e02b99379aa781d",
+      "size": 14764
+    },
+    {
+      "path": "通用知识/核心概念详解与参考答案.md",
+      "sha": "9c7f9f0b7c5663949fbf35cb0b0ee6adaa915b72",
+      "size": 10807
+    },
+    {
+      "path": "通用知识/模型微调完全指南.md",
+      "sha": "3a024c32877f106c3338d01870754c87f03b0bba",
+      "size": 55950
+    },
+    {
+      "path": "通用知识/海外顶级AI公司面试攻略-2026.md",
+      "sha": "f5047653a533e1dd507fd1dea9851ccad04fccc3",
+      "size": 9515
+    },
+    {
+      "path": "通用知识/系统设计面试题-进阶篇.md",
+      "sha": "a0e370ce44748c5493317928f43700b5260d0ae8",
+      "size": 2782
+    },
+    {
+      "path": "通用知识/自进化Agent与Skill生命周期.md",
+      "sha": "efcac55b20a4f6d65f2d49d237b83df9de72dada",
+      "size": 4575
+    },
+    {
+      "path": "通用知识/跨公司Agent岗位能力矩阵.md",
+      "sha": "6effdc209bc1e84a1f1992d79f6aa570b030f4df",
+      "size": 4148
+    },
+    {
+      "path": "通用知识/高频拷打题-牛客热帖.md",
+      "sha": "fa29ea0402b91bbdbcd26e8a8cb7cbadd3f1e7a4",
+      "size": 27962
+    },
+    {
+      "path": "通用知识/高频面试新题-2025.md",
+      "sha": "2458ae5ee50af111ffa279824fa68fd92f061c51",
+      "size": 9349
+    },
+    {
+      "path": "阿里巴巴/岗位要求.md",
+      "sha": "2cf80a651830af1b41cfcb93925bd7d0296e52e3",
+      "size": 1371
+    },
+    {
+      "path": "阿里巴巴/真实面经-牛客实录.md",
+      "sha": "e0eb3a7204e73792c4f30f32a260000cecf99b09",
+      "size": 6096
+    },
+    {
+      "path": "阿里巴巴/面试题与面经.md",
+      "sha": "f420152375a70928ef28118d29c3f755e1736312",
+      "size": 5716
+    },
+    {
+      "path": "面试算法题/2026-10-算法与手写面试题与参考答案.md",
+      "sha": "57ab20275129d8cc015eed48690d666b826643a8",
+      "size": 17907
+    },
+    {
+      "path": "面试算法题/AI模型与Agent手撕题.md",
+      "sha": "d73c3306fde1501e52d49fa0fade089631e82db6",
+      "size": 8162
+    },
+    {
+      "path": "面试算法题/README.md",
+      "sha": "f1f751fc527d85ac4d06a9aaae98e1327a362185",
+      "size": 826
+    },
+    {
+      "path": "面试算法题/index.html",
+      "sha": "a50d0f2ec59d541ae3df1eaa0320fe7665c6e9bc",
+      "size": 71486
+    },
+    {
+      "path": "面试算法题/python/README.md",
+      "sha": "80e4f6aa15a45ae1fbc03f62ed1f7bcd85513a65",
+      "size": 1792
+    },
+    {
+      "path": "面试算法题/python/algorithm_answers.py",
+      "sha": "eb11fac2fd41a27239db55ff5b4a9aeacfc3f85b",
+      "size": 15416
+    },
+    {
+      "path": "面试算法题/python/test_algorithm_answers.py",
+      "sha": "d3fa08a764d95f013145de7cd4ccd98a4368b62b",
+      "size": 10769
+    },
+    {
+      "path": "项目实战/01-RAG知识问答系统.md",
+      "sha": "de17a2575e0bebc3b70ff912c1b271754882371a",
+      "size": 26225
+    },
+    {
+      "path": "项目实战/02-多Agent协作系统.md",
+      "sha": "94965a40747e365ce643ccfc3f49467320618cc7",
+      "size": 28926
+    },
+    {
+      "path": "项目实战/03-生产级Agent应用.md",
+      "sha": "b7223302c59df5d4e109fd13f5fa0c199d2daa18",
+      "size": 43583
+    },
+    {
+      "path": "项目实战/2026-10-项目与研发面试题与参考答案.md",
+      "sha": "2b0d86162a26212e88fc348802ce61c96e9c3495",
+      "size": 15278
+    },
+    {
+      "path": "项目实战/实操考题/01-智能文档问答Agent.md",
+      "sha": "c9b88a8fccdc0eeca81895a45bae6820d5703443",
+      "size": 1845
+    },
+    {
+      "path": "项目实战/实操考题/02-多Agent团队协作.md",
+      "sha": "2fe4bea07da70345cad6e283b1e083bf9e5b1f6f",
+      "size": 1550
+    },
+    {
+      "path": "项目实战/实操考题/03-ReAct模式Agent.md",
+      "sha": "c67a22ea7c92223ce68f4d092c62fb0afccdf07e",
+      "size": 1256
+    },
+    {
+      "path": "项目实战/实操考题/04-AI限时全栈开发.md",
+      "sha": "f583d47225f249635b5d6a99c4a1dda30d2266c8",
+      "size": 1886
+    },
+    {
+      "path": "项目实战/实操考题/05-AI调试挑战.md",
+      "sha": "541200aba4409c5f1969e3749850a3b6d0713b5b",
+      "size": 1477
+    },
+    {
+      "path": "项目实战/实操考题/06-AI-CodeReview-Agent.md",
+      "sha": "ecd3cdcad43422df56e90823e6fb4344f0438264",
+      "size": 1296
+    }
+  ]
+}

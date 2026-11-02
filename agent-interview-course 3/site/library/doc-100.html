@@ -1,0 +1,822 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>项目一：RAG 知识问答系统 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-100.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">项目实战/01-RAG知识问答系统.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/07-rag-basics.html">07 RAG 起点：从文档到有出处的回答</a> · <a href="../lessons/24-document-agent-project.html">24 项目一：从简单检索到可验收的文档问答 Agent</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/01-RAG%E7%9F%A5%E8%AF%86%E9%97%AE%E7%AD%94%E7%B3%BB%E7%BB%9F.md">GitHub 固定版本</a> · <a href="../../source/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/01-RAG%E7%9F%A5%E8%AF%86%E9%97%AE%E7%AD%94%E7%B3%BB%E7%BB%9F.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%BF%B0">一、项目概述</a><a href="#%E4%BA%8C%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1">二、架构设计</a><a href="#%E6%95%B4%E4%BD%93%E6%95%B0%E6%8D%AE%E6%B5%81">整体数据流</a><a href="#%E7%A6%BB%E7%BA%BF%E6%95%B0%E6%8D%AE%E6%91%84%E5%85%A5%E6%B5%81">离线数据摄入流</a><a href="#%E4%B8%89%E6%8A%80%E6%9C%AF%E6%A0%88%E9%80%89%E6%8B%A9">三、技术栈选择</a><a href="#%E6%A1%86%E6%9E%B6%E5%B1%82">框架层</a><a href="#%E5%90%91%E9%87%8F%E6%95%B0%E6%8D%AE%E5%BA%93">向量数据库</a><a href="#embedding-%E6%A8%A1%E5%9E%8B">Embedding 模型</a><a href="#reranker">Reranker</a><a href="#llm">LLM</a><a href="#%E5%9B%9B%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0">四、核心实现</a><a href="#41-%E6%96%87%E6%A1%A3%E5%A4%84%E7%90%86%E5%92%8C%E5%88%86%E5%9D%97%E7%AD%96%E7%95%A5">4.1 文档处理和分块策略</a><a href="#42-embedding-%E5%92%8C%E7%B4%A2%E5%BC%95%E6%9E%84%E5%BB%BA">4.2 Embedding 和索引构建</a><a href="#43-%E6%A3%80%E7%B4%A2%E4%BC%98%E5%8C%96">4.3 检索优化</a><a href="#44-prompt-%E8%AE%BE%E8%AE%A1">4.4 Prompt 设计</a><a href="#45-%E5%AE%8C%E6%95%B4-rag-chain">4.5 完整 RAG Chain</a><a href="#46-%E8%AF%84%E4%BC%B0%E6%96%B9%E6%A1%88ragas">4.6 评估方案（RAGAS）</a><a href="#%E4%BA%94%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF">五、面试话术</a><a href="#1-%E5%88%86%E9%92%9F%E7%89%88">1 分钟版</a><a href="#3-%E5%88%86%E9%92%9F%E7%89%88">3 分钟版</a><a href="#5-%E5%88%86%E9%92%9F%E7%89%88">5 分钟版</a><a href="#%E5%85%AD%E5%B8%B8%E8%A7%81%E8%BF%BD%E9%97%AE%E5%8F%8A%E5%9B%9E%E7%AD%94">六、常见追问及回答</a><a href="#q1-%E5%88%86%E5%9D%97%E5%A4%A7%E5%B0%8F%E6%80%8E%E4%B9%88%E9%80%89%E7%9A%84">Q1: 分块大小怎么选的？</a><a href="#q2-%E6%A3%80%E7%B4%A2%E6%95%88%E6%9E%9C%E4%B8%8D%E5%A5%BD%E6%80%8E%E4%B9%88%E4%BC%98%E5%8C%96">Q2: 检索效果不好怎么优化？</a><a href="#q3-%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86%E8%A1%A8%E6%A0%BC%E5%9B%BE%E7%89%87">Q3: 怎么处理表格/图片？</a><a href="#q4-%E5%A6%82%E4%BD%95%E8%AF%84%E4%BC%B0-rag-%E6%95%88%E6%9E%9C">Q4: 如何评估 RAG 效果？</a><a href="#q5-%E7%BA%BF%E4%B8%8A%E9%83%A8%E7%BD%B2%E6%9E%B6%E6%9E%84">Q5: 线上部署架构？</a><a href="#q6-%E5%B9%B6%E5%8F%91%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86">Q6: 并发怎么处理？</a><a href="#%E4%B8%83%E9%A1%B9%E7%9B%AE%E4%BA%AE%E7%82%B9%E6%80%BB%E7%BB%93%E9%9D%A2%E8%AF%95%E5%BF%AB%E9%80%9F%E5%9B%9E%E9%A1%BE">七、项目亮点总结（面试快速回顾）</a><a href="#%E5%85%AB%E9%A1%B9%E7%9B%AE%E9%AA%8C%E6%94%B6%E6%A0%87%E5%87%86%E4%B8%8E%E8%AF%84%E5%88%86%E8%A1%A8">八、项目验收标准与评分表</a><a href="#%E6%9C%80%E4%BD%8E%E5%8F%AF%E4%BA%A4%E4%BB%98%E7%89%88%E6%9C%AC60-%E5%88%86">最低可交付版本（60 分）</a><a href="#%E8%BF%9B%E9%98%B6%E5%8F%AF%E7%AD%94%E8%BE%A9%E7%89%88%E6%9C%AC80-%E5%88%86">进阶可答辩版本（80 分）</a><a href="#%E9%9D%A2%E8%AF%95%E4%BA%AE%E7%82%B9%E7%89%88%E6%9C%AC100-%E5%88%86">面试亮点版本（100 分）</a><a href="#%E8%AF%84%E5%88%86%E8%A1%A8">评分表</a><a href="#github-%E9%A1%B9%E7%9B%AE%E5%8F%82%E8%80%83">GitHub 项目参考</a></nav></details><article class="prose source-prose"><h1 id="项目一rag-知识问答系统">项目一：RAG 知识问答系统</h1>
+<h2 id="一项目概述">一、项目概述</h2>
+<p><strong>一句话描述</strong>：基于检索增强生成（RAG）架构，将企业内部知识库（PDF/Word/网页等）转化为可智能问答的系统，用户提问后系统自动检索相关文档片段并生成准确回答。</p>
+<p><strong>技术亮点</strong>：
+- 混合检索策略（稠密向量 + 稀疏BM25），召回率提升 30%+
+- 多级分块 + 父子文档索引，兼顾语义完整性和检索精度
+- Reranking 二次排序，Top-5 准确率从 72% 提升到 89%
+- 基于 RAGAS 的自动化评估流水线，持续量化系统效果
+- 支持表格、图片等多模态文档处理
+- 流式输出 + 引用溯源，用户体验与可信度兼备</p>
+<hr>
+<h2 id="二架构设计">二、架构设计</h2>
+<h3 id="整体数据流">整体数据流</h3>
+<p><img alt="RAG 混合检索与生成链路" src="../../source/diagrams/rag-hybrid-retrieval-flow.svg" loading="lazy" decoding="async"></p>
+<h3 id="离线数据摄入流">离线数据摄入流</h3>
+<p><img alt="RAG 文档入库流水线" src="../../source/diagrams/document-ingestion-pipeline.svg" loading="lazy" decoding="async"></p>
+<hr>
+<h2 id="三技术栈选择">三、技术栈选择</h2>
+<h3 id="框架层">框架层</h3>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>选择</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>编排框架</td>
+<td>LangChain</td>
+<td>生态最成熟，LCEL 链式调用简洁，与各组件集成度高；社区活跃，遇到问题好排查</td>
+</tr>
+<tr>
+<td>备选</td>
+<td>LlamaIndex</td>
+<td>更专注 RAG 场景，数据连接器丰富；如果项目纯做 RAG 可以考虑</td>
+</tr>
+</tbody>
+</table>
+<p><strong>面试加分</strong>：我们最初用 LlamaIndex 做 PoC，后来切到 LangChain，因为项目后期需要加 Agent 能力，LangChain 的 Agent 生态更完整。</p>
+<h3 id="向量数据库">向量数据库</h3>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>选择</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>开发/测试</td>
+<td>Chroma</td>
+<td>嵌入式、零配置、Python 原生，本地开发快</td>
+</tr>
+<tr>
+<td>生产环境</td>
+<td>Milvus</td>
+<td>分布式架构支持十亿级向量、支持 GPU 加速检索、有完善的运维工具</td>
+</tr>
+</tbody>
+</table>
+<p><strong>选型决策过程</strong>：PoC 阶段用 Chroma 快速验证，数据量到百万级后迁移到 Milvus。Milvus 支持 IVF_PQ 等多种索引类型，可以在召回率和延迟间灵活权衡。</p>
+<h3 id="embedding-模型">Embedding 模型</h3>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>选择</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>中文场景</td>
+<td>BGE-Large-zh-v1.5</td>
+<td>中文 MTEB 榜单 Top，开源可私有化部署，1024 维向量</td>
+</tr>
+<tr>
+<td>多语言/英文</td>
+<td>OpenAI text-embedding-3-small</td>
+<td>效果好、维度可调（256/1024/3072），按 token 计费成本可控</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键考量</strong>：数据隐私要求高 → BGE 本地部署；追求效果且预算充足 → OpenAI。我们的方案是用 BGE 兜底，在效果不达标的 case 上回退到 OpenAI。</p>
+<h3 id="reranker">Reranker</h3>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>选择</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>首选</td>
+<td>BGE-Reranker-v2-m3</td>
+<td>开源、多语言支持好、精度接近商业方案</td>
+</tr>
+<tr>
+<td>备选</td>
+<td>Cohere Rerank</td>
+<td>API 方式，精度最高，但有延迟和成本</td>
+</tr>
+</tbody>
+</table>
+<h3 id="llm">LLM</h3>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>选择</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主力</td>
+<td>GPT-4o</td>
+<td>综合能力最强，长上下文支持好（128K）</td>
+</tr>
+<tr>
+<td>成本敏感</td>
+<td>GPT-4o-mini / DeepSeek</td>
+<td>简单问题走小模型降本</td>
+</tr>
+<tr>
+<td>私有化</td>
+<td>Qwen2.5-72B</td>
+<td>中文效果优秀，vLLM 部署</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="四核心实现">四、核心实现</h2>
+<h3 id="41-文档处理和分块策略">4.1 文档处理和分块策略</h3>
+<h4 id="文档解析">文档解析</h4>
+<pre><code class="language-python">from langchain_community.document_loaders import (
+    PyPDFLoader,
+    UnstructuredWordDocumentLoader,
+    UnstructuredHTMLLoader,
+)
+from langchain.schema import Document
+from typing import List
+import hashlib
+
+
+class DocumentProcessor:
+    &quot;&quot;&quot;统一文档处理器，支持多格式解析&quot;&quot;&quot;
+
+    LOADER_MAP = {
+        &quot;.pdf&quot;: PyPDFLoader,
+        &quot;.docx&quot;: UnstructuredWordDocumentLoader,
+        &quot;.doc&quot;: UnstructuredWordDocumentLoader,
+        &quot;.html&quot;: UnstructuredHTMLLoader,
+    }
+
+    def load(self, file_path: str) -&gt; List[Document]:
+        suffix = file_path.rsplit(&quot;.&quot;, 1)[-1]
+        loader_cls = self.LOADER_MAP.get(f&quot;.{suffix}&quot;)
+        if not loader_cls:
+            raise ValueError(f&quot;不支持的文件格式: {suffix}&quot;)
+
+        loader = loader_cls(file_path)
+        docs = loader.load()
+
+        # 添加元数据
+        for doc in docs:
+            doc.metadata[&quot;source&quot;] = file_path
+            doc.metadata[&quot;doc_id&quot;] = hashlib.md5(
+                file_path.encode()
+            ).hexdigest()
+
+        return docs
+</code></pre>
+<h4 id="智能分块策略">智能分块策略</h4>
+<pre><code class="language-python">from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.schema import Document
+from typing import List
+
+
+class SmartChunker:
+    &quot;&quot;&quot;
+    多级分块策略：
+    1. 递归字符分块（基础）
+    2. 父子文档索引（检索小块，返回大块上下文）
+    &quot;&quot;&quot;
+
+    def __init__(
+        self,
+        chunk_size: int = 512,
+        chunk_overlap: int = 64,
+        parent_chunk_size: int = 2048,
+    ):
+        # 子块：用于精确检索
+        self.child_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+            separators=[&quot;\n\n&quot;, &quot;\n&quot;, &quot;。&quot;, &quot;！&quot;, &quot;？&quot;, &quot;；&quot;, &quot; &quot;, &quot;&quot;],
+            length_function=len,
+        )
+        # 父块：用于提供上下文
+        self.parent_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=parent_chunk_size,
+            chunk_overlap=128,
+            separators=[&quot;\n\n&quot;, &quot;\n&quot;, &quot;。&quot;, &quot; &quot;, &quot;&quot;],
+        )
+
+    def chunk_with_parent(
+        self, documents: List[Document]
+    ) -&gt; tuple[List[Document], List[Document]]:
+        &quot;&quot;&quot;返回 (子块列表, 父块列表)&quot;&quot;&quot;
+        parent_docs = self.parent_splitter.split_documents(documents)
+
+        child_docs = []
+        for i, parent in enumerate(parent_docs):
+            parent.metadata[&quot;parent_id&quot;] = f&quot;parent_{i}&quot;
+            children = self.child_splitter.split_documents([parent])
+            for child in children:
+                child.metadata[&quot;parent_id&quot;] = f&quot;parent_{i}&quot;
+            child_docs.extend(children)
+
+        return child_docs, parent_docs
+
+    def chunk_simple(self, documents: List[Document]) -&gt; List[Document]:
+        &quot;&quot;&quot;简单分块，适用于不需要父子索引的场景&quot;&quot;&quot;
+        return self.child_splitter.split_documents(documents)
+</code></pre>
+<p><strong>分块大小选择依据</strong>：
+- <strong>512 tokens</strong>：经实验对比，在我们的金融知识库场景下，512 在检索精度和上下文完整性间取得最佳平衡
+- 过小（128-256）：语义断裂，检索结果碎片化
+- 过大（1024+）：噪声增多，向量表示稀释
+- <strong>overlap 64</strong>：约 12.5% 的重叠率，防止关键信息在分块边界丢失</p>
+<h3 id="42-embedding-和索引构建">4.2 Embedding 和索引构建</h3>
+<pre><code class="language-python">from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_community.vectorstores import Milvus
+from langchain.storage import InMemoryStore
+from langchain.retrievers import ParentDocumentRetriever
+
+
+class IndexBuilder:
+    &quot;&quot;&quot;向量索引构建器&quot;&quot;&quot;
+
+    def __init__(self, collection_name: str = &quot;knowledge_base&quot;):
+        # 初始化 Embedding 模型
+        self.embeddings = HuggingFaceBgeEmbeddings(
+            model_name=&quot;BAAI/bge-large-zh-v1.5&quot;,
+            model_kwargs={&quot;device&quot;: &quot;cuda&quot;},
+            encode_kwargs={
+                &quot;normalize_embeddings&quot;: True,
+                &quot;batch_size&quot;: 64,
+            },
+        )
+
+        # 初始化向量数据库
+        self.vector_store = Milvus(
+            embedding_function=self.embeddings,
+            collection_name=collection_name,
+            connection_args={
+                &quot;host&quot;: &quot;localhost&quot;,
+                &quot;port&quot;: &quot;19530&quot;,
+            },
+            index_params={
+                &quot;metric_type&quot;: &quot;IP&quot;,  # 内积（因为已归一化）
+                &quot;index_type&quot;: &quot;IVF_FLAT&quot;,
+                &quot;params&quot;: {&quot;nlist&quot;: 1024},
+            },
+        )
+
+    def build_index(self, documents: list):
+        &quot;&quot;&quot;批量构建索引&quot;&quot;&quot;
+        batch_size = 500
+        for i in range(0, len(documents), batch_size):
+            batch = documents[i : i + batch_size]
+            self.vector_store.add_documents(batch)
+            print(
+                f&quot;已索引 {min(i + batch_size, len(documents))}/{len(documents)}&quot;
+            )
+
+    def build_parent_child_index(self, documents: list):
+        &quot;&quot;&quot;构建父子文档索引&quot;&quot;&quot;
+        chunker = SmartChunker()
+        child_docs, parent_docs = chunker.chunk_with_parent(documents)
+
+        # 父文档存内存/Redis
+        parent_store = InMemoryStore()
+        for doc in parent_docs:
+            parent_store.mset(
+                [(doc.metadata[&quot;parent_id&quot;], doc)]
+            )
+
+        # 子文档入向量库
+        self.build_index(child_docs)
+
+        return parent_store
+</code></pre>
+<h3 id="43-检索优化">4.3 检索优化</h3>
+<h4 id="混合检索-reranking">混合检索 + Reranking</h4>
+<pre><code class="language-python">from langchain.retrievers import EnsembleRetriever
+from langchain_community.retrievers import BM25Retriever
+from langchain.schema import Document
+from FlagEmbedding import FlagReranker
+from typing import List
+
+
+class HybridRetriever:
+    &quot;&quot;&quot;混合检索器：稠密检索 + BM25 + Reranking&quot;&quot;&quot;
+
+    def __init__(self, vector_store, corpus_docs: List[Document]):
+        # 稠密检索
+        self.dense_retriever = vector_store.as_retriever(
+            search_type=&quot;similarity&quot;,
+            search_kwargs={&quot;k&quot;: 20},
+        )
+
+        # 稀疏检索 (BM25)
+        self.bm25_retriever = BM25Retriever.from_documents(
+            corpus_docs, k=20
+        )
+
+        # 融合检索（RRF - Reciprocal Rank Fusion）
+        self.ensemble_retriever = EnsembleRetriever(
+            retrievers=[self.dense_retriever, self.bm25_retriever],
+            weights=[0.6, 0.4],  # 稠密权重略高
+        )
+
+        # Reranker
+        self.reranker = FlagReranker(
+            &quot;BAAI/bge-reranker-v2-m3&quot;, use_fp16=True
+        )
+
+    def retrieve(self, query: str, top_k: int = 5) -&gt; List[Document]:
+        &quot;&quot;&quot;完整检索流程&quot;&quot;&quot;
+        # Step 1: 混合检索，召回 top 20
+        candidates = self.ensemble_retriever.invoke(query)
+
+        # Step 2: Reranking，精排到 top_k
+        if not candidates:
+            return []
+
+        pairs = [[query, doc.page_content] for doc in candidates]
+        scores = self.reranker.compute_score(pairs)
+
+        # 排序并取 top_k
+        scored_docs = list(zip(candidates, scores))
+        scored_docs.sort(key=lambda x: x[1], reverse=True)
+
+        return [doc for doc, score in scored_docs[:top_k]]
+
+
+class QueryTransformer:
+    &quot;&quot;&quot;查询改写，提升检索效果&quot;&quot;&quot;
+
+    def __init__(self, llm):
+        self.llm = llm
+
+    def multi_query(self, original_query: str) -&gt; List[str]:
+        &quot;&quot;&quot;生成多个角度的查询&quot;&quot;&quot;
+        prompt = f&quot;&quot;&quot;请将以下用户问题从3个不同角度改写，生成3个语义相近但表述不同的查询。
+每行一个查询，不要编号。
+
+原始问题：{original_query}
+&quot;&quot;&quot;
+        response = self.llm.invoke(prompt)
+        queries = [
+            q.strip()
+            for q in response.content.strip().split(&quot;\n&quot;)
+            if q.strip()
+        ]
+        return [original_query] + queries[:3]
+
+    def hyde(self, query: str) -&gt; str:
+        &quot;&quot;&quot;HyDE: 先生成假设性答案，用答案去检索&quot;&quot;&quot;
+        prompt = f&quot;&quot;&quot;请针对以下问题，写一段简短的假设性回答（约100字）。
+不需要保证准确性，只需要包含相关术语和概念。
+
+问题：{query}
+&quot;&quot;&quot;
+        response = self.llm.invoke(prompt)
+        return response.content
+</code></pre>
+<h3 id="44-prompt-设计">4.4 Prompt 设计</h3>
+<pre><code class="language-python">RAG_PROMPT_TEMPLATE = &quot;&quot;&quot;你是一个专业的知识问答助手。请严格根据以下参考资料回答用户问题。
+
+## 回答要求
+1. 只基于参考资料回答，不要编造信息
+2. 如果参考资料不足以回答，明确告知用户
+3. 在回答中用 [1][2] 等标注引用来源
+4. 回答要结构化、简洁明了
+
+## 参考资料
+{context}
+
+## 用户问题
+{question}
+
+## 回答
+&quot;&quot;&quot;
+
+# 带有引用溯源的格式化
+def format_context(docs: list) -&gt; str:
+    &quot;&quot;&quot;格式化检索结果，带引用编号&quot;&quot;&quot;
+    parts = []
+    for i, doc in enumerate(docs, 1):
+        source = doc.metadata.get(&quot;source&quot;, &quot;未知来源&quot;)
+        page = doc.metadata.get(&quot;page&quot;, &quot;&quot;)
+        header = f&quot;[{i}] 来源: {source}&quot;
+        if page:
+            header += f&quot; (第{page}页)&quot;
+        parts.append(f&quot;{header}\n{doc.page_content}&quot;)
+    return &quot;\n\n---\n\n&quot;.join(parts)
+</code></pre>
+<h3 id="45-完整-rag-chain">4.5 完整 RAG Chain</h3>
+<pre><code class="language-python">from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+
+
+class RAGSystem:
+    &quot;&quot;&quot;完整 RAG 系统&quot;&quot;&quot;
+
+    def __init__(self, retriever: HybridRetriever):
+        self.retriever = retriever
+        self.llm = ChatOpenAI(
+            model=&quot;gpt-4o&quot;,
+            temperature=0,
+            streaming=True,
+        )
+        self.prompt = ChatPromptTemplate.from_template(RAG_PROMPT_TEMPLATE)
+
+        # LCEL 链
+        self.chain = (
+            {
+                &quot;context&quot;: lambda x: format_context(
+                    self.retriever.retrieve(x[&quot;question&quot;])
+                ),
+                &quot;question&quot;: lambda x: x[&quot;question&quot;],
+            }
+            | self.prompt
+            | self.llm
+            | StrOutputParser()
+        )
+
+    def ask(self, question: str) -&gt; str:
+        &quot;&quot;&quot;同步问答&quot;&quot;&quot;
+        return self.chain.invoke({&quot;question&quot;: question})
+
+    async def ask_stream(self, question: str):
+        &quot;&quot;&quot;流式问答&quot;&quot;&quot;
+        async for chunk in self.chain.astream({&quot;question&quot;: question}):
+            yield chunk
+</code></pre>
+<h3 id="46-评估方案ragas">4.6 评估方案（RAGAS）</h3>
+<pre><code class="language-python">from ragas import evaluate
+from ragas.metrics import (
+    faithfulness,
+    answer_relevancy,
+    context_precision,
+    context_recall,
+)
+from datasets import Dataset
+
+
+class RAGEvaluator:
+    &quot;&quot;&quot;RAG 系统评估器&quot;&quot;&quot;
+
+    def __init__(self, rag_system: RAGSystem):
+        self.rag = rag_system
+
+    def build_eval_dataset(self, test_cases: list) -&gt; Dataset:
+        &quot;&quot;&quot;
+        test_cases 格式:
+        [{&quot;question&quot;: &quot;...&quot;, &quot;ground_truth&quot;: &quot;...&quot;, &quot;contexts&quot;: [...]}]
+        &quot;&quot;&quot;
+        questions, answers, contexts, ground_truths = [], [], [], []
+
+        for case in test_cases:
+            q = case[&quot;question&quot;]
+            answer = self.rag.ask(q)
+            retrieved_docs = self.rag.retriever.retrieve(q)
+
+            questions.append(q)
+            answers.append(answer)
+            contexts.append([d.page_content for d in retrieved_docs])
+            ground_truths.append(case[&quot;ground_truth&quot;])
+
+        return Dataset.from_dict({
+            &quot;question&quot;: questions,
+            &quot;answer&quot;: answers,
+            &quot;contexts&quot;: contexts,
+            &quot;ground_truth&quot;: ground_truths,
+        })
+
+    def evaluate(self, test_cases: list) -&gt; dict:
+        dataset = self.build_eval_dataset(test_cases)
+        result = evaluate(
+            dataset,
+            metrics=[
+                faithfulness,       # 忠实度：答案是否基于上下文
+                answer_relevancy,   # 相关性：答案是否切题
+                context_precision,  # 精确率：检索结果是否相关
+                context_recall,     # 召回率：是否检索到关键信息
+            ],
+        )
+        return result
+
+# 指标解读：
+# - faithfulness &gt; 0.85：答案幻觉少
+# - answer_relevancy &gt; 0.80：回答切题
+# - context_precision &gt; 0.75：检索精准
+# - context_recall &gt; 0.80：关键信息都检索到了
+</code></pre>
+<hr>
+<h2 id="五面试话术">五、面试话术</h2>
+<h3 id="1-分钟版">1 分钟版</h3>
+<blockquote>
+<p>我做了一个企业知识问答系统，核心是 RAG 架构。文档经过解析、分块、向量化后存入 Milvus，用户提问时通过混合检索（向量+BM25）召回候选片段，再用 Reranker 精排，最后送入 GPT-4o 生成带引用的回答。主要亮点是混合检索把召回率提升了 30%，Reranking 把 Top-5 准确率从 72% 提到 89%。系统日均处理 5000+ 次查询，P95 延迟控制在 2 秒内。</p>
+</blockquote>
+<h3 id="3-分钟版">3 分钟版</h3>
+<blockquote>
+<p>这个项目背景是公司内部有大量 PDF、Word 格式的技术文档和规章制度，员工经常找不到想要的信息。我们搭建了一个 RAG 知识问答系统来解决这个问题。</p>
+<p>架构上分两条线：离线数据流和在线服务流。离线这边，文档经过 Unstructured 解析后，用递归字符分块做切分，chunk_size 设为 512，实验对比过 256 和 1024，512 效果最好。然后用 BGE-Large 做向量化，存入 Milvus。</p>
+<p>在线检索时，有三个关键优化：第一是混合检索，向量检索和 BM25 通过 RRF 融合，权重 6:4，解决了纯向量检索对关键词不敏感的问题；第二是 Reranking，用 BGE-Reranker 对 Top-20 候选做二次精排，取 Top-5；第三是 Query 改写，对模糊查询做多角度展开。</p>
+<p>评估用的 RAGAS 框架，四个核心指标：faithfulness 0.88、answer_relevancy 0.85、context_precision 0.82、context_recall 0.86。我们建了 200 条标注测试集，每次迭代都跑评估。</p>
+<p>部署在 K8s 上，Milvus 集群 3 节点，服务做了水平扩容，日均 5000+ 查询，P95 在 2 秒。</p>
+</blockquote>
+<h3 id="5-分钟版">5 分钟版</h3>
+<blockquote>
+<p>（在 3 分钟版基础上补充以下内容）</p>
+<p>分块策略我们迭代了三版。第一版直接按固定长度切，效果差，经常把一句话切断。第二版换成递归字符分块，按段落 → 句子 → 字符的优先级切分，效果提升明显。第三版引入了父子文档索引：用小块（512）做精确检索，命中后返回对应的大块（2048）给 LLM，既保证了检索精度又提供了充足的上下文。</p>
+<p>Embedding 模型选型也做了对比实验。在我们的中文金融文档测试集上，BGE-Large-zh 的 Hit@5 是 0.83，OpenAI text-embedding-3-small 是 0.86，差距不大但 BGE 可以本地部署、无隐私风险。最终选择 BGE 做主力，对于效果不达标的特殊 case 回退到 OpenAI。</p>
+<p>多模态处理方面，表格我们用 Unstructured 提取后转成 Markdown 格式再分块，图片用 GPT-4o 做 OCR + 描述生成。PDF 里的流程图会单独提取，用 VLM 生成文字描述后入库。</p>
+<p>成本控制上，我们做了查询分级：简单查询走 GPT-4o-mini（成本低 10 倍），复杂查询才走 GPT-4o。通过一个轻量分类器判断查询复杂度，整体 API 成本降低了 60%。</p>
+<p>上线后遇到的最大挑战是知识时效性，文档更新后索引需要同步。我们做了增量更新机制，文档变更时只重新处理变更部分，通过 doc_id 和版本号管理。</p>
+</blockquote>
+<hr>
+<h2 id="六常见追问及回答">六、常见追问及回答</h2>
+<h3 id="q1-分块大小怎么选的">Q1: 分块大小怎么选的？</h3>
+<p><strong>回答</strong>：</p>
+<blockquote>
+<p>我们做了系统性实验。在 200 条标注 QA 对上分别测试了 256、512、768、1024 四种 chunk_size。评估指标用 Hit@5（Top-5 检索结果中包含正确答案的比例）和 RAGAS 的 context_recall。</p>
+<p>结果是 512 综合最优：256 语义碎片化严重，context_recall 只有 0.71；1024 噪声多，检索精度下降；512 的 Hit@5 = 0.83，context_recall = 0.86。</p>
+<p>不过这个结论是场景相关的。我们的文档偏金融合规类，段落结构清晰。如果是代码文档，可能需要更大的 chunk_size（1024+）来保持代码块完整性。</p>
+<p>另外我们还配合了 overlap = 64（约 12.5%），防止关键信息在分块边界丢失。这个比例也是实验调出来的，太大会增加冗余，太小会丢信息。</p>
+</blockquote>
+<h3 id="q2-检索效果不好怎么优化">Q2: 检索效果不好怎么优化？</h3>
+<p><strong>回答</strong>：</p>
+<blockquote>
+<p>检索效果差要分阶段排查，我的经验是按这个优先级处理：</p>
+<p><strong>第一层：分块质量</strong>。检查分块是否合理，是不是把关键信息切断了。我遇到过分块把一个表格切成两半的情况，加了表格感知的分块逻辑后解决。</p>
+<p><strong>第二层：Embedding 质量</strong>。用一些典型 case 手动看向量相似度，判断 Embedding 模型是否适合当前领域。如果领域特殊（比如医学），可能需要微调 Embedding 模型。</p>
+<p><strong>第三层：检索策略</strong>。纯向量检索对精确关键词不敏感，加 BM25 做混合检索通常有 10-30% 的提升。</p>
+<p><strong>第四层：Query 端优化</strong>。用户的查询往往不清晰，做 Query 改写和多查询扩展能提升召回。HyDE（先生成假设性答案再检索）在某些场景效果很好。</p>
+<p><strong>第五层：Reranking</strong>。召回 Top-20 再精排到 Top-5，这一步通常能提升 10-15% 的精度。</p>
+<p>每一步都要有量化指标来验证效果，不能凭感觉调。</p>
+</blockquote>
+<h3 id="q3-怎么处理表格图片">Q3: 怎么处理表格/图片？</h3>
+<p><strong>回答</strong>：</p>
+<blockquote>
+<p><strong>表格处理</strong>：
+1. 用 Unstructured 或 Camelot 库提取 PDF 中的表格
+2. 转成 Markdown 格式保留结构
+3. 表格作为一个整体分块，不切分行
+4. 在元数据中标记 <code>type=table</code>，检索时可以区分处理</p>
+<p><strong>图片处理</strong>：
+1. 纯文字图片：OCR 提取文字，用 PaddleOCR 或 Tesseract
+2. 图表/流程图：用 GPT-4o Vision 生成文字描述
+3. 描述文字和原图路径一起存入向量库
+4. 回答时如果引用了图片，把图片链接也返回给用户</p>
+<p><strong>实际踩坑</strong>：PDF 中的扫描件表格识别率很低，我们最终对这类文档做了预处理：先用 OCR 转成可编辑格式，再走标准流程。</p>
+</blockquote>
+<h3 id="q4-如何评估-rag-效果">Q4: 如何评估 RAG 效果？</h3>
+<p><strong>回答</strong>：</p>
+<blockquote>
+<p>我们用 RAGAS 框架做系统性评估，四个核心指标：</p>
+<ul>
+<li><strong>Faithfulness（忠实度）</strong>：答案是否基于检索到的上下文，不是瞎编的。&gt;0.85 算合格。</li>
+<li><strong>Answer Relevancy（答案相关性）</strong>：答案是否切题回答了用户的问题。</li>
+<li><strong>Context Precision（上下文精确率）</strong>：检索到的内容是否都是相关的。</li>
+<li><strong>Context Recall（上下文召回率）</strong>：回答需要的信息是否都被检索到了。</li>
+</ul>
+<p><strong>评估流程</strong>：
+1. 人工标注 200 条 QA 对作为测试集（领域专家标注 ground truth）
+2. 每次系统迭代后自动跑评估，CI/CD 集成
+3. 关注指标趋势，任何指标下降超过 2% 需要排查</p>
+<p>除了离线评估，还有线上指标：
+- 用户满意度（点赞/点踩）
+- 引用准确率（人工抽查 50 条/周）
+- 无法回答比例（&lt;15% 为目标）</p>
+</blockquote>
+<h3 id="q5-线上部署架构">Q5: 线上部署架构？</h3>
+<p><strong>回答</strong>：</p>
+<blockquote>
+<p><img alt="RAG 系统部署拓扑" src="../../source/diagrams/rag-deployment-topology.svg" loading="lazy" decoding="async"></p>
+<ul>
+<li><strong>FastAPI</strong>：异步框架，流式输出用 SSE</li>
+<li><strong>Milvus 集群</strong>：3 节点，读写分离，数据持久化到 MinIO</li>
+<li><strong>Redis</strong>：缓存热点查询结果，命中率约 15%，TTL 1 小时</li>
+<li><strong>K8s HPA</strong>：根据 QPS 自动扩缩容，阈值设在单实例 50 QPS</li>
+<li><strong>CDN</strong>：静态资源（文档原文预览）走 CDN</li>
+</ul>
+<p>关键可靠性设计：
+- LLM API 降级：OpenAI 不可用时自动切到本地 Qwen2.5
+- 检索超时：设 3 秒超时，超时返回缓存结果或提示
+- 限流：单用户 10 QPS，防滥用</p>
+</blockquote>
+<h3 id="q6-并发怎么处理">Q6: 并发怎么处理？</h3>
+<p><strong>回答</strong>：</p>
+<blockquote>
+<p>并发瓶颈主要在三个环节：</p>
+<p><strong>1. Embedding 计算</strong>：用 GPU 做 batch inference，批大小 64，单 A100 吞吐约 500 QPS。线上查询用异步队列攒批处理。</p>
+<p><strong>2. 向量检索</strong>：Milvus 本身支持高并发，单节点 1000+ QPS 没问题。瓶颈在索引类型选择——IVF_FLAT 精度高但慢，我们用 HNSW（ef=64），延迟 &lt;50ms。</p>
+<p><strong>3. LLM 生成</strong>：这是最大瓶颈。OpenAI API 有 rate limit，我们做了：
+  - 请求队列 + 令牌桶限流
+  - 多 API Key 轮询
+  - 热点问题缓存
+  - 简单问题走小模型分流</p>
+<p>整体做到日均 5000+ 查询、峰值 QPS 50、P95 延迟 &lt;2s。</p>
+</blockquote>
+<hr>
+<h2 id="七项目亮点总结面试快速回顾">七、项目亮点总结（面试快速回顾）</h2>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>检索优化</td>
+<td>混合检索(向量+BM25) + Reranking，召回率+30%，Top-5 准确率 72%→89%</td>
+</tr>
+<tr>
+<td>分块策略</td>
+<td>递归字符分块 + 父子文档索引，实验对比选定 512 tokens</td>
+</tr>
+<tr>
+<td>评估体系</td>
+<td>RAGAS 4 指标自动化评估，200 条标注测试集</td>
+</tr>
+<tr>
+<td>成本控制</td>
+<td>查询分级（大小模型分流），API 成本降低 60%</td>
+</tr>
+<tr>
+<td>生产化</td>
+<td>K8s 部署、缓存、降级、限流，日均 5000+ QPS</td>
+</tr>
+<tr>
+<td>多模态</td>
+<td>表格 Markdown 化 + 图片 VLM 描述，覆盖 90%+ 文档类型</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="八项目验收标准与评分表">八、项目验收标准与评分表</h2>
+<h3 id="最低可交付版本60-分">最低可交付版本（60 分）</h3>
+<table>
+<thead>
+<tr>
+<th>验收项</th>
+<th>标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文档入库</td>
+<td>支持至少 20 个 Markdown/PDF/HTML 文档，保留来源元数据</td>
+</tr>
+<tr>
+<td>基础检索</td>
+<td>支持向量检索，能返回 TopK 文档片段</td>
+</tr>
+<tr>
+<td>答案生成</td>
+<td>回答中包含引用来源，不允许无来源编造</td>
+</tr>
+<tr>
+<td>基础入口</td>
+<td>提供 CLI、Web 或 HTTP API 任一种可用入口</td>
+</tr>
+<tr>
+<td>README</td>
+<td>说明数据准备、启动方式、示例问题和已知限制</td>
+</tr>
+</tbody>
+</table>
+<h3 id="进阶可答辩版本80-分">进阶可答辩版本（80 分）</h3>
+<table>
+<thead>
+<tr>
+<th>验收项</th>
+<th>标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>混合检索</td>
+<td>Dense + BM25 双路召回，并说明融合策略</td>
+</tr>
+<tr>
+<td>Rerank</td>
+<td>接入 reranker，对比 rerank 前后的 TopK 命中率</td>
+</tr>
+<tr>
+<td>评估集</td>
+<td>至少 30 条人工问题，统计 Recall@K、Faithfulness、幻觉率</td>
+</tr>
+<tr>
+<td>多格式文档</td>
+<td>对 PDF 表格、标题层级、代码块或图片 OCR 有处理策略</td>
+</tr>
+<tr>
+<td>可观测性</td>
+<td>记录 query、召回片段、rerank 分数、最终引用</td>
+</tr>
+</tbody>
+</table>
+<h3 id="面试亮点版本100-分">面试亮点版本（100 分）</h3>
+<table>
+<thead>
+<tr>
+<th>验收项</th>
+<th>标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>可量化优化</td>
+<td>有明确指标提升，例如 Recall@5、延迟、成本、幻觉率</td>
+</tr>
+<tr>
+<td>失败复盘</td>
+<td>至少 5 个 bad case，能归因到分块、召回、重排或生成层</td>
+</tr>
+<tr>
+<td>热更新</td>
+<td>新文档入库后无需重启服务即可被检索</td>
+</tr>
+<tr>
+<td>安全边界</td>
+<td>支持权限过滤、敏感信息脱敏或拒答机制</td>
+</tr>
+<tr>
+<td>生产部署</td>
+<td>Docker 化，提供本地或云端部署说明</td>
+</tr>
+</tbody>
+</table>
+<h3 id="评分表">评分表</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>权重</th>
+<th>面试官关注点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RAG 链路完整性</td>
+<td>25%</td>
+<td>数据处理、检索、重排、生成是否闭环</td>
+</tr>
+<tr>
+<td>评估与指标</td>
+<td>25%</td>
+<td>是否能证明系统变好，而不是凭感觉</td>
+</tr>
+<tr>
+<td>工程化</td>
+<td>20%</td>
+<td>API、部署、日志、缓存、热更新</td>
+</tr>
+<tr>
+<td>复杂文档处理</td>
+<td>15%</td>
+<td>表格、PDF、长文档、多格式输入</td>
+</tr>
+<tr>
+<td>答辩表达</td>
+<td>15%</td>
+<td>能否讲清 trade-off 和失败案例</td>
+</tr>
+</tbody>
+</table>
+<h3 id="github-项目参考">GitHub 项目参考</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/langchain-ai/rag-from-scratch" rel="noreferrer">langchain-ai/rag-from-scratch</a></td>
+<td>学 RAG 分块、检索、生成基本套路</td>
+</tr>
+<tr>
+<td><a href="https://github.com/run-llama/llama_index" rel="noreferrer">run-llama/llama_index</a></td>
+<td>学文档索引、数据连接器和 query engine</td>
+</tr>
+<tr>
+<td><a href="https://github.com/explodinggradients/ragas" rel="noreferrer">explodinggradients/ragas</a></td>
+<td>学 RAG 自动评估指标</td>
+</tr>
+<tr>
+<td><a href="https://github.com/milvus-io/milvus" rel="noreferrer">milvus-io/milvus</a></td>
+<td>学生产级向量数据库能力</td>
+</tr>
+<tr>
+<td><a href="https://github.com/chroma-core/chroma" rel="noreferrer">chroma-core/chroma</a></td>
+<td>学本地快速原型向量库</td>
+</tr>
+</tbody>
+</table></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

@@ -1,0 +1,269 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>Agent Harness 评测与发布门禁 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-062.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/Agent-Harness评测与发布门禁.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/17-evaluation-harness.html">17 评测、失败归因与发布门禁</a> · <a href="../lessons/24-document-agent-project.html">24 项目一：从简单检索到可验收的文档问答 Agent</a> · <a href="../lessons/25-coding-agent-project.html">25 项目二：多 Agent 研发、Code Review 与 Harness 门禁</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/Agent-Harness%E8%AF%84%E6%B5%8B%E4%B8%8E%E5%8F%91%E5%B8%83%E9%97%A8%E7%A6%81.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/Agent-Harness%E8%AF%84%E6%B5%8B%E4%B8%8E%E5%8F%91%E5%B8%83%E9%97%A8%E7%A6%81.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80harness-%E4%B8%8D%E5%8F%AA%E6%98%AF%E8%B7%91-benchmark-%E7%9A%84%E8%84%9A%E6%9C%AC">一、Harness 不只是跑 Benchmark 的脚本</a><a href="#%E4%BA%8C%E4%B8%89%E7%B1%BB-spec">二、三类 Spec</a><a href="#task-spec">Task Spec</a><a href="#environment-spec">Environment Spec</a><a href="#expected-outcome">Expected Outcome</a><a href="#%E4%B8%89%E4%B8%89%E5%B1%82-grading">三、三层 Grading</a><a href="#outcome-grading">Outcome Grading</a><a href="#trajectory-grading">Trajectory Grading</a><a href="#state-grading">State Grading</a><a href="#%E5%9B%9Bgrader-%E7%BB%84%E5%90%88">四、Grader 组合</a><a href="#%E4%BA%94%E8%AF%84%E6%B5%8B%E9%9B%86%E5%88%86%E5%B1%82">五、评测集分层</a><a href="#%E5%85%ADbenchmark-%E9%80%89%E6%8B%A9%E7%9F%A9%E9%98%B5">六、Benchmark 选择矩阵</a><a href="#%E4%B8%83%E5%A4%B1%E8%B4%A5%E5%88%86%E7%B1%BB">七、失败分类</a><a href="#%E5%85%AB%E5%8F%91%E5%B8%83%E9%97%A8%E7%A6%81">八、发布门禁</a><a href="#%E4%B9%9Dshadow-%E4%B8%8E-canary">九、Shadow 与 Canary</a><a href="#shadow-mode">Shadow Mode</a><a href="#canary">Canary</a><a href="#%E5%8D%81%E5%A4%B1%E8%B4%A5%E6%A0%B7%E6%9C%AC%E5%9B%9E%E6%B5%81">十、失败样本回流</a><a href="#%E5%8D%81%E4%B8%80harness-%E5%B9%B3%E5%8F%B0%E6%9C%80%E5%B0%8F%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B">十一、Harness 平台最小数据模型</a><a href="#%E5%8D%81%E4%BA%8C%E9%AB%98%E9%A2%91%E9%9D%A2%E8%AF%95%E9%A2%98">十二、高频面试题</a></nav></details><article class="prose source-prose"><h1 id="agent-harness-评测与发布门禁">Agent Harness 评测与发布门禁</h1>
+<h2 id="一harness-不只是跑-benchmark-的脚本">一、Harness 不只是跑 Benchmark 的脚本</h2>
+<p>Agent Harness 的职责是把任务、环境、执行、轨迹、判分和发布决策连接成可重复实验：</p>
+<pre><code class="language-text">Task Spec + Environment Spec
+          ↓
+       Agent Runner
+          ↓
+ Trace + Final State + Artifacts
+          ↓
+ Rule/Test/LLM/Human Graders
+          ↓
+ Regression Report
+          ↓
+ Release Gate
+</code></pre>
+<h2 id="二三类-spec">二、三类 Spec</h2>
+<h3 id="task-spec">Task Spec</h3>
+<pre><code class="language-yaml">id: customer-refund-001
+objective: 核验订单并在符合规则时发起退款
+initial_state: fixtures/refund/order-001.json
+allowed_tools: [get_order, read_policy, request_approval, refund]
+timeout_seconds: 180
+cost_budget_usd: 0.5
+required_artifacts: [decision.json, trace.json]
+</code></pre>
+<h3 id="environment-spec">Environment Spec</h3>
+<p>必须固定：</p>
+<ul>
+<li>工具与 Schema 版本；</li>
+<li>数据快照；</li>
+<li>时间和随机种子；</li>
+<li>网络是否开放；</li>
+<li>用户身份和权限；</li>
+<li>沙箱资源；</li>
+<li>故障注入规则。</li>
+</ul>
+<h3 id="expected-outcome">Expected Outcome</h3>
+<p>不能只写一段参考答案，应同时定义：</p>
+<ul>
+<li>最终业务状态；</li>
+<li>必须产生的 Artifact；</li>
+<li>禁止发生的副作用；</li>
+<li>允许的中间路径；</li>
+<li>成本和延迟上限；</li>
+<li>是否必须人工审批。</li>
+</ul>
+<h2 id="三三层-grading">三、三层 Grading</h2>
+<h3 id="outcome-grading">Outcome Grading</h3>
+<p>检查最终结果：文件是否生成、订单是否更新、测试是否通过、回答是否有正确证据。</p>
+<h3 id="trajectory-grading">Trajectory Grading</h3>
+<p>检查过程：是否调用正确工具、是否重复尝试、是否跳过审批、是否使用不必要的高成本模型。</p>
+<h3 id="state-grading">State Grading</h3>
+<p>检查环境最终状态：数据库、文件系统、Git、远端资源是否处于期望状态，以及是否留下未完成副作用。</p>
+<p>一个任务可能 Outcome 正确但 Trajectory 不安全，也可能答案看起来正确但 State 没有真正改变。</p>
+<h2 id="四grader-组合">四、Grader 组合</h2>
+<table>
+<thead>
+<tr>
+<th>Grader</th>
+<th>适合</th>
+<th>风险</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>规则</td>
+<td>Schema、权限、次数、格式</td>
+<td>难判断语义质量</td>
+</tr>
+<tr>
+<td>单元/E2E 测试</td>
+<td>代码和确定性状态</td>
+<td>覆盖不到主观质量</td>
+</tr>
+<tr>
+<td>环境检查</td>
+<td>数据库、文件、浏览器状态</td>
+<td>搭建成本较高</td>
+</tr>
+<tr>
+<td>LLM-as-Judge</td>
+<td>开放式文本和解释</td>
+<td>偏差、漂移、自洽性问题</td>
+</tr>
+<tr>
+<td>人工评审</td>
+<td>高风险和模糊任务</td>
+<td>成本高、速度慢</td>
+</tr>
+</tbody>
+</table>
+<p>推荐：规则和测试先判硬约束，LLM Judge 只判开放部分，人审抽检并校准 Judge。</p>
+<h2 id="五评测集分层">五、评测集分层</h2>
+<pre><code class="language-text">Smoke：少量关键路径，分钟级
+Regression：历史失败和核心功能
+Safety：注入、越权、泄露、危险操作
+Recovery：超时、断网、重启、重复消费
+Canary：接近真实流量的小比例验证
+</code></pre>
+<p>数据集需要版本化，并记录：来源、创建原因、适用版本、是否可能进入训练数据。</p>
+<h2 id="六benchmark-选择矩阵">六、Benchmark 选择矩阵</h2>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>可参考 Benchmark</th>
+<th>重点能力</th>
+<th>不能单独证明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Coding Agent</td>
+<td>SWE-bench Verified、SWE-Lancer</td>
+<td>修改真实仓库、测试和交付</td>
+<td>企业权限、长期运行</td>
+</tr>
+<tr>
+<td>Web Agent</td>
+<td>WebArena、BrowserGym</td>
+<td>浏览器导航与网页操作</td>
+<td>OS 级操作和真实账号安全</td>
+</tr>
+<tr>
+<td>Computer-use</td>
+<td>OSWorld</td>
+<td>跨应用桌面操作</td>
+<td>企业业务正确性</td>
+</tr>
+<tr>
+<td>工具与用户交互</td>
+<td>τ-bench、AppWorld</td>
+<td>工具调用、状态变化、多轮一致性</td>
+<td>自有业务规则</td>
+</tr>
+<tr>
+<td>通用 Agent</td>
+<td>GAIA、AgentBench</td>
+<td>综合推理和工具使用</td>
+<td>特定场景 SLA</td>
+</tr>
+<tr>
+<td>安全</td>
+<td>AgentDojo、内部红队集</td>
+<td>间接注入、越权、数据泄露</td>
+<td>全部生产攻击</td>
+</tr>
+<tr>
+<td>科研 Agent</td>
+<td>PaperBench</td>
+<td>长程研究和复现</td>
+<td>普通业务 Agent</td>
+</tr>
+</tbody>
+</table>
+<p>选择 Benchmark 时要问：</p>
+<ol>
+<li>环境是否可重复；</li>
+<li>最终状态是否能自动验证；</li>
+<li>是否测多次稳定性而非单次成功；</li>
+<li>是否容易通过特殊提示或数据污染刷分；</li>
+<li>与真实岗位任务的距离有多大。</li>
+</ol>
+<h2 id="七失败分类">七、失败分类</h2>
+<p>建议将失败统一映射到以下类别：</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>任务理解</td>
+<td>错解目标、遗漏约束</td>
+</tr>
+<tr>
+<td>规划</td>
+<td>拆分错误、依赖顺序错误</td>
+</tr>
+<tr>
+<td>上下文</td>
+<td>关键事实丢失、压缩失真</td>
+</tr>
+<tr>
+<td>检索</td>
+<td>召回缺失、证据冲突</td>
+</tr>
+<tr>
+<td>工具</td>
+<td>选错工具、参数错误、超时</td>
+</tr>
+<tr>
+<td>协作</td>
+<td>Agent 角色重叠、消息遗漏、冲突未解决</td>
+</tr>
+<tr>
+<td>Runtime</td>
+<td>重复消费、恢复错误、状态竞争</td>
+</tr>
+<tr>
+<td>验证</td>
+<td>假完成、测试不足、Judge 误判</td>
+</tr>
+<tr>
+<td>安全</td>
+<td>越权、注入、敏感信息泄露</td>
+</tr>
+</tbody>
+</table>
+<p>多 Agent 系统应额外记录失败传播链：哪个 Agent 首先产生错误，哪个环节没有拦截，最终由谁把错误转成外部副作用。</p>
+<h2 id="八发布门禁">八、发布门禁</h2>
+<p>建议配置示例：</p>
+<pre><code class="language-yaml">release_gate:
+  verified_success_rate: &quot;&gt;= 0.90&quot;
+  first_pass_success_rate: &quot;&gt;= baseline - 0.02&quot;
+  critical_safety_violations: 0
+  recovery_success_rate: &quot;&gt;= 0.95&quot;
+  p95_latency: &quot;&lt;= baseline * 1.15&quot;
+  cost_per_success: &quot;&lt;= baseline * 1.10&quot;
+</code></pre>
+<p>不能只看平均总分。关键安全场景应使用“一票否决”。</p>
+<h2 id="九shadow-与-canary">九、Shadow 与 Canary</h2>
+<h3 id="shadow-mode">Shadow Mode</h3>
+<p>新版本接收生产请求副本，但不产生真实副作用。适合比较路由、计划和工具选择。</p>
+<p>注意：即使不执行工具，把真实数据发送给新模型也可能构成数据泄露，因此仍需权限和脱敏。</p>
+<h3 id="canary">Canary</h3>
+<p>只让小比例真实任务进入新版本，并设置：</p>
+<ul>
+<li>用户和场景白名单；</li>
+<li>更低预算；</li>
+<li>强制人工审批；</li>
+<li>自动回滚阈值；</li>
+<li>与旧版本并行统计。</li>
+</ul>
+<h2 id="十失败样本回流">十、失败样本回流</h2>
+<pre><code class="language-text">线上失败
+→ 归因到输入/规划/上下文/检索/工具/模型/验证/Runtime
+→ 最小化成可复现 Task Spec
+→ 加入 Regression 或 Safety Eval
+→ 修复
+→ 新旧版本对比
+→ 通过门禁后发布
+</code></pre>
+<p>不能把完整生产数据无审查地写回训练集或长期记忆。</p>
+<h2 id="十一harness-平台最小数据模型">十一、Harness 平台最小数据模型</h2>
+<pre><code class="language-text">Dataset → Task → Run → Step/Span → Artifact
+                         ↓
+                       Grade
+                         ↓
+                  Evaluation Report
+                         ↓
+                    Release Decision
+</code></pre>
+<p>每次 Run 应固定：代码提交、模型版本、Prompt 版本、工具版本、数据快照和环境镜像。</p>
+<h2 id="十二高频面试题">十二、高频面试题</h2>
+<ol>
+<li>Harness、Benchmark、Eval 和 AgentOps 有什么区别？</li>
+<li>Outcome、Trajectory、State Grading 为什么要分开？</li>
+<li>LLM-as-Judge 为什么不能单独作为发布门禁？</li>
+<li>如何保证一次评测可复现？</li>
+<li>失败样本如何回流但不污染评测集？</li>
+<li>Shadow Mode 如何避免副作用？</li>
+<li>Canary 阶段哪些指标应一票否决？</li>
+<li>如何评估需要人工审批的任务？</li>
+<li>多 Agent Harness 如何判定责任和失败传播？</li>
+<li>模型升级后为什么必须重新跑安全与恢复评测？</li>
+</ol></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

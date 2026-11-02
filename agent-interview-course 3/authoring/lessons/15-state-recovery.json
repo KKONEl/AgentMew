@@ -1,0 +1,290 @@
+{
+  "id": "15",
+  "slug": "15-state-recovery",
+  "title": "状态机、持久化与崩溃恢复",
+  "stage": "05 生产与可靠性",
+  "prerequisites": [
+    "09",
+    "工具调用的输入、回执与副作用"
+  ],
+  "minutes": 60,
+  "goals": [
+    "把聊天记录转换为可恢复的业务状态机",
+    "解释checkpoint、幂等、outbox分别解决的提交空隙",
+    "用故障注入验证恢复且不重复产生业务效果"
+  ],
+  "sources": [
+    "通用知识/2026-10-状态与恢复面试题与参考答案.md",
+    "通用知识/LangChain与LangGraph深度解析.md"
+  ],
+  "body": "## 从一个“失败重试”制造的重复工单开始\n用户让 Agent 为订单 order-17 创建售后工单。工具已在远端创建 T1，网络却在返回回执前断开。Agent 看到超时，把任务记成失败，重新生成请求编号又创建 T2。错误不在模型理解，而在系统把“没有收到成功”误当成“业务没有成功”。先牢牢记住三个结果：确定成功、确定失败、结果未知。只有前两种可以直接决定下一步；未知需要查询、同键重试或人工对账。\n\nAgent 任务横跨数据库、模型服务和外部工具，单一数据库事务通常覆盖不了全部系统。状态机的作用是把这些空隙显式化，让每个崩溃点都有可解释的去向。它不能凭一张图把外部 API 变成事务的一部分。生产设计应先问：什么操作允许重算，什么操作会改变外部世界，外部系统有没有去重和查询能力？\n\n## 机制：状态、检查点与效果是三个对象\n可以用 QUEUED → RUNNING → INTENT_RECORDED → WAITING_RECEIPT → SUCCEEDED 描述主线；超时进入 UNKNOWN，审批进入 WAITING_APPROVAL，耗尽预算进入 FAILED，用户取消进入 CANCEL_REQUESTED。对每个转换定义触发条件与责任主体，禁止成功状态被旧 Worker 覆盖成运行中。取消请求也不等于远端操作已撤销，要等待确认或进入对账。\n\nCheckpoint 是某个已提交边界的运行快照，至少包括任务目标、输入和来源版本、当前节点、状态版本、计划、产物引用、工具意图、稳定操作 ID、幂等键、回执、重试次数、截止时间和权限/审批版本。模型和提示配置也要可回溯。聊天历史只是其中一种输入，未必能还原外部业务事实。可重算的摘要可以保留来源引用；不可重建的授权和回执必须先可靠落盘，敏感字段应最小化保存。\n\n幂等关注的是效果：同一业务操作被重复执行时，结果等价于执行一次。键应来自业务身份，例如 order-17:create，并且相同键绑定相同请求内容。若同键参数不同，应拒绝而非覆盖。模型重写了文字、Worker 换了机器、网络重连，都不能随意换键。幂等表需要保存状态与结果，不能只记“见过这个键”；处理中、未知、成功应有不同返回。\n\nOutbox 解决的是“本地业务提交了但事件没发出去”。在同一个本地事务里写任务状态与待投递事件，由后台投递器扫描发送。投递成功后、标记已发送前崩溃会导致再次投递，所以消费者仍须按事件 ID 去重。Outbox 提供可恢复的至少一次投递路径，不能单独宣称端到端 exactly-once，也不能让一个不支持幂等的支付 API 自动去重。\n\n## 已解例：按四个崩溃点推导工单恢复\n第一步在事务中保存创建意图与稳定键；还没提交就崩溃，数据库里没有该意图，恢复从前一检查点重算即可。第二步事务已提交但尚未发送，恢复读取意图，用原键发送。第三步远端创建成功但回执丢失，状态标为未知；若支持查询就按键查 T1，若支持同键重试则拿到原结果。第四步本地保存回执后、返回用户前崩溃，恢复直接返回 T1，无须再次创建。\n\n如果远端既不支持查询也不支持幂等，第三步无法自动判断。正确设计是暂停自动写入、给出操作关联信息并对账，必要时按业务规则补偿；声称“捕获异常再重试保证一次”是错误的。补偿也不是时间倒流：发出邮件无法让收件人没看见，补偿失败也需要状态与重试预算。\n\n恢复时还要复核授权：检查点中曾经批准过，并不表示当前参数、资源版本、有效期和主体权限仍匹配；若变化或撤销就重新审批。下方最小实验不含审批字段，因此不能用它证明旧授权恢复安全。\n\n## 两个 Worker 与租约边界\n任务租约到期只允许新 Worker 接管，不会物理停止旧进程。旧进程可能经历长暂停后继续提交。状态更新可用 compare-and-swap：只有 version 等于读取时版本才更新，再将 version 加一。跨所有权的写入使用单调 epoch/fencing token，下游原子比较已见 token 与此次 token，拒绝过旧写入。同一 token 内还需要操作 ID 与版本去重。\n\n这里有一个常被忽略的边界：若新 Worker 还没向资源端写入，新 token 尚未被资源端观察到，仅比较“已见最大 token”不一定知道旧租约已到期。更严格的语义需要把授权世代发布或检查与写入协议结合。外部 API 不接受 token 时，不能把内部锁的保证扩展到它，只能用其幂等契约、受控网关或串行化降低风险。\n\n## 如何验证，如何在面试里讲\n按“意图前、意图后、外部成功后、回执提交后”注入崩溃，断言最终工单数、事件数、任务终态与审计关联，而不只看程序有没有异常。再加入重复消费、旧 Worker 提交、审批过期、取消与恢复并发。回放测试应使用隔离桩，不再次调用真实写接口。\n\n面试可以这样组织：先声明我保证的是同一业务操作的幂等效果，再描述持久化边界与状态转换，然后沿请求成功但回执丢失的时间线解释恢复，最后明确远端不支持去重时转对账。练习中的字典扮演支持幂等的远端系统，SQLite 扮演可靠本地存储；它验证算法顺序，不证明磁盘断电、分布式数据库或真实外部系统的全部保证。能说清这层边界，比只报框架名称更有说服力。",
+  "diagram": {
+    "nodes": [
+      "事务保存意图与事件",
+      "原键创建T1后丢弃回执",
+      "本地记unknown",
+      "同键恢复返回T1",
+      "事务写done与sent=1",
+      "断言并打印最终结果"
+    ],
+    "caption": "逐步对应真实实验：只有字典模拟远端去重，最终没有版本校验或完整投递器。",
+    "walkthrough": {
+      "scenario": "沿《模拟远端成功后丢失回执》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "原实验逐步执行",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "本地保存创建意图",
+              "input": "SQLite内存库，尚无任务和事件",
+              "action": "同一with db块插入order-17的intent任务与order-17:create事件。",
+              "output": "task=(order-17,intent,NULL)；outbox.sent=0",
+              "state": "remote={}；任务意图已提交",
+              "failure": false,
+              "section": "机制：状态、检查点与效果是三个对象",
+              "why": "先记意图才能在效果未知时知道原来要做哪个操作；本例事务只覆盖两张SQLite表。",
+              "code_lines": [
+                3,
+                10
+              ]
+            },
+            {
+              "node": 1,
+              "title": "第一次调用创建T1",
+              "input": "key=order-17:create；remote={}",
+              "action": "create_ticket检查键不存在，创建T1；调用方故意不保存返回值。",
+              "output": "remote={order-17:create:T1}；本地receipt仍为NULL",
+              "state": "远端模拟效果=1；本地status=intent",
+              "failure": false,
+              "section": "已解例：按四个崩溃点推导工单恢复",
+              "why": "“调用方没有保存回执”和“没有产生工单”不同；这里直接调用函数模拟回执丢失，没有真的断网。",
+              "code_lines": [
+                11,
+                18
+              ]
+            },
+            {
+              "node": 2,
+              "title": "把本地状态记成unknown",
+              "input": "remote已有T1；本地未存回执",
+              "action": "本地UPDATE status=unknown，再打印数据库读出的状态。",
+              "output": "after_timeout=unknown",
+              "state": "status=unknown；receipt=NULL；remote数量=1",
+              "failure": false,
+              "section": "已解例：按四个崩溃点推导工单恢复",
+              "why": "unknown保留不确定性；把它当未执行并换键重试才会制造重复。",
+              "code_lines": [
+                19,
+                21
+              ]
+            },
+            {
+              "node": 3,
+              "title": "同键恢复得到原T1",
+              "input": "key仍为order-17:create",
+              "action": "再次调用create_ticket；原键已存在，返回T1而不新增。",
+              "output": "receipt=T1",
+              "state": "remote数量仍为1；本地仍unknown",
+              "failure": false,
+              "section": "已解例：按四个崩溃点推导工单恢复",
+              "why": "去重来自字典的同键语义，不能把它理解为另一个独立查询API。",
+              "code_lines": [
+                12,
+                22
+              ]
+            },
+            {
+              "node": 4,
+              "title": "提交回执和已发送标记",
+              "input": "receipt=T1；outbox.sent=0",
+              "action": "事务中把任务更新为done并把outbox.sent置1。",
+              "output": "task=(order-17,done,T1)；outbox.sent=1",
+              "state": "本地记录与模拟远端结果对应",
+              "failure": false,
+              "section": "已解例：按四个崩溃点推导工单恢复",
+              "why": "这一步是本地原子提交，没有实现版本CAS、投递器扫描或跨远端事务。",
+              "code_lines": [
+                23,
+                25
+              ]
+            },
+            {
+              "node": 5,
+              "title": "重复调用并断言最终结果",
+              "input": "本地done；remote仅T1",
+              "action": "再同键调用并检查工单数、事件数与任务终态，打印最终三行。",
+              "output": "remote_tickets=1；receipt=T1；state=done",
+              "state": "所有原assert通过",
+              "failure": false,
+              "section": "如何验证，如何在面试里讲",
+              "why": "最终验证的是同键重复效果只有一次，不能据此声称内存数据能跨真实进程重启保留。",
+              "code_lines": [
+                26,
+                33
+              ]
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "同一实验的失败变式",
+          "basis": "把第22行恢复调用改为create_ticket(key+\":retry\")的单因素变式；单独执行验证在原第27行抛AssertionError，非原程序自动发生的第二分支。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "本地保存创建意图",
+              "input": "SQLite内存库，尚无任务和事件",
+              "action": "同一with db块插入order-17的intent任务与order-17:create事件。",
+              "output": "task=(order-17,intent,NULL)；outbox.sent=0",
+              "state": "remote={}；任务意图已提交",
+              "failure": false,
+              "section": "机制：状态、检查点与效果是三个对象",
+              "why": "先记意图才能在效果未知时知道原来要做哪个操作；本例事务只覆盖两张SQLite表。",
+              "code_lines": [
+                3,
+                10
+              ]
+            },
+            {
+              "node": 1,
+              "title": "第一次调用创建T1",
+              "input": "key=order-17:create；remote={}",
+              "action": "create_ticket检查键不存在，创建T1；调用方故意不保存返回值。",
+              "output": "remote={order-17:create:T1}；本地receipt仍为NULL",
+              "state": "远端模拟效果=1；本地status=intent",
+              "failure": false,
+              "section": "已解例：按四个崩溃点推导工单恢复",
+              "why": "“调用方没有保存回执”和“没有产生工单”不同；这里直接调用函数模拟回执丢失，没有真的断网。",
+              "code_lines": [
+                11,
+                18
+              ]
+            },
+            {
+              "node": 2,
+              "title": "把本地状态记成unknown",
+              "input": "remote已有T1；本地未存回执",
+              "action": "本地UPDATE status=unknown，再打印数据库读出的状态。",
+              "output": "after_timeout=unknown",
+              "state": "status=unknown；receipt=NULL；remote数量=1",
+              "failure": false,
+              "section": "已解例：按四个崩溃点推导工单恢复",
+              "why": "unknown保留不确定性；把它当未执行并换键重试才会制造重复。",
+              "code_lines": [
+                19,
+                21
+              ]
+            },
+            {
+              "node": 3,
+              "title": "变式：恢复时换键",
+              "input": "沿用unknown与remote已有T1的状态",
+              "action": "【变式推演，已单独运行】把第22行改为create_ticket(key+\":retry\")，字典新增T2。",
+              "output": "receipt=T2；remote数量=2",
+              "state": "本地仍unknown，等待后续提交",
+              "failure": true,
+              "section": "已解例：按四个崩溃点推导工单恢复",
+              "why": "新的业务键被当作新操作，函数不会知道这仍是同一张工单。",
+              "code_lines": [
+                22,
+                22
+              ]
+            },
+            {
+              "node": 4,
+              "title": "变式仍会写入错误回执",
+              "input": "receipt=T2；原outbox事件键未变",
+              "action": "沿用第23—25行，把任务写成done/T2并标记原事件已发送。",
+              "output": "本地task.receipt=T2；remote有T1和T2",
+              "state": "重复效果已经发生，done不能证明正确",
+              "failure": true,
+              "section": "已解例：按四个崩溃点推导工单恢复",
+              "why": "一个看似成功的终态可以掩盖重复业务对象，需要后续不变量断言。",
+              "code_lines": [
+                23,
+                25
+              ]
+            },
+            {
+              "node": 5,
+              "title": "原断言抓住不一致",
+              "input": "原key返回T1，但receipt是T2",
+              "action": "第27行assert create_ticket(key)==receipt失败；后续数量断言与最终打印不执行。",
+              "output": "AssertionError；此前只打印after_timeout=unknown",
+              "state": "停止于第27行；不是原expected的完整输出",
+              "failure": true,
+              "section": "如何验证，如何在面试里讲",
+              "why": "最早失败的是回执一致性断言，不能误称第28行一定先执行并报错。",
+              "code_lines": [
+                27,
+                28
+              ]
+            }
+          ],
+          "code_overrides": {
+            "22": "receipt = create_ticket(key + \":retry\")  # 变式：恢复错误地更换业务键"
+          }
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "Checkpoint 有了，为什么还会重复创建工单？",
+      "a": "Checkpoint 保存本地进度，无法把远端创建与本地回执保存变成一个原子事务。远端成功后、本地落盘前崩溃，恢复可能重放该节点。需要先存稳定操作键，由远端按键去重或查询；没有这些能力则进入未知和对账，而不是宣称已经失败。",
+      "rubric": "应指出跨系统提交空隙、稳定幂等键和无法自动恢复的边界。"
+    },
+    {
+      "q": "Outbox 已发送后未标记即崩溃，会丢消息还是重复？",
+      "a": "恢复会再次扫描未标记事件，通常产生重复投递。消费者应把事件ID去重记录与本地业务更新放在一个事务；只在内存去重，重启后仍会重复。对外部写操作还需要外部幂等，outbox本身不能包办。",
+      "rubric": "说明至少一次、消费者事务和外部副作用边界。"
+    },
+    {
+      "q": "租约有效时抢到锁，为什么还要 fencing token？",
+      "a": "租约过期不会终止旧进程，暂停后恢复的旧Worker可能写回过时结果。新世代持有递增token，资源端原子比较并拒绝旧token；只在Worker本地检查锁存在有检查与使用之间的竞态。资源端不支持token时保证受限。",
+      "rubric": "包括旧进程复活、写入端原子校验、外部系统支持条件。"
+    },
+    {
+      "q": "恢复时可以沿用昨天批准的删除操作吗？",
+      "a": "不能仅凭检查点中有“已批准”就执行。先检查主体权限、资源版本、参数指纹、有效期和撤销状态；若范围变化或授权过期，重新审批。重复审批会增加等待，但沿用不匹配授权可能删除错误资源。",
+      "rubric": "把运行恢复和重新授权分开，给出版本或参数反例。"
+    }
+  ],
+  "lab": {
+    "title": "模拟远端成功后丢失回执",
+    "task": "先预测第二次调用是否新增工单，再运行。说明SQL事务只覆盖了哪些表，以及remote为何必须复用原键。",
+    "code": "import sqlite3\n\ndb = sqlite3.connect(\":memory:\")\ndb.executescript(\"\"\"\nCREATE TABLE task(id TEXT PRIMARY KEY, status TEXT, receipt TEXT);\nCREATE TABLE outbox(event_id TEXT PRIMARY KEY, sent INTEGER DEFAULT 0);\n\"\"\")\nwith db:\n    db.execute(\"INSERT INTO task VALUES (?, ?, NULL)\", (\"order-17\", \"intent\"))\n    db.execute(\"INSERT INTO outbox(event_id) VALUES (?)\", (\"order-17:create\",))\nremote = {}\ndef create_ticket(key):\n    if key not in remote:\n        remote[key] = \"T\" + str(len(remote) + 1)\n    return remote[key]\n\nkey = \"order-17:create\"\ncreate_ticket(key)  # 远端完成；模拟回执尚未保存便崩溃\nwith db:\n    db.execute(\"UPDATE task SET status='unknown' WHERE id='order-17'\")\nprint(\"after_timeout=\" + db.execute(\"SELECT status FROM task\").fetchone()[0])\nreceipt = create_ticket(key)  # 恢复时复用同一业务键\nwith db:\n    db.execute(\"UPDATE task SET status='done', receipt=?\", (receipt,))\n    db.execute(\"UPDATE outbox SET sent=1 WHERE event_id=?\", (key,))\n# 模拟投递回执再次丢失，重复消费仍不会新增业务对象\nassert create_ticket(key) == receipt\nassert len(remote) == 1\nassert db.execute(\"SELECT COUNT(*) FROM outbox\").fetchone()[0] == 1\nassert db.execute(\"SELECT status, receipt FROM task\").fetchone() == (\"done\", \"T1\")\nprint(\"remote_tickets=\" + str(len(remote)))\nprint(\"receipt=\" + receipt)\nprint(\"state=done\")\n",
+    "expected": "after_timeout=unknown\nremote_tickets=1\nreceipt=T1\nstate=done\n",
+    "explanation": "第一次远端写入后故意不保存回执，以unknown表示结果未知。恢复以原键取回T1，重复执行也只有一个远端对象。本地意图和outbox同事务落盘；字典模拟远端去重而不是实际网络持久化。",
+    "extensions": [
+      "把恢复键改成order-17:create:retry，再观察assert为何失败。",
+      "为本地状态增加version，写出阻止旧Worker覆盖done的条件更新。"
+    ],
+    "extension_answers": [
+      "新键代表新操作，remote会新增T2，len(remote)==1断言失败。这证明去重依赖业务键稳定，而非函数被调用几次。",
+      "增加version INTEGER，更新使用UPDATE task SET status=?,version=version+1 WHERE id=? AND version=? AND status=?；检查rowcount为1才算成功，否则重读状态，不能无条件覆盖。"
+    ]
+  },
+  "pitfalls": [
+    "把超时统一记为业务失败并更换幂等键",
+    "只存对话，没有操作意图、授权版本和工具回执",
+    "把outbox或分布式锁描述成跨任意系统的一次执行保证"
+  ],
+  "checkpoint": "能画出四个崩溃点，实际运行脚本并解释为何只有一张工单；能指出不支持查询/幂等的远端必须对账。",
+  "alignment": {
+    "case_title": "模拟远端成功后丢失回执",
+    "insert_after": "已解例：按四个崩溃点推导工单恢复",
+    "bridge": "把上面的四个崩溃点收缩到一个能亲手追踪的边界：工单已经创建，但本地尚未保存回执。接下来的图和实验始终使用同一订单order-17。task表的status、receipt表示本地认知，remote字典表示支持同键去重的远端；两者不属于同一个事务。\n\n第一次create_ticket(key)把T1放进remote，却故意丢掉返回值，随后本地记unknown，所以屏幕先出现after_timeout=unknown。恢复仍传入order-17:create，函数找到原键，receipt得到T1，再把task改成done、outbox.sent改成1。\n\n最后的assert检查回执相同、工单与事件各一条，因此输出remote_tickets=1、receipt=T1、state=done。先看清每步是哪份状态变化，再比较“把恢复键改成新键”的失败分支：它新增T2，原回执一致性断言首先失败。这样就能把正文的提交空隙与下面具体代码连起来；不要把函数重放误读成一个未实现的远端查询接口。",
+    "coverage": "仅实现内存SQLite中的意图/回执与outbox标记、字典同键去重和顺序故障模拟；未实现真实进程重启、网络、持久远端、outbox扫描投递、参数指纹、完整checkpoint、审批、CAS、租约、fencing或人工对账系统。",
+    "question_sections": [
+      "机制：状态、检查点与效果是三个对象",
+      "机制：状态、检查点与效果是三个对象",
+      "两个 Worker 与租约边界",
+      "机制：状态、检查点与效果是三个对象"
+    ],
+    "coverage_summary": "字典模拟远端回执与本地状态，不连接真实工单服务。"
+  }
+}

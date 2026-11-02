@@ -1,0 +1,104 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>Agent 系统设计面试题 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-088.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/系统设计面试题-进阶篇.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E9%9D%A2%E8%AF%95%E9%A2%98-%E8%BF%9B%E9%98%B6%E7%AF%87.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E9%9D%A2%E8%AF%95%E9%A2%98-%E8%BF%9B%E9%98%B6%E7%AF%87.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E9%A2%98%E7%9B%AE%E5%88%97%E8%A1%A8">题目列表</a><a href="#1-%E8%AE%BE%E8%AE%A1%E8%87%AA%E4%B8%BB%E5%AE%A2%E6%9C%8D-agent">1. 设计自主客服 Agent</a><a href="#2-%E8%AE%BE%E8%AE%A1%E5%A4%9A-agent-%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%9B%A2%E9%98%9F">2. 设计多 Agent 代码开发团队</a><a href="#3-%E8%AE%BE%E8%AE%A1-rag-%E7%B3%BB%E7%BB%9F">3. 设计 RAG 系统</a><a href="#4-%E8%AE%BE%E8%AE%A1-agent-%E8%AE%B0%E5%BF%86%E7%B3%BB%E7%BB%9F">4. 设计 Agent 记忆系统</a><a href="#5-%E8%AE%BE%E8%AE%A1-agent-%E7%9B%91%E6%8E%A7%E4%B8%8E%E8%AF%84%E4%BC%B0%E7%B3%BB%E7%BB%9F">5. 设计 Agent 监控与评估系统</a><a href="#6-%E8%AE%BE%E8%AE%A1%E5%AE%89%E5%85%A8%E7%9A%84-agent-%E7%B3%BB%E7%BB%9F">6. 设计安全的 Agent 系统</a><a href="#7-%E8%AE%BE%E8%AE%A1%E5%8F%AF%E6%89%A9%E5%B1%95%E7%9A%84-agent-%E7%BC%96%E6%8E%92%E7%B3%BB%E7%BB%9F">7. 设计可扩展的 Agent 编排系统</a><a href="#8-%E8%AE%BE%E8%AE%A1-agent-%E7%9A%84%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E7%B3%BB%E7%BB%9F">8. 设计 Agent 的工具调用系统</a><a href="#9-%E8%B7%A8%E6%95%B0%E5%8D%83%E6%AC%A1%E8%B0%83%E7%94%A8%E4%BC%98%E5%8C%96%E6%88%90%E6%9C%AC">9. 跨数千次调用优化成本</a><a href="#10-%E8%AE%BE%E8%AE%A1%E5%AE%9E%E6%97%B6-agent-%E7%B3%BB%E7%BB%9F">10. 设计实时 Agent 系统</a><a href="#11-%E8%AE%BE%E8%AE%A1-agent-%E7%9A%84%E6%B5%8B%E8%AF%95%E6%A1%86%E6%9E%B6">11. 设计 Agent 的测试框架</a><a href="#12-%E8%AE%BE%E8%AE%A1%E4%BC%81%E4%B8%9A%E7%BA%A7-agent-%E9%83%A8%E7%BD%B2%E6%9E%B6%E6%9E%84">12. 设计企业级 Agent 部署架构</a><a href="#13-%E8%AE%BE%E8%AE%A1-agent-%E7%9A%84%E7%9F%A5%E8%AF%86%E6%9B%B4%E6%96%B0%E7%B3%BB%E7%BB%9F">13. 设计 Agent 的知识更新系统</a><a href="#14-%E8%AE%BE%E8%AE%A1-ai-%E4%BB%A3%E7%A0%81%E8%BF%81%E7%A7%BB-agent">14. 设计 AI 代码迁移 Agent</a><a href="#15-%E8%AE%BE%E8%AE%A1-agent-%E7%9A%84-ab-%E6%B5%8B%E8%AF%95%E5%B9%B3%E5%8F%B0">15. 设计 Agent 的 A/B 测试平台</a></nav></details><article class="prose source-prose"><h1 id="agent-系统设计面试题">Agent 系统设计面试题</h1>
+<h2 id="题目列表">题目列表</h2>
+<h3 id="1-设计自主客服-agent">1. 设计自主客服 Agent</h3>
+<p>设计一个能处理用户投诉和咨询的客服 Agent 系统。
+- 如何定义升级边界（何时转人工）？
+- 知识检索策略？
+- 多轮对话的状态管理？
+- 如何保证回答的准确性和合规性？</p>
+<h3 id="2-设计多-agent-代码开发团队">2. 设计多 Agent 代码开发团队</h3>
+<p>类似 GitHub Squad，设计一个由 PM Agent + Frontend Agent + Backend Agent + QA Agent 组成的开发团队。
+- 如何分配任务？
+- Agent 之间如何通信？
+- 冲突解决机制？
+- 如何保证代码一致性？</p>
+<h3 id="3-设计-rag-系统">3. 设计 RAG 系统</h3>
+<p>为一个拥有 10 万份文档的企业设计 RAG 系统。
+- 文档分割策略？
+- 向量数据库选型（FAISS vs Pinecone vs Chroma）？
+- 如何处理多模态文档（PDF、图片、表格）？
+- 检索质量评估？</p>
+<h3 id="4-设计-agent-记忆系统">4. 设计 Agent 记忆系统</h3>
+<ul>
+<li>短期记忆（上下文窗口）vs 长期记忆（向量数据库）</li>
+<li>实体记忆 vs 对话记忆 vs 知识记忆</li>
+<li>记忆的压缩与淘汰策略</li>
+<li>跨会话的记忆持久化</li>
+</ul>
+<h3 id="5-设计-agent-监控与评估系统">5. 设计 Agent 监控与评估系统</h3>
+<ul>
+<li>如何衡量 Agent 的任务成功率？</li>
+<li>如何检测幻觉（hallucination）？</li>
+<li>成本监控与优化</li>
+<li>A/B 测试不同 prompt 的效果</li>
+</ul>
+<h3 id="6-设计安全的-agent-系统">6. 设计安全的 Agent 系统</h3>
+<ul>
+<li>如何防范 prompt injection？</li>
+<li>Agent 权限边界设计</li>
+<li>敏感操作的 human-in-the-loop 审批</li>
+<li>审计日志</li>
+</ul>
+<h3 id="7-设计可扩展的-agent-编排系统">7. 设计可扩展的 Agent 编排系统</h3>
+<ul>
+<li>串行 vs 并行 vs DAG 编排</li>
+<li>错误处理与重试策略</li>
+<li>超时管理</li>
+<li>Agent 的动态注册与发现</li>
+</ul>
+<h3 id="8-设计-agent-的工具调用系统">8. 设计 Agent 的工具调用系统</h3>
+<ul>
+<li>Tool 的注册与描述</li>
+<li>如何让 Agent 选择正确的工具？</li>
+<li>工具调用的错误处理</li>
+<li>MCP（Model Context Protocol）的设计思路</li>
+</ul>
+<h3 id="9-跨数千次调用优化成本">9. 跨数千次调用优化成本</h3>
+<ul>
+<li>模型选择策略（大模型 vs 小模型分流）</li>
+<li>Prompt 缓存</li>
+<li>批量处理</li>
+<li>何时用 Agent、何时用简单规则</li>
+</ul>
+<h3 id="10-设计实时-agent-系统">10. 设计实时 Agent 系统</h3>
+<ul>
+<li>流式响应</li>
+<li>WebSocket vs SSE</li>
+<li>并发控制</li>
+<li>长时间任务的进度通知</li>
+</ul>
+<h3 id="11-设计-agent-的测试框架">11. 设计 Agent 的测试框架</h3>
+<ul>
+<li>如何对 Agent 行为做回归测试？</li>
+<li>模拟 LLM 响应（mock）</li>
+<li>端到端测试策略</li>
+<li>评估指标设计</li>
+</ul>
+<h3 id="12-设计企业级-agent-部署架构">12. 设计企业级 Agent 部署架构</h3>
+<ul>
+<li>多租户隔离</li>
+<li>RBAC 权限控制</li>
+<li>合规性（数据不出境、审计）</li>
+<li>灰度发布</li>
+</ul>
+<h3 id="13-设计-agent-的知识更新系统">13. 设计 Agent 的知识更新系统</h3>
+<ul>
+<li>知识库的增量更新</li>
+<li>如何处理过时信息？</li>
+<li>知识冲突解决</li>
+<li>实时 vs 定期更新</li>
+</ul>
+<h3 id="14-设计-ai-代码迁移-agent">14. 设计 AI 代码迁移 Agent</h3>
+<ul>
+<li>将一个 Python 项目迁移到 TypeScript</li>
+<li>如何保证功能等价？</li>
+<li>测试覆盖策略</li>
+<li>处理语言特性差异</li>
+</ul>
+<h3 id="15-设计-agent-的-ab-测试平台">15. 设计 Agent 的 A/B 测试平台</h3>
+<ul>
+<li>如何对比不同 prompt / 模型 / 工具组合？</li>
+<li>流量分配</li>
+<li>统计显著性判断</li>
+<li>自动化收敛</li>
+</ul></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

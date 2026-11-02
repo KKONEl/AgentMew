@@ -1,0 +1,220 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>LangChain &amp; LangGraph 深度解析与面试题 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-075.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/LangChain与LangGraph深度解析.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/15-state-recovery.html">15 状态机、持久化与崩溃恢复</a> · <a href="../lessons/23-framework-selection.html">23 框架与平台选型：职责、恢复契约和 Skill 生命周期</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/LangChain%E4%B8%8ELangGraph%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/LangChain%E4%B8%8ELangGraph%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80langchain-%E6%A0%B8%E5%BF%83%E6%9E%B6%E6%9E%84">一、LangChain 核心架构</a><a href="#%E6%A8%A1%E5%9D%97%E4%BD%93%E7%B3%BB">模块体系</a><a href="#lcellangchain-expression-language">LCEL（LangChain Expression Language）</a><a href="#agent-%E7%B1%BB%E5%9E%8B">Agent 类型</a><a href="#%E4%BA%8Clanggraph-%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90">二、LangGraph 深度解析</a><a href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5">核心概念</a><a href="#%E5%85%B3%E9%94%AE%E7%89%B9%E6%80%A7%E8%AF%A6%E8%A7%A3">关键特性详解</a><a href="#langgraph-vs-langchain-agent">LangGraph vs LangChain Agent</a><a href="#%E4%B8%89%E5%AE%9E%E6%88%98%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F">三、实战设计模式</a><a href="#1-react-loop%E6%9C%80%E5%9F%BA%E7%A1%80%E7%9A%84-agent-%E5%BE%AA%E7%8E%AF">1. ReAct Loop（最基础的 Agent 循环）</a><a href="#2-plan-and-execute">2. Plan-and-Execute</a><a href="#3-reflection%E8%87%AA%E6%88%91%E5%8F%8D%E6%80%9D">3. Reflection（自我反思）</a><a href="#4-multi-agent-supervisor">4. Multi-Agent Supervisor</a><a href="#%E5%9B%9B%E9%AB%98%E9%A2%91%E9%9D%A2%E8%AF%95%E9%A2%98">四、高频面试题</a><a href="#langchain">LangChain</a><a href="#langgraph">LangGraph</a><a href="#%E5%AF%B9%E6%AF%94%E4%B8%8E%E9%80%89%E5%9E%8B">对比与选型</a><a href="#%E4%BA%94%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%E8%A6%81%E7%82%B9">五、参考答案要点</a><a href="#q5-react-agent-%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86">Q5: ReAct Agent 工作原理</a><a href="#q10-supervisor-%E5%A4%9A-agent-%E6%A8%A1%E5%BC%8F">Q10: Supervisor 多 Agent 模式</a></nav></details><article class="prose source-prose"><h1 id="langchain-langgraph-深度解析与面试题">LangChain &amp; LangGraph 深度解析与面试题</h1>
+<h2 id="一langchain-核心架构">一、LangChain 核心架构</h2>
+<h3 id="模块体系">模块体系</h3>
+<pre><code>LangChain
+├── Models（模型层）
+│   ├── LLMs（文本生成）
+│   ├── Chat Models（对话模型）
+│   └── Embedding Models（嵌入模型）
+├── Prompts（提示层）
+│   ├── PromptTemplate
+│   ├── ChatPromptTemplate
+│   └── FewShotPromptTemplate
+├── Chains（链）
+│   ├── LLMChain（基础链）
+│   ├── SequentialChain（顺序链）
+│   ├── RouterChain（路由链）
+│   └── LCEL（LangChain Expression Language）
+├── Agents（代理）
+│   ├── ReAct Agent
+│   ├── OpenAI Functions Agent
+│   └── Plan-and-Execute Agent
+├── Memory（记忆）
+│   ├── ConversationBufferMemory
+│   ├── ConversationSummaryMemory
+│   └── ConversationTokenBufferMemory
+├── Tools（工具）
+│   ├── Search, Calculator, Code Interpreter...
+│   └── 自定义 Tool
+└── Retrievers（检索器）
+    ├── VectorStoreRetriever
+    ├── MultiQueryRetriever
+    └── SelfQueryRetriever
+</code></pre>
+<h3 id="lcellangchain-expression-language">LCEL（LangChain Expression Language）</h3>
+<ul>
+<li>LangChain 的现代链构建方式</li>
+<li>用管道操作符 <code>|</code> 连接组件</li>
+<li>支持流式输出、批处理、异步</li>
+<li>示例：<code>prompt | llm | output_parser</code></li>
+</ul>
+<h3 id="agent-类型">Agent 类型</h3>
+<ol>
+<li><strong>ReAct</strong>：推理+行动交替，最经典</li>
+<li><strong>OpenAI Functions</strong>：利用 OpenAI 函数调用能力</li>
+<li><strong>Plan-and-Execute</strong>：先规划再执行，适合复杂任务</li>
+<li><strong>Tool Calling Agent</strong>：通用工具调用（新版推荐）</li>
+</ol>
+<hr>
+<h2 id="二langgraph-深度解析">二、LangGraph 深度解析</h2>
+<h3 id="核心概念">核心概念</h3>
+<pre><code class="language-python">from langgraph.graph import StateGraph, END
+
+# 1. 定义状态
+class AgentState(TypedDict):
+    messages: list
+    next_step: str
+
+# 2. 创建图
+graph = StateGraph(AgentState)
+
+# 3. 添加节点（每个节点是一个函数）
+graph.add_node(&quot;agent&quot;, agent_node)
+graph.add_node(&quot;tool&quot;, tool_node)
+
+# 4. 添加边（定义流转）
+graph.add_edge(&quot;agent&quot;, &quot;tool&quot;)           # 无条件边
+graph.add_conditional_edges(&quot;tool&quot;, router) # 条件边
+
+# 5. 设置入口
+graph.set_entry_point(&quot;agent&quot;)
+
+# 6. 编译运行
+app = graph.compile()
+result = app.invoke({&quot;messages&quot;: [...]})
+</code></pre>
+<h3 id="关键特性详解">关键特性详解</h3>
+<h4 id="1-状态管理">1. 状态管理</h4>
+<ul>
+<li>每次节点执行都会更新全局 State</li>
+<li>State 在整个图执行期间持久化</li>
+<li>支持 Checkpointing：可以保存/恢复执行状态</li>
+<li>支持 Time Travel：回到任意历史检查点</li>
+</ul>
+<h4 id="2-条件边conditional-edges">2. 条件边（Conditional Edges）</h4>
+<pre><code class="language-python">def router(state):
+    if state[&quot;need_tool&quot;]:
+        return &quot;tool_node&quot;
+    return END
+
+graph.add_conditional_edges(&quot;agent&quot;, router, {
+    &quot;tool_node&quot;: &quot;tool_node&quot;,
+    END: END
+})
+</code></pre>
+<h4 id="3-人工干预human-in-the-loop">3. 人工干预（Human-in-the-loop）</h4>
+<ul>
+<li>在关键节点前暂停，等待人工审批</li>
+<li><code>interrupt_before</code> / <code>interrupt_after</code> 参数</li>
+<li>适用场景：敏感操作确认、Agent 决策审核</li>
+</ul>
+<h4 id="4-多-agent-协作模式">4. 多 Agent 协作模式</h4>
+<ul>
+<li><strong>Supervisor 模式</strong>：一个主 Agent 调度多个子 Agent</li>
+<li><strong>对等模式</strong>：Agent 间直接通信</li>
+<li><strong>层级模式</strong>：多层管理结构</li>
+</ul>
+<h3 id="langgraph-vs-langchain-agent">LangGraph vs LangChain Agent</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>LangChain Agent</th>
+<th>LangGraph</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>工作流</td>
+<td>线性/简单分支</td>
+<td>任意图结构</td>
+</tr>
+<tr>
+<td>状态管理</td>
+<td>基本 Memory</td>
+<td>丰富 State + Checkpoint</td>
+</tr>
+<tr>
+<td>循环</td>
+<td>不支持</td>
+<td>原生支持</td>
+</tr>
+<tr>
+<td>人工干预</td>
+<td>有限</td>
+<td>完善</td>
+</tr>
+<tr>
+<td>多 Agent</td>
+<td>简单嵌套</td>
+<td>原生支持</td>
+</tr>
+<tr>
+<td>学习曲线</td>
+<td>低</td>
+<td>中等</td>
+</tr>
+<tr>
+<td>生产就绪</td>
+<td>中等</td>
+<td>高</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="三实战设计模式">三、实战设计模式</h2>
+<h3 id="1-react-loop最基础的-agent-循环">1. ReAct Loop（最基础的 Agent 循环）</h3>
+<pre><code>用户输入 → Agent 推理 → 是否需要工具？
+  ├── 是 → 调用工具 → 获取结果 → 回到 Agent 推理
+  └── 否 → 输出最终答案
+</code></pre>
+<h3 id="2-plan-and-execute">2. Plan-and-Execute</h3>
+<p><img alt="Plan-and-Execute 模式：规划→执行→重规划" src="../../source/diagrams/plan-and-execute.svg" loading="lazy" decoding="async"></p>
+<h3 id="3-reflection自我反思">3. Reflection（自我反思）</h3>
+<pre><code>Agent 生成答案 → Critic 评估质量
+  ├── 不满意 → Agent 重新生成（带反馈）
+  └── 满意 → 输出最终答案
+</code></pre>
+<h3 id="4-multi-agent-supervisor">4. Multi-Agent Supervisor</h3>
+<pre><code>用户输入 → Supervisor Agent
+  ├── 分派给 Research Agent
+  ├── 分派给 Code Agent
+  └── 分派给 Writing Agent
+  → 汇总结果 → 输出
+</code></pre>
+<hr>
+<h2 id="四高频面试题">四、高频面试题</h2>
+<h3 id="langchain">LangChain</h3>
+<ol>
+<li>LangChain 的核心模块有哪些？各自作用？</li>
+<li>什么是 LCEL？相比传统 Chain 有什么优势？</li>
+<li>LangChain 中的 Memory 有哪几种？各自适用场景？</li>
+<li>如何在 LangChain 中自定义 Tool？需要注意什么？</li>
+<li>ReAct Agent 的工作原理是什么？</li>
+</ol>
+<h3 id="langgraph">LangGraph</h3>
+<ol start="6">
+<li>LangGraph 的图结构（Node, Edge, State）如何工作？</li>
+<li>什么是条件边？如何实现分支逻辑？</li>
+<li>LangGraph 如何实现 Human-in-the-loop？</li>
+<li>LangGraph 的 Checkpoint 机制是什么？有什么用？</li>
+<li>如何用 LangGraph 实现多 Agent 协作？描述 Supervisor 模式。</li>
+</ol>
+<h3 id="对比与选型">对比与选型</h3>
+<ol start="11">
+<li>LangChain 和 LangGraph 如何互补？举一个结合使用的例子。</li>
+<li>你会在什么场景下选择 LangGraph 而不是 LangChain Agent？</li>
+<li>LangGraph vs CrewAI vs AutoGen，各自优劣？</li>
+<li>如何调试和监控基于 LangGraph 的 Agent 应用？</li>
+<li>LangGraph 在生产环境中有哪些注意事项（错误处理、超时、成本控制）？</li>
+</ol>
+<hr>
+<h2 id="五参考答案要点">五、参考答案要点</h2>
+<h3 id="q5-react-agent-工作原理">Q5: ReAct Agent 工作原理</h3>
+<ul>
+<li>ReAct = Reasoning + Acting</li>
+<li>循环过程：Thought → Action → Observation → Thought → ...</li>
+<li>LLM 先"思考"当前状况，决定是否需要使用工具</li>
+<li>如果需要：选择工具并提供参数 → 执行工具 → 观察结果</li>
+<li>如果不需要：直接生成最终回答</li>
+<li>核心 Prompt 格式包含 Thought/Action/Action Input/Observation</li>
+</ul>
+<h3 id="q10-supervisor-多-agent-模式">Q10: Supervisor 多 Agent 模式</h3>
+<ul>
+<li>一个 Supervisor Agent 负责任务调度</li>
+<li>接收用户输入后，决定分派给哪个子 Agent</li>
+<li>子 Agent 各自完成任务后将结果返回 Supervisor</li>
+<li>Supervisor 汇总结果，决定是否需要继续或输出最终答案</li>
+<li>LangGraph 实现：Supervisor 是一个条件节点，子 Agent 是独立节点</li>
+<li>State 中维护当前进度和各 Agent 的输出</li>
+</ul></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

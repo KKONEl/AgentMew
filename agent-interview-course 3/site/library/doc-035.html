@@ -1,0 +1,334 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>美团 AI Agent/大模型岗位 - 真实面经网络实录 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-035.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">美团/真实面经-网络实录.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E7%BE%8E%E5%9B%A2/%E7%9C%9F%E5%AE%9E%E9%9D%A2%E7%BB%8F-%E7%BD%91%E7%BB%9C%E5%AE%9E%E5%BD%95.md">GitHub 固定版本</a> · <a href="../../source/%E7%BE%8E%E5%9B%A2/%E7%9C%9F%E5%AE%9E%E9%9D%A2%E7%BB%8F-%E7%BD%91%E7%BB%9C%E5%AE%9E%E5%BD%95.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E9%9D%A2%E7%BB%8F%E4%B8%80%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%AE%97%E6%B3%95%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%A0%A1%E6%8B%9B">面经一：大模型算法工程师（校招）</a><a href="#ai%E9%9D%A2%E8%AF%9515%E5%88%86%E9%92%9F%E7%89%9B%E5%AE%A2%E5%B9%B3%E5%8F%B0">AI面试（15分钟，牛客平台）</a><a href="#%E4%B8%80%E9%9D%A2%E6%8A%80%E6%9C%AF%E9%9D%A265%E5%88%86%E9%92%9F">一面（技术面，65分钟）</a><a href="#%E4%BA%8C%E9%9D%A2%E6%8A%80%E6%9C%AF%E9%9D%A255%E5%88%86%E9%92%9F">二面（技术面，55分钟）</a><a href="#%E4%B8%89%E9%9D%A2%E4%B8%BB%E7%AE%A1%E9%9D%A240%E5%88%86%E9%92%9F">三面（主管面，40分钟）</a><a href="#%E9%9D%A2%E7%BB%8F%E4%BA%8C%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%A4%BE%E6%8B%9B">面经二：大模型应用开发（社招）</a><a href="#%E4%B8%80%E9%9D%A260%E5%88%86%E9%92%9F">一面（60分钟）</a><a href="#%E4%BA%8C%E9%9D%A250%E5%88%86%E9%92%9F">二面（50分钟）</a><a href="#%E4%B8%89%E9%9D%A2hr%E9%9D%A230%E5%88%86%E9%92%9F">三面（HR面，30分钟）</a><a href="#%E9%9D%A2%E7%BB%8F%E4%B8%89ai-agent%E8%AF%84%E6%B5%8B%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%A0%A1%E6%8B%9B">面经三：AI Agent评测工程师（校招）</a><a href="#%E4%B8%80%E9%9D%A250%E5%88%86%E9%92%9F">一面（50分钟）</a><a href="#%E4%BA%8C%E9%9D%A245%E5%88%86%E9%92%9F">二面（45分钟）</a><a href="#%E9%9D%A2%E7%BB%8F%E5%9B%9Bai-agent-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%912026-%E6%96%B0%E5%A2%9E%E5%85%AC%E5%BC%80%E6%9D%A5%E6%BA%90">面经四：AI Agent / 大模型应用开发（2026 新增公开来源）</a><a href="#2026-%E9%AB%98%E9%A2%91%E8%BF%BD%E9%97%AE">2026 高频追问</a><a href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E5%BB%BA%E8%AE%AE">总结与建议</a><a href="#%E7%BE%8E%E5%9B%A2%E9%9D%A2%E8%AF%95%E7%89%B9%E7%82%B9">美团面试特点</a><a href="#%E5%87%86%E5%A4%87%E5%BB%BA%E8%AE%AE">准备建议</a></nav></details><article class="prose source-prose"><h1 id="美团-ai-agent大模型岗位-真实面经网络实录">美团 AI Agent/大模型岗位 - 真实面经网络实录</h1>
+<blockquote>
+<p>整理自牛客、脉脉、CSDN等平台的真实面试分享，2024-2025年</p>
+</blockquote>
+<hr>
+<h2 id="面经一大模型算法工程师校招">面经一：大模型算法工程师（校招）</h2>
+<p><strong>面试时间：</strong> 2024年10月（秋招）<br>
+<strong>岗位：</strong> 大模型算法工程师 - 基础研发平台<br>
+<strong>结果：</strong> 已offer  </p>
+<h3 id="ai面试15分钟牛客平台">AI面试（15分钟，牛客平台）</h3>
+<p><strong>Q1：简单自我介绍</strong></p>
+<blockquote>
+<p>回答思路：控制在2分钟，重点突出大模型相关经历。</p>
+</blockquote>
+<p><strong>Q2：解释一下Transformer中的Attention机制</strong></p>
+<blockquote>
+<p>回答思路：简洁地讲了Self-Attention的QKV计算过程和Scaling。AI面试不需要太深入，讲清楚核心概念即可。</p>
+</blockquote>
+<p><strong>Q3：简单代码题 - 两数之和</strong></p>
+<blockquote>
+<p>回答思路：哈希表解法，O(n)。AI面试代码题一般比较简单。</p>
+</blockquote>
+<p><strong>AI面试体验：</strong> 美团的AI面试是校招流程的第一步，由AI视频面试系统完成。会录制你的回答视频，建议对着镜头回答，表情自然。</p>
+<h3 id="一面技术面65分钟">一面（技术面，65分钟）</h3>
+<p><strong>Q1：详细讲讲你的大模型项目，重点说说技术方案和你的贡献</strong></p>
+<blockquote>
+<p>回答思路：讲了一个多Agent协作的智能客服系统。从架构设计、Agent分工、工具注册、记忆管理到评估体系的完整流程。强调了自己负责的核心模块（工具调用优化和多轮对话管理）。</p>
+</blockquote>
+<p><strong>Q2：Transformer的位置编码你了解哪些？RoPE详细讲讲</strong></p>
+<blockquote>
+<p>回答思路：
+- 绝对位置编码：正弦/余弦、可学习embedding
+- 相对位置编码：Relative Position Bias（T5）、RoPE、ALiBi
+- RoPE：在复数空间旋转Q/K向量编码位置，使attention score只依赖相对位置
+- 公式推导：通过欧拉公式 e^(iθ) 实现旋转</p>
+</blockquote>
+<p><strong>Q3：MHA vs MQA vs GQA区别？为什么现在主流用GQA？</strong></p>
+<blockquote>
+<p>回答思路：
+- MHA：每个头独立Q/K/V，效果好但KV Cache占用大
+- MQA：共享一组K/V，极大减少KV Cache但可能损失精度
+- GQA：分组共享，性能和效率的最佳平衡
+- LLaMA2-70B就用GQA（8组），Qwen2也用GQA</p>
+</blockquote>
+<p><strong>Q4：Scaling Laws讲一下，涌现能力你怎么理解？</strong></p>
+<blockquote>
+<p>回答思路：
+- Scaling Laws（Chinchilla）：模型性能随参数量N、数据量D、计算量C幂律增长
+- 最优配比：N和D应该等比例扩大
+- 涌现能力：模型规模超过某个阈值后突然出现的能力（few-shot、CoT推理等）
+- 有争议：BIG-bench论文指出涌现可能是度量方式造成的</p>
+</blockquote>
+<p><strong>Q5：LLM推理的解码策略有哪些？</strong></p>
+<blockquote>
+<p>回答思路：
+- Greedy Search：每步选概率最高的token，简单但容易重复
+- Beam Search：保持top-k个候选序列，更全局但计算量大
+- Top-K Sampling：从概率最高的K个token中采样
+- Nucleus/Top-P Sampling：从累积概率达到P的最小集合中采样
+- Temperature：控制分布平缓度</p>
+</blockquote>
+<p><strong>Q6：代码题 - 设计一个高并发排队系统</strong></p>
+<blockquote>
+<p>回答思路：用优先级队列+分布式锁。讲了系统设计思路：接入层（限流）→排队层（Redis有序集合）→处理层（消费者线程池）。</p>
+</blockquote>
+<h3 id="二面技术面55分钟">二面（技术面，55分钟）</h3>
+<p><strong>Q1：AI Agent的核心组件有哪些？ReAct框架讲一下</strong></p>
+<blockquote>
+<p>回答思路：
+- 核心组件：LLM大脑、规划器、记忆、工具、观察器
+- ReAct = Reasoning + Acting，交替执行思考和行动
+- 流程循环：Thought → Action → Observation → Thought → ...
+- 与CoT的区别：CoT只思考不行动，ReAct能调用工具获取外部信息</p>
+</blockquote>
+<p><strong>Q2：Function Calling怎么实现的？怎么提高工具调用的准确率？</strong></p>
+<blockquote>
+<p>回答思路：
+- 实现：在prompt中提供工具schema，LLM输出结构化调用请求
+- 训练时在SFT数据中加入工具调用样本
+- 提高准确率：
+  1. 优化工具description（清晰、有示例）
+  2. Few-shot examples
+  3. 添加工具选择验证步骤
+  4. 限制可选工具集（根据query先过滤）</p>
+</blockquote>
+<p><strong>Q3：美团的到店餐饮场景，你觉得Agent能怎么用？</strong></p>
+<blockquote>
+<p>回答思路：
+- 智能推荐Agent：根据用户偏好、位置、预算推荐餐厅
+- 客服Agent：处理订单问题、退款、投诉
+- 商家助手Agent：帮商家优化菜品描述、分析经营数据
+- 点餐Agent：多轮对话帮用户做个性化点餐决策
+- 面试官很感兴趣，追问了推荐Agent怎么和现有推荐系统结合</p>
+</blockquote>
+<p><strong>Q4：多智能体系统怎么设计？如何协调？</strong></p>
+<blockquote>
+<p>回答思路：
+- 架构：Orchestrator模式（中心调度）vs Peer-to-Peer（对等协作）
+- 通信：共享记忆黑板、消息传递、事件驱动
+- 冲突解决：优先级、投票、仲裁Agent
+- 美团场景：客服中心可以用多Agent - 意图分类Agent + 信息检索Agent + 问题解决Agent + 质量审核Agent</p>
+</blockquote>
+<p><strong>Q5：计算机网络 - TCP三次握手和四次挥手，为什么挥手要四次？</strong></p>
+<blockquote>
+<p>回答思路：标准回答。四次挥手因为TCP是全双工，每个方向需要独立关闭，ACK和FIN分开发送。</p>
+</blockquote>
+<p><strong>Q6：代码题 - 最长无重复字符子串（LeetCode 3）</strong></p>
+<blockquote>
+<p>回答思路：滑动窗口+哈希集合，O(n)。</p>
+</blockquote>
+<h3 id="三面主管面40分钟">三面（主管面，40分钟）</h3>
+<p><strong>Q1：你对美团的AI战略怎么看？</strong></p>
+<blockquote>
+<p>回答思路：美团是生活服务平台，AI的价值在于提升用户体验和商家效率。讲了对美团"零售+科技"定位的理解。</p>
+</blockquote>
+<p><strong>Q2：如果让你负责一个大模型应用项目，你怎么推进？</strong></p>
+<blockquote>
+<p>回答思路：需求分析→技术选型→MVP开发→内部测试→小流量验证→全量上线→持续优化。强调了数据驱动和用户反馈闭环。</p>
+</blockquote>
+<p><strong>Q3：你最近三年的职业规划？</strong></p>
+<blockquote>
+<p>回答思路：第一年深入业务理解技术落地，第二年在Agent方向做技术突破，第三年带领小团队。</p>
+</blockquote>
+<p><strong>面试体验：</strong>
+美团面试整体节奏比较紧凑，每轮都有代码题或系统设计题。面试官很关注你对业务的理解，强烈建议提前了解美团的产品和业务场景（外卖、到店、酒旅等），想想大模型在这些场景中能解决什么问题。</p>
+<hr>
+<h2 id="面经二大模型应用开发社招">面经二：大模型应用开发（社招）</h2>
+<p><strong>面试时间：</strong> 2025年1月<br>
+<strong>岗位：</strong> AI应用开发 - 核心本地商业<br>
+<strong>结果：</strong> 已offer  </p>
+<h3 id="一面60分钟">一面（60分钟）</h3>
+<p><strong>Q1：你们的大模型应用是怎么架构的？</strong></p>
+<blockquote>
+<p>回答思路：讲了一个企业知识问答系统的完整架构。用户输入→Query理解→多路检索（BM25+向量+知识图谱）→Reranker→Prompt构建→LLM生成→后处理→输出。</p>
+</blockquote>
+<p><strong>Q2：RAG系统你怎么评估效果？</strong></p>
+<blockquote>
+<p>回答思路：
+- 检索端：Hit Rate@K, MRR, Recall@K
+- 生成端：Faithfulness（是否忠于检索内容）、Relevance（是否回答了问题）、Completeness（是否完整）
+- 端到端：RAGAS框架（Context Precision, Context Recall, Answer Relevance, Faithfulness）
+- 用户维度：用户满意度评分、二次提问率</p>
+</blockquote>
+<p><strong>Q3：LLM"复读机"问题怎么解决？</strong></p>
+<blockquote>
+<p>回答思路：
+- 生成时：Repetition Penalty、Frequency Penalty、Presence Penalty
+- 训练时：数据去重、避免相似样本过多
+- 后处理：检测重复内容并截断
+- 采样策略：提高temperature、使用Top-P采样增加多样性</p>
+</blockquote>
+<p><strong>Q4：Context Engineering讲讲你的理解</strong></p>
+<blockquote>
+<p>回答思路：
+- 核心理念：在正确的时机把正确的信息喂给模型
+- 实践：动态构建System Prompt、检索相关上下文、管理对话历史长度
+- 与Prompt Engineering的区别：PE关注怎么写prompt，CE关注如何管理信息流
+- 技术手段：摘要压缩、重要信息前置、工具描述动态选择</p>
+</blockquote>
+<p><strong>Q5：Redis分布式锁怎么实现？有什么问题？</strong></p>
+<blockquote>
+<p>回答思路：SETNX+过期时间。问题：锁过期但业务未完成（watchdog续期）、Redis主从切换丢锁（RedLock）、不可重入（计数器）。</p>
+</blockquote>
+<p><strong>Q6：代码题 - 排行榜设计（Top-K问题）</strong></p>
+<blockquote>
+<p>回答思路：用Redis的Sorted Set实现，ZADD更新分数、ZREVRANGE获取排行。讨论了数据量大时的分片策略。</p>
+</blockquote>
+<h3 id="二面50分钟">二面（50分钟）</h3>
+<p><strong>Q1：你觉得大模型在美团最有价值的应用是什么？</strong></p>
+<blockquote>
+<p>回答思路：
+- 搜索：用LLM做query理解和结果摘要
+- 客服：自动化处理80%的常见问题，节省人力成本
+- 内容生成：商家描述、菜品介绍、营销文案自动生成
+- 选了客服场景详细展开</p>
+</blockquote>
+<p><strong>Q2：如何确保Agent在客服场景中的安全性？</strong></p>
+<blockquote>
+<p>回答思路：
+- 输入防护：Prompt注入检测、敏感词过滤
+- 输出审核：涉及金额/退款等操作需人工确认
+- 权限控制：Agent只能执行预定义的操作集合
+- 兜底机制：识别到无法处理的问题自动转人工
+- 监控告警：异常对话实时告警</p>
+</blockquote>
+<p><strong>Q3：JVM垃圾回收了解吗？G1和ZGC的区别？</strong></p>
+<blockquote>
+<p>回答思路：
+- G1：分Region管理堆内存，Mixed GC，停顿时间可预测
+- ZGC：着色指针+读屏障，几乎无停顿（&lt;10ms），支持TB级堆
+- G1适合中小堆（几GB），ZGC适合大堆和低延迟场景</p>
+</blockquote>
+<p><strong>Q4：Spring Boot中常用的注解有哪些？</strong></p>
+<blockquote>
+<p>回答思路：@SpringBootApplication、@RestController、@Service、@Autowired、@Bean、@Configuration、@Value等。简单讲了IoC和AOP的概念。</p>
+</blockquote>
+<p><strong>Q5：代码题 - 合并区间（LeetCode 56）</strong></p>
+<blockquote>
+<p>回答思路：排序后遍历合并，O(nlogn)。</p>
+</blockquote>
+<h3 id="三面hr面30分钟">三面（HR面，30分钟）</h3>
+<p>标准HR面试，问了职业规划、团队协作经历、对美团的理解、薪资期望等。</p>
+<p><strong>面试体验：</strong>
+美团社招面试Java基础问得比较多（如果你是Java栈），因为美团后端主要用Java。大模型部分更看重你的应用能力和对业务场景的理解。面试效率高，从一面到offer大约2周。</p>
+<hr>
+<h2 id="面经三ai-agent评测工程师校招">面经三：AI Agent评测工程师（校招）</h2>
+<p><strong>面试时间：</strong> 2025年2月<br>
+<strong>岗位：</strong> AI Agent评测 - 基础研发平台<br>
+<strong>结果：</strong> 进入终面  </p>
+<h3 id="一面50分钟">一面（50分钟）</h3>
+<p><strong>Q1：你对AI Agent评测的理解？应该评测哪些方面？</strong></p>
+<blockquote>
+<p>回答思路：
+- 功能性评测：任务完成率、工具调用准确率、多轮对话连贯性
+- 安全性评测：Prompt注入防御、幻觉率、敏感内容过滤
+- 性能评测：响应延迟、吞吐量、资源消耗
+- 用户体验评测：自然度、有用性、满意度
+- 回归评测：版本迭代不引入新问题</p>
+</blockquote>
+<p><strong>Q2：如何设计评测方案？给我一个具体的例子</strong></p>
+<blockquote>
+<p>回答思路：以美团客服Agent为例：
+- 构建评测数据集：从真实对话日志中挑选+人工构造边界case
+- 自动评测：意图识别准确率、回答相关性（LLM-as-Judge）
+- 人工评测：专家标注满意度（1-5分制）
+- 压力测试：并发用户数、响应时间分位数
+- A/B测试：新版本vs旧版本的用户留存和解决率对比</p>
+</blockquote>
+<p><strong>Q3：如何评测Agent的多场景适应能力？</strong></p>
+<blockquote>
+<p>回答思路：
+- 设计多场景测试集（外卖投诉、酒店预订、餐厅推荐等）
+- 每个场景设置不同难度级别
+- 跨场景切换测试（同一对话中切换话题）
+- 长尾场景覆盖（罕见问题、方言、错别字等）</p>
+</blockquote>
+<p><strong>Q4：数据分析能力 - 如果Agent上线后用户满意度下降了5%，你怎么排查？</strong></p>
+<blockquote>
+<p>回答思路：
+1. 分维度分析：哪类问题满意度下降最多？
+2. 查看对话日志：找到差评对话分析具体原因
+3. 检查是否有数据/模型变更
+4. AB测试确认是否是版本问题
+5. 用户画像分析：是否特定用户群体受影响</p>
+</blockquote>
+<p><strong>Q5：代码题 - 有效的括号字符串（LeetCode 20）</strong></p>
+<blockquote>
+<p>回答思路：栈匹配。</p>
+</blockquote>
+<h3 id="二面45分钟">二面（45分钟）</h3>
+<p><strong>Q1：Linux命令 - 如何查看进程信息？如何查看GPU使用情况？</strong></p>
+<blockquote>
+<p>回答思路：ps aux、top/htop、nvidia-smi。讲了如何用nvidia-smi监控GPU显存和利用率。</p>
+</blockquote>
+<p><strong>Q2：你有使用过哪些测试框架？</strong></p>
+<blockquote>
+<p>回答思路：pytest（Python）、JUnit（Java）、Selenium（Web自动化）。讲了pytest的fixture和parametrize。</p>
+</blockquote>
+<p><strong>Q3：如何处理评测中的主观性问题？</strong></p>
+<blockquote>
+<p>回答思路：
+- 制定详细的评测标准和打分rubric
+- 多人独立评测，计算inter-annotator agreement（Cohen's Kappa）
+- 当分歧大时组织讨论达成共识
+- 对评测员定期校准培训</p>
+</blockquote>
+<p><strong>Q4：你的一个失败经历，学到了什么？</strong></p>
+<blockquote>
+<p>回答思路：讲了一次评测方案设计不完善导致上线后发现问题的经历，学到了要在评测设计阶段就引入边界case和对抗测试。</p>
+</blockquote>
+<p><strong>面试体验：</strong>
+美团评测岗不只是写测试用例，更需要对AI系统有全面的理解。面试会考察你的分析能力、测试方案设计能力和一定的编码能力。适合对QA有经验、又对大模型感兴趣的人。</p>
+<hr>
+<h2 id="面经四ai-agent-大模型应用开发2026-新增公开来源">面经四：AI Agent / 大模型应用开发（2026 新增公开来源）</h2>
+<blockquote>
+<p>来源：小红书、知乎公开页面；以下为摘要索引，完整内容请查看来源链接。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>标题</th>
+<th>核心考点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>小红书</td>
+<td>美团 AI Agent开发 一面面经（小红书站内搜索原标题）</td>
+<td>PDF RAG、RAGAS、LangGraph、MCP、ReAct、Rerank、JSON 工具调用、流式输出</td>
+</tr>
+<tr>
+<td>小红书</td>
+<td>美团AI-Agent工程师面经，看看难度（小红书站内搜索原标题）</td>
+<td>AI-Agent 工程师面经、项目深挖</td>
+</tr>
+<tr>
+<td>知乎</td>
+<td><a href="https://www.zhihu.com/en/article/688624199" rel="noreferrer">Meituan Large Model Algorithm Intern questions</a></td>
+<td>RAG 项目、指标、Qwen、LoRA、PDF/表格解析</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/794534137632727040" rel="noreferrer">美团二面面经</a></td>
+<td>智能体平台、Agent vs LLM、RAG 知识库、设计模式、高并发</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2026-高频追问">2026 高频追问</h3>
+<ol>
+<li>工业 PDF 跨页表格如何切片？如何保留上下文、表头和元数据？</li>
+<li>RAGAS 如何测幻觉、相关性、忠实度？线上指标和离线指标怎么结合？</li>
+<li>心理咨询/生活服务 Agent 如何做安全流转和转人工？</li>
+<li>工具 JSON 异常、schema 不合法、外部 API 超时如何兜底？</li>
+<li>Agent 与普通 LLM 调用、普通 RAG 系统的边界是什么？</li>
+</ol>
+<hr>
+<h2 id="总结与建议">总结与建议</h2>
+<h3 id="美团面试特点">美团面试特点</h3>
+<ol>
+<li><strong>AI面试环节</strong>：校招有AI视频面试，注意仪表和表达流畅度</li>
+<li><strong>业务理解很重要</strong>：面试官一定会问大模型在美团场景中的应用</li>
+<li><strong>Java基础常考</strong>：社招后端方向会考JVM、Spring、Redis等</li>
+<li><strong>系统设计题</strong>：喜欢出排队系统、排行榜等与业务相关的系统设计</li>
+<li><strong>算法题Medium级别</strong>：以LeetCode Medium为主，偶尔Easy</li>
+</ol>
+<h3 id="准备建议">准备建议</h3>
+<ol>
+<li>提前了解美团的核心业务：外卖、到店餐饮、酒旅、闪购等</li>
+<li>想清楚大模型在生活服务领域的应用场景，准备2-3个具体方案</li>
+<li>如果面Java后端方向，JVM/Spring/Redis/MySQL要复习扎实</li>
+<li>关注美团技术博客（tech.meituan.com），了解他们的技术方向</li>
+<li>AI面试环节要练习看镜头回答问题，注意时间控制</li>
+</ol></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

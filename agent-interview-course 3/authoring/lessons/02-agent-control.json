@@ -1,0 +1,240 @@
+{
+  "id": "02",
+  "slug": "02-agent-control",
+  "title": "Agent 与 Workflow：有界控制流与观察反馈",
+  "stage": "01 语言模型与 Agent",
+  "prerequisites": [
+    "01"
+  ],
+  "minutes": 75,
+  "goals": [
+    "用控制权归属区分 Workflow 与 Agent",
+    "解释 ReAct 与计划执行的适用边界",
+    "设计可终止、可检查的 Agent 循环"
+  ],
+  "sources": [
+    "通用知识/Agent核心概念与设计模式.md",
+    "通用知识/2026-10-Agent架构面试题与参考答案.md"
+  ],
+  "body": "## 场景：处理一份报销申请\n某团队有两种任务。第一种是报销单字段抽取、校验金额、查制度、生成审批草稿，流程和分支都可以提前写好。第二种是调查“为什么本月报销异常”，可能要查部门、日期、发票重复情况，再根据观察决定查什么。两者都可以调用模型，也都可以有循环，但它们的下一步由谁决定，存在关键差别。\n\nWorkflow 指预先定义的步骤与分支主要由程序控制，模型可以作为某一步的分类器或生成器。Agent 则把一定范围内的下一步动作选择交给模型，再由运行时执行和反馈。自主性不是开关，而是一个范围：开发者可以限定可用工具、动作类型、步数、金额与审批边界。复杂工作流可以包含一个局部 Agent，Agent 也可以调用固定子工作流。\n\n## 先选控制方式，再选框架\n如果任务路径稳定、结果容易定义、每一步都有合规要求，先用固定流程通常更容易测试、解释和控制成本。若输入差异大、中间观察会改变调查方向，而且无法穷举所有合理路径，可以在受控范围引入 Agent。不能因为用了大模型就把整个系统叫自主 Agent，也不能认为固定工作流不具备智能。应以业务不确定性、风险和可验证性决定控制权分配。\n\n例如字段抽取失败时，工作流可以固定再尝试一次不同提示，然后进入人工补录。这是程序预设的恢复分支。调查 Agent 发现重复发票集中在一个供应商，临时决定按供应商聚合再查原票，则体现了基于观察选择新行动。无论哪种方式，付款权限都不能因为模型“想到了”而增加。\n\n## ReAct：让行动被观察纠正\nReAct 将 reasoning 与 acting 交替组织。工程上关注的是“依据当前状态选择动作→执行动作→取得观察→更新状态→再决策”的闭环。它不要求向用户展示模型所有内部推理，更不应把长篇思维文字当成审计证据。应记录可见的结构化动作、工具参数、结果、耗时、状态变化与停止原因。\n\n一个调查任务可以先搜索规则，观察发现问题仅涉及海外差旅，再读取对应规则；如果第一次结果为空，下一步应调整查询条件，而不是机械重复相同搜索。观察必须带上明确含义：空列表表示查询成功但没有记录，超时表示执行结果未确认，权限拒绝表示当前身份不能查询。把这三者都转成“无结果”，会让模型在错误状态上继续规划。\n\n## 计划执行：把目标拆成可验收步骤\nPlan-and-Execute 先提出计划，再执行步骤。计划通常记录步骤目标、依赖、预期产物和验收条件。例如“取订单记录”是动作描述，“得到本月每个部门的已审批金额及完整性标记”才是可验收产物。执行器根据工具结果推进；观察推翻前提时，应重新规划，而不是为了遵循旧计划继续做错。\n\n计划不需要一次写到最细。长任务可以保持粗粒度里程碑，再细化当前一步。这避免对未知未来过度承诺。但计划也不能取代运行时约束：计划写了“查询三次”不等于代码一定只会查询三次，实际计数器必须在运行时维护。对于多步骤工作，完成标志也应依据产物存在、校验通过等客观条件，而不是仅根据模型说“完成”。\n\n## 已解例：一个最多四步的调查器\n目标是找到部门异常的证据，实验将业务调查抽象成三个动作字符串：search、inspect、finish。run 默认 limit=4，先以空 seen 和 observations 开始。第1步 search 得到 empty，第2步 inspect 得到 evidence，第3步 finish 检查 observations 中已经有 evidence，于是返回 success。把动作序列换成 search、search、finish，第二次相同动作和观察会以 no_progress 停止；把 limit 改为1，第二步尚未执行就返回 budget_exhausted。这里没有实际月份查询、部门 B 分组或票据接口；这些业务能力要由真实工具补齐。生产中还应记录 task_id、查询条件、剩余预算和未完成项，并校验候选工具的许可范围。\n\n若第三步超时，系统不能直接宣称没有重复票据。可以在预算允许且查询可安全重试时再查；若步数已耗尽，则输出部分结果与未确认项，以 budget_exhausted 停止。这样一次失败仍提供可用、诚实的结果。模型的候选动作还应受 schema 校验、身份与权限校验，避免把“我决定查询全部用户”变成真实授权。\n\n## 有界循环的三个底线\n第一，限定资源：步数、累计耗时、费用和单工具超时。只设 max_steps 仍可能被一个永不返回的工具挂住，所以工具本身也需要截止时间。第二，检测无进展：相同动作、参数和观察连续重复，说明需要改变策略或停止；只看“模型说正在推进”没有意义。第三，明确停止状态：成功、等待用户、权限阻断、资源耗尽和执行失败应区分。停止并不代表成功，资源耗尽时要保留已完成产物和恢复点。\n\n面试表达可以从“为什么需要动态决策”起步，接着说明哪些动作交给模型、哪些约束始终在代码，最后给出一条观察纠正计划的例子和预算耗尽时的产品行为。不要用“ReAct 更强”结束回答；强弱必须落到任务成功率、成本、时延和故障恢复等可测指标。本课示例是教练补充机制演示，原文相关题目只提供复习主题线索。\n",
+  "diagram": {
+    "nodes": [
+      "初始化独立运行",
+      "搜索得到 empty",
+      "检查得到 evidence",
+      "finish 验收或边界停止",
+      "汇总三种停止原因"
+    ],
+    "caption": "本实验的机制轨迹：实现有上限和无进展检测的控制器。节点只追踪代码实际状态；变式边界另行标明。",
+    "walkthrough": {
+      "scenario": "沿《实现有上限和无进展检测的控制器》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "原实验代码对照",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "初始化 ok 调用",
+              "input": "actions=[search,inspect,finish]；limit=4",
+              "action": "创建空 seen 和 observations",
+              "output": "开始第1步",
+              "state": "seen={}；observations=[]",
+              "failure": false,
+              "section": "已解例：一个最多四步的调查器",
+              "why": "每次 run 都新建状态，三个测试互不串用。",
+              "code_lines": [
+                1,
+                4
+              ]
+            },
+            {
+              "node": 1,
+              "title": "search 建立空观察",
+              "input": "step=1；action=search",
+              "action": "未超限且不是 finish，记录 (search,empty)",
+              "output": "observations=[empty]",
+              "state": "seen={(search,empty)}",
+              "failure": false,
+              "section": "ReAct：让行动被观察纠正",
+              "why": "同一动作是否推进，要结合它实际得到的观察判断。",
+              "code_lines": [
+                5,
+                14
+              ]
+            },
+            {
+              "node": 2,
+              "title": "inspect 得到证据",
+              "input": "step=2；observations=[empty]",
+              "action": "记录 (inspect,evidence)",
+              "output": "observations=[empty,evidence]",
+              "state": "seen 含两个不同签名",
+              "failure": false,
+              "section": "已解例：一个最多四步的调查器",
+              "why": "inspect 的固定 evidence 使验收条件具备。",
+              "code_lines": [
+                9,
+                14
+              ]
+            },
+            {
+              "node": 3,
+              "title": "finish 验收",
+              "input": "step=3；action=finish",
+              "action": "检查 evidence 已在 observations 中",
+              "output": "ok[0]=success",
+              "state": "本次 run 返回并停止",
+              "failure": false,
+              "section": "已解例：一个最多四步的调查器",
+              "why": "返回成功依赖观察存在，而不只依赖动作叫 finish。",
+              "code_lines": [
+                7,
+                8
+              ]
+            },
+            {
+              "node": 4,
+              "title": "执行另两用例并打印",
+              "input": "stuck 重复search；short 的limit=1",
+              "action": "断言三种返回值并打印",
+              "output": "normal: success\nrepeated: no_progress\nlimited: budget_exhausted",
+              "state": "三个调用均完成",
+              "failure": false,
+              "section": "有界循环的三个底线",
+              "why": "独立测试覆盖成功、无进展与预算耗尽三个出口。",
+              "code_lines": [
+                17,
+                25
+              ]
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "边界与故障分支",
+          "basis": "原代码已有并已运行的 stuck 用例，不是新增推演；normal 的汇总也包含原有 short 用例。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "初始化 stuck 调用",
+              "input": "actions=[search,search,finish]；limit=4",
+              "action": "创建空状态",
+              "output": "等待第1步",
+              "state": "seen={}；observations=[]",
+              "failure": false,
+              "section": "已解例：一个最多四步的调查器",
+              "why": "故障分支是原代码已有的第二个独立调用。",
+              "code_lines": [
+                1,
+                4
+              ]
+            },
+            {
+              "node": 1,
+              "title": "第一次 search",
+              "input": "step=1；search",
+              "action": "得到 empty 并登记签名",
+              "output": "observations=[empty]",
+              "state": "seen={(search,empty)}",
+              "failure": false,
+              "section": "ReAct：让行动被观察纠正",
+              "why": "第一次空结果仍可作为下一步判断依据。",
+              "code_lines": [
+                9,
+                14
+              ]
+            },
+            {
+              "node": 3,
+              "title": "第二次 search 被停止",
+              "input": "step=2；search 再次得到empty",
+              "action": "发现 (search,empty) 已存在，直接 return",
+              "output": "stuck[0]=no_progress；finish 未执行",
+              "state": "observations 仍为 [empty]",
+              "failure": true,
+              "section": "有界循环的三个底线",
+              "why": "重复签名说明没有新增信息，且返回发生在 append 之前。",
+              "code_lines": [
+                9,
+                14
+              ]
+            },
+            {
+              "node": 4,
+              "title": "报告停止原因",
+              "input": "stuck[0]=no_progress",
+              "action": "断言并打印本用例对应行",
+              "output": "repeated: no_progress",
+              "state": "正常用例和short仍各自独立运行",
+              "failure": false,
+              "section": "有界循环的三个底线",
+              "why": "无进展是明确停止状态，不会被记为成功。",
+              "code_lines": [
+                21,
+                24
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "一个有循环的程序就是 Agent 吗？",
+      "a": "不是。重试三次的循环可能完全由程序预设。核心要看下一步动作或路径是否在受限范围内由模型根据观察动态决定。循环、工具调用和框架名称都不足以单独定义 Agent。",
+      "rubric": "指出控制权归属，并给固定重试反例。"
+    },
+    {
+      "q": "为什么计划写得越详细不一定越好？",
+      "a": "后续信息尚未出现时，细计划依赖未经验证的假设，执行后可能迅速失效。应让步骤有产物和验收，保持粗粒度里程碑，随着真实观察细化或重规划，同时由运行时限定预算。",
+      "rubric": "解释未知信息与计划失效的因果，提出滚动细化。"
+    },
+    {
+      "q": "只有 max_steps=10 能保证任务 30 秒内结束吗？",
+      "a": "不能。单个工具调用可耗时数分钟或永久阻塞。需要总 deadline、每次调用超时、取消传播与超时后的状态处理；返回结果未知的写操作不能盲目重试。",
+      "rubric": "区分调用次数与墙钟时间，提到结果未知。"
+    },
+    {
+      "q": "设计重复动作检测，怎样避免误杀合理轮询？",
+      "a": "记录工具名、规范化参数、观察摘要与进展标记。相同查询加相同观察多次可判无进展；合理轮询要有明确轮询策略、间隔、最大次数与状态变化目标，独立于无意义重试。",
+      "rubric": "包含动作和观察，不仅看工具名；说明轮询例外需要约束。"
+    }
+  ],
+  "lab": {
+    "title": "实现有上限和无进展检测的控制器",
+    "task": "运行两个模拟策略，观察成功停止和重复停止。决策器是固定脚本，目的是隔离控制机制，不模拟模型智能。",
+    "code": "def run(actions, limit=4):\n    seen = set()\n    observations = []\n    for step, action in enumerate(actions, 1):\n        if step > limit:\n            return \"budget_exhausted\", observations\n        if action == \"finish\":\n            return (\"success\" if \"evidence\" in observations else \"incomplete\"), observations\n        observation = \"evidence\" if action == \"inspect\" else \"empty\"\n        signature = (action, observation)\n        if signature in seen:\n            return \"no_progress\", observations\n        seen.add(signature)\n        observations.append(observation)\n    return \"incomplete\", observations\n\nok = run([\"search\", \"inspect\", \"finish\"])\nstuck = run([\"search\", \"search\", \"finish\"])\nshort = run([\"search\", \"inspect\", \"finish\"], limit=1)\nassert ok[0] == \"success\"\nassert stuck[0] == \"no_progress\"\nassert short[0] == \"budget_exhausted\"\nprint(\"normal:\", ok[0])\nprint(\"repeated:\", stuck[0])\nprint(\"limited:\", short[0])\n",
+    "expected": "normal: success\nrepeated: no_progress\nlimited: budget_exhausted\n",
+    "explanation": "seen 保存动作与观察组合，同一个空搜索重复出现就停止。finish 还要检查证据，避免模型空口宣称成功。limit 在执行动作前判断。真实系统还需要墙钟超时，此脚本只验证步数和进展约束。",
+    "extensions": [
+      "将正常策略改为 search、finish，应返回什么？",
+      "为“权限被拒绝”增加独立停止状态。"
+    ],
+    "extension_answers": [
+      "返回 incomplete，因为 observations 中没有 evidence；可加入 assert run([\"search\",\"finish\"])[0]==\"incomplete\"。",
+      "在工具分支之前检查 action==\"forbidden\"，返回 (\"permission_denied\", observations)，并断言该分支立即停止，没有新增观察。"
+    ]
+  },
+  "pitfalls": [
+    "用长思考文本代替可审计动作记录",
+    "模型说完成就直接标记成功",
+    "只限制循环步数却不给工具调用设截止时间"
+  ],
+  "checkpoint": "能为同一报销业务设计固定流程和受限 Agent 两个版本，并说明动态控制的收益、预算及失败出口。",
+  "alignment": {
+    "case_title": "实现有上限和无进展检测的控制器",
+    "insert_after": "已解例：一个最多四步的调查器",
+    "bridge": "正文的调查器在实验中压缩为 run(actions, limit=4)，演示与代码都只用 search、inspect、finish 三个动作。search 对应“尝试寻找线索”，代码固定返回 empty；inspect 对应“检查到证据”，代码固定返回 evidence；finish 不是自动成功，而是检查 observations 是否真的包含 evidence。\n\n正常序列 search→inspect→finish 因而返回 success。seen 记录动作与观察的二元组，第一次搜索后包含 (search, empty)，第二次相同搜索会命中它，直接返回 no_progress，且不会把重复观察再次写入 observations。\n\n第三个原有用例 short 使用同样动作但 limit=1：第一步搜索允许执行，第二步 inspect 在执行前就因 step=2 大于1停止，返回 budget_exhausted。三行输出 normal、repeated、limited 正好分别报告这三个独立调用的停止原因，不能把它们误看成同一次运行的连续状态。",
+    "coverage": "仅执行预设动作列表和固定观察，不调用模型，不查询报销/工单，不校验权限，不生成真实调查报告，也没有墙钟超时。",
+    "question_sections": [
+      "先选控制方式，再选框架",
+      "计划执行：把目标拆成可验收步骤",
+      "有界循环的三个底线",
+      "有界循环的三个底线"
+    ],
+    "coverage_summary": "固定脚本提供动作和观察，用来检查循环怎样结束；不运行模型规划器。"
+  }
+}

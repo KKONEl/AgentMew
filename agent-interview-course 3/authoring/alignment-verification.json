@@ -1,0 +1,117 @@
+{
+  "lessons": 26,
+  "linked_frames": 262,
+  "boundary_programs_executed": 18,
+  "errors": [],
+  "variants": [
+    {
+      "lesson": "01",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "AssertionError"
+    },
+    {
+      "lesson": "04",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "KeyError: 'admin_delete'"
+    },
+    {
+      "lesson": "05",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "AssertionError"
+    },
+    {
+      "lesson": "06",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "AssertionError"
+    },
+    {
+      "lesson": "07",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "AssertionError"
+    },
+    {
+      "lesson": "08",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "AssertionError"
+    },
+    {
+      "lesson": "10",
+      "returncode": 0,
+      "stdout": "step1: retrieve students\ninsufficient evidence\n",
+      "exception": null
+    },
+    {
+      "lesson": "11",
+      "returncode": 1,
+      "stdout": "refine\nfallback\ncombine\n",
+      "exception": "ValueError: max() iterable argument is empty"
+    },
+    {
+      "lesson": "12",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "AssertionError"
+    },
+    {
+      "lesson": "13",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "AssertionError"
+    },
+    {
+      "lesson": "14",
+      "returncode": 1,
+      "stdout": "summary: 检索质量\n",
+      "exception": "KeyError: '检索质量'"
+    },
+    {
+      "lesson": "15",
+      "returncode": 1,
+      "stdout": "after_timeout=unknown\n",
+      "exception": "AssertionError"
+    },
+    {
+      "lesson": "16",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "AssertionError: stale or ungrounded result"
+    },
+    {
+      "lesson": "17",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "AssertionError"
+    },
+    {
+      "lesson": "18",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "AssertionError"
+    },
+    {
+      "lesson": "19",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "AssertionError"
+    },
+    {
+      "lesson": "20",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "AssertionError"
+    },
+    {
+      "lesson": "21",
+      "returncode": 1,
+      "stdout": "",
+      "exception": "AssertionError"
+    }
+  ],
+  "status": "PASS"
+}

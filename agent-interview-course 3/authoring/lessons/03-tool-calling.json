@@ -1,0 +1,256 @@
+{
+  "id": "03",
+  "slug": "03-tool-calling",
+  "title": "工具调用：校验、权限、幂等与未知结果",
+  "stage": "02 工具、上下文与记忆",
+  "prerequisites": [
+    "02"
+  ],
+  "minutes": 75,
+  "goals": [
+    "解释模型提议与程序执行的边界",
+    "分开处理结构校验、业务校验和权限",
+    "在超时后正确处理写操作的未知状态"
+  ],
+  "sources": [
+    "通用知识/Agent核心概念与设计模式.md",
+    "通用知识/2026-10-Agent架构面试题与参考答案.md"
+  ],
+  "body": "## 场景：一句“退款”变成了真实副作用\n用户说：“给订单 A17 退 3 元（300 分）。”模型返回一个 JSON：工具名 refund，参数是订单号和金额。这只是一份执行提议。真正改变支付状态的是应用中的执行器与后端服务。Function Calling 是让模型产生结构化工具调用的接口机制；Tool Use 是使用外部能力的更广泛概念。结构化调用减少文本解析歧义，但不能自动提供权限、幂等或业务正确性。\n\n本课采取一个完整链路：模型选择工具与参数，运行时解析并校验，绑定已认证身份，检查资源权限和业务条件，执行服务，再把结果作为有调用关联标识的观察交回模型。自然语言回复“已退款”必须晚于已验证成功结果。教材中的退款只是离线示意，不连接真实支付系统；原文题目主题提供练习入口，工程处理属于教练补充。\n\n## 三层校验各管什么\n结构校验关心字段是否存在、类型是否正确、枚举是否合法、额外字段是否被允许。金额建议使用整数分，避免浮点货币误差。JSON 中 true 在某些宿主语言中与整数有继承关系，手写校验时要避免把布尔值当金额；实验使用 type(value) is int 显式排除它。\n\n业务校验检查参数在当前业务中是否有效，例如金额大于零、不超过剩余可退额度、订单状态允许退款、币种一致。结构合法的 amount_cents=999999999 仍可能违反业务。权限校验则判断当前主体能否对该订单执行该动作。tenant_id、user_id、角色和有效授权从可信运行时取得，不能让模型参数决定自己是谁，也不能信任用户说“我就是管理员”。这三层应都在执行边界实现，而不是只写在提示词里。\n\n## 最小权限与工具设计\n查询和写入应有清楚边界。一个名为 manage_order 的万能工具若能查询、退款、删除、改用户，schema 即使很完整也难以限制误用。更好的设计是暴露粒度明确的能力，为每种能力说明用途、参数单位、前置条件、结果字段和副作用。敏感动作需要的授权范围、金额上限或确认由可信策略决定，模型不能从检索文章中“学到”新权限。\n\n工具描述也不是安全策略的唯一事实来源。模型可能误选工具、被外部文本诱导、填入过时参数。执行器应默认输入不可信，在访问数据库或外部 API 前做检查，并给出可恢复的错误类型，例如 validation_error、permission_denied、conflict、timeout_unknown。让模型看懂错误有助于修复参数，但错误里不应泄露无权查看的用户数据。\n\n## 已解例：超时为什么不等于失败\n在实验中，订单 A17 属于租户 t1，可退额度为1000分。调用 refund(\"t1\", \"A17\", 300, \"r1\", lose_response=True) 后，服务先扣300分，额度变700分，并将结果 confirmed 记入 ledger，再主动抛出 TimeoutError 模拟响应丢失。应用只看到超时。如果把超时解释为“未发生”，再次创建新退款，用户可能收到两笔。这里存在三种知识状态：已确认成功、已确认失败、结果未知。超时通常只说明调用方没在时间内拿到确定结果，不说明远端事务没有提交。\n\n可行方案是在首次请求前生成业务幂等键，例如与租户及本次退款意图绑定的 refund_request_id。服务端将这个键、规范化请求参数与结果持久记录，重试相同业务操作时返回同一结果。若同一个键带来不同金额，应拒绝冲突，不能默默返回旧结果或执行新金额。幂等键的作用域、保留时间、并发处理和事务原子性都必须定义，单进程字典只能演示，不能解决生产多副本竞争。\n\n调用方超时后，可以按原键查询操作状态，或在服务承诺幂等的情况下使用原键重试。若后端不支持幂等也无状态查询，就把任务标为待核实，进入对账或人工处理；不能为了让 Agent 继续而凭空推断成功或失败。对用户应表达“请求已提交，结果待确认”，而不是“退款失败，可再试一次”。\n\n## 关联标识与并行边界\n当模型一次提出多个工具调用时，必须用调用 ID 关联各自结果，不能靠返回顺序猜测。订单查询与规则读取可能独立并行；查询订单后才能根据剩余额度退款，后者有依赖，不能为了省时间同时执行。幂等键属于业务操作标识，工具调用 ID 属于本轮消息关联标识，二者不要混用：一次业务退款可能经历多个网络调用 ID，但应该保持同一个业务幂等键。\n\n## 面试中的专业表达\n可以沿“参数正确不等于操作安全”展开：“我把模型输出作为不可信提议，先做 schema 与业务校验，再用运行时身份授权；货币用整数最小单位。写工具生成业务幂等键，服务端原子记录参数与结果。超时归类为结果未知，通过状态查询或原键重试收敛，必要时对账。审计记录调用 ID、业务键、状态与证据，但避免把凭据写进日志。”这段表达同时说明了模型边界、分布式失败和可恢复性，适用于支付、发邮件、建工单等具有副作用的操作。\n",
+  "diagram": {
+    "nodes": [
+      "准备A17和空账本",
+      "验证t1与300分",
+      "扣款后记录r1",
+      "提交后模拟丢响应",
+      "原键重试并检查700",
+      "拒绝冲突与跨租户"
+    ],
+    "caption": "本实验的机制轨迹：模拟“提交后丢响应”与幂等重试。节点只追踪代码实际状态；变式边界另行标明。",
+    "walkthrough": {
+      "scenario": "沿《模拟“提交后丢响应”与幂等重试》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "原实验代码对照",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "准备退款状态",
+              "input": "ledger={}；订单A17",
+              "action": "设置tenant=t1，refundable=1000",
+              "output": "等待首次请求",
+              "state": "A17.refundable=1000；ledger为空",
+              "failure": false,
+              "section": "已解例：超时为什么不等于失败",
+              "why": "有了明确起始额度才能判定是否重复扣款。",
+              "code_lines": [
+                1,
+                2
+              ]
+            },
+            {
+              "node": 1,
+              "title": "校验首次调用",
+              "input": "refund(t1,A17,300,r1,lose_response=True)",
+              "action": "检查正整数、订单归属、未命中账本和额度",
+              "output": "允许新退款",
+              "state": "payload=(A17,300)；scoped_key=(t1,r1)",
+              "failure": false,
+              "section": "三层校验各管什么",
+              "why": "身份、参数和业务额度都通过才可产生副作用。",
+              "code_lines": [
+                4,
+                18
+              ]
+            },
+            {
+              "node": 2,
+              "title": "扣款并保存结果",
+              "input": "额度1000；首次业务键",
+              "action": "扣300，写入confirmed",
+              "output": "额度变700；ledger有1项",
+              "state": "ledger[(t1,r1)]=((A17,300),confirmed)",
+              "failure": false,
+              "section": "已解例：超时为什么不等于失败",
+              "why": "先提交状态后丢响应，是未知结果场景的核心。",
+              "code_lines": [
+                19,
+                21
+              ]
+            },
+            {
+              "node": 3,
+              "title": "模拟响应丢失",
+              "input": "lose_response=True；账本已写入",
+              "action": "抛TimeoutError，由调用方捕获",
+              "output": "first response: unknown",
+              "state": "服务端已提交；调用方暂未知",
+              "failure": false,
+              "section": "已解例：超时为什么不等于失败",
+              "why": "超时发生在写入之后，不能从客户端异常推断未执行。",
+              "code_lines": [
+                22,
+                29
+              ]
+            },
+            {
+              "node": 4,
+              "title": "原键重试",
+              "input": "同identity、订单、300分与r1",
+              "action": "命中历史payload，直接返回confirmed，不再扣额",
+              "output": "retry: confirmed; remaining: 700",
+              "state": "额度仍700；ledger仍1项",
+              "failure": false,
+              "section": "已解例：超时为什么不等于失败",
+              "why": "相同业务意图重用同键才能复用结果。",
+              "code_lines": [
+                30,
+                32
+              ]
+            },
+            {
+              "node": 5,
+              "title": "执行拒绝边界",
+              "input": "循环(t1,400)、(t2,300)",
+              "action": "分别抛键冲突和权限异常，再检查账本数量",
+              "output": "ValueError: idempotency conflict\nPermissionError: denied",
+              "state": "最终额度700；len(ledger)=1",
+              "failure": false,
+              "section": "三层校验各管什么",
+              "why": "拒绝发生在扣款之前，不增加副作用。",
+              "code_lines": [
+                33,
+                38
+              ]
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "边界与故障分支",
+          "basis": "原代码for循环已有并已验证的两个拒绝分支；此前提交与重试沿用原代码状态。红色步骤表示该操作被拒绝，不表示整个脚本崩溃。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "建立同一初始状态",
+              "input": "A17=t1，额度1000",
+              "action": "按原代码首次请求并原键重试",
+              "output": "额度700，记录1项",
+              "state": "同正常流程完成至第32行",
+              "failure": false,
+              "section": "已解例：超时为什么不等于失败",
+              "why": "边界测试延续同一脚本既有状态，不重置账本。",
+              "code_lines": [
+                26,
+                32
+              ]
+            },
+            {
+              "node": 5,
+              "title": "同键改金额为400",
+              "input": "identity=t1；key=r1；payload=(A17,400)",
+              "action": "对照已记载的(A17,300)，抛ValueError",
+              "output": "ValueError: idempotency conflict",
+              "state": "额度仍700；旧记录保留",
+              "failure": true,
+              "section": "已解例：超时为什么不等于失败",
+              "why": "同键不同请求必须拒绝，不能默默执行新金额。",
+              "code_lines": [
+                12,
+                16
+              ]
+            },
+            {
+              "node": 5,
+              "title": "跨租户尝试",
+              "input": "identity=t2；A17属于t1；cents=300",
+              "action": "租户不匹配，在读取幂等结果前抛PermissionError",
+              "output": "PermissionError: denied",
+              "state": "额度仍700；未新增(t2,r1)",
+              "failure": true,
+              "section": "三层校验各管什么",
+              "why": "即使参数和业务键看似相同，也不能访问其他租户订单。",
+              "code_lines": [
+                7,
+                9
+              ]
+            },
+            {
+              "node": 5,
+              "title": "核对拒绝后的状态",
+              "input": "两个异常由for循环捕获",
+              "action": "检查账本只有一项",
+              "output": "len(ledger)==1通过",
+              "state": "程序正常结束",
+              "failure": false,
+              "section": "已解例：超时为什么不等于失败",
+              "why": "拒绝应保持原副作用数量不变。",
+              "code_lines": [
+                33,
+                38
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "参数 schema 合法，为什么仍不能执行？",
+      "a": "schema 只能保证结构约束，无法证明订单归属、剩余额度、当前状态和用户授权。必须由运行时认证主体查询资源权限，并检查业务不变量。",
+      "rubric": "至少覆盖权限与业务两层，明确身份不来自模型。"
+    },
+    {
+      "q": "退款超时后换一个 request_id 重试有什么风险？",
+      "a": "第一次可能已经提交，换新业务键会被当作新操作，造成重复退款。应保持原业务键，查询该键状态或使用服务承诺的幂等重试；无保证时转待核实。",
+      "rubric": "解释超时未知与重复副作用因果。"
+    },
+    {
+      "q": "同幂等键、不同金额如何处理？",
+      "a": "服务保存首次请求的规范化参数摘要；再次收到同键但不同参数应返回冲突，既不创建第二次操作，也不假装新金额已执行。需要租户作用域与原子并发保护。",
+      "rubric": "参数绑定、冲突拒绝、原子性三个点。"
+    },
+    {
+      "q": "工具调用 ID 能直接作为业务幂等键吗？",
+      "a": "通常不能直接依赖。调用 ID 用于一次模型消息与结果关联，重试或重新生成可能产生新 ID；业务键应跨网络重试稳定，代表同一业务意图。可以显式建立映射，但生命周期必须独立定义。",
+      "rubric": "区分关联与业务去重，说明重试稳定性。"
+    }
+  ],
+  "lab": {
+    "title": "模拟“提交后丢响应”与幂等重试",
+    "task": "运行程序，观察首次响应丢失以后重试仍只扣一次；再测试参数冲突与越权。",
+    "code": "ledger = {}\norders = {\"A17\": {\"tenant\": \"t1\", \"refundable\": 1000}}\n\ndef refund(identity, order_id, cents, key, lose_response=False):\n    if type(cents) is not int or cents <= 0:\n        raise ValueError(\"invalid amount\")\n    order = orders[order_id]\n    if order[\"tenant\"] != identity:\n        raise PermissionError(\"denied\")\n    scoped_key = (identity, key)\n    payload = (order_id, cents)\n    if scoped_key in ledger:\n        old_payload, result = ledger[scoped_key]\n        if payload != old_payload:\n            raise ValueError(\"idempotency conflict\")\n        return result\n    if cents > order[\"refundable\"]:\n        raise ValueError(\"over limit\")\n    order[\"refundable\"] -= cents\n    result = \"confirmed\"\n    ledger[scoped_key] = (payload, result)\n    if lose_response:\n        raise TimeoutError(\"unknown to caller\")\n    return result\n\ntry:\n    refund(\"t1\", \"A17\", 300, \"r1\", lose_response=True)\nexcept TimeoutError:\n    print(\"first response: unknown\")\nassert refund(\"t1\", \"A17\", 300, \"r1\") == \"confirmed\"\nassert orders[\"A17\"][\"refundable\"] == 700\nprint(\"retry: confirmed; remaining:\", orders[\"A17\"][\"refundable\"])\nfor identity, amount in [(\"t1\", 400), (\"t2\", 300)]:\n    try:\n        refund(identity, \"A17\", amount, \"r1\")\n    except (ValueError, PermissionError) as exc:\n        print(type(exc).__name__ + \": \" + str(exc))\nassert len(ledger) == 1\n",
+    "expected": "first response: unknown\nretry: confirmed; remaining: 700\nValueError: idempotency conflict\nPermissionError: denied\n",
+    "explanation": "首次操作先扣额、记账，再模拟网络丢响应，因此客户端未知但服务端已成功。原键重试命中历史结果，不再扣款。更改金额触发键冲突，跨租户在读取账本结果前拒绝。字典为单进程演示，生产要持久化并在数据库事务中原子去重。",
+    "extensions": [
+      "尝试 cents=True，说明为什么必须拒绝。",
+      "将重试键改成 r2，观察余额并解释风险。"
+    ],
+    "extension_answers": [
+      "type(True) 是 bool，即使 isinstance(True,int) 为真，本例 type(cents) is not int 仍拒绝，防止布尔类型被当作 1 分。",
+      "r2 被视作新业务操作，会再扣 300，余额变 400；更新断言即可复现重复副作用，证明重试键必须稳定。"
+    ]
+  },
+  "pitfalls": [
+    "把 JSON 结构正确等同于授权正确",
+    "把超时当成远端未执行",
+    "用本轮调用 ID 替代跨重试稳定的业务键"
+  ],
+  "checkpoint": "能解释一笔写操作的成功、失败、未知三态，并用实际运行结果证明原键重试只产生一次副作用。",
+  "alignment": {
+    "case_title": "模拟“提交后丢响应”与幂等重试",
+    "insert_after": "已解例：超时为什么不等于失败",
+    "bridge": "用同一笔退款观察校验、幂等和未知结果：orders 中的 A17 属于 t1，可退1000分，首次请求用身份 t1、金额300分和业务键 r1。refund 先检查金额类型和正数，再比较订单租户；ledger 的键是 (identity, key)，因此本例实际记账键为 (t1, r1)，请求内容 payload 则是 (A17, 300)。\n\n首次调用先扣到700分、保存 confirmed，再用 lose_response=True 主动抛出超时；客户端只打印 first response: unknown，不能据此回滚已经发生的扣额。原键重试会读到同一 payload 与结果，不再执行扣款，于是第二行显示 remaining: 700。\n\n随后同一脚本继续尝试两个边界：t1 将同键金额改成400分会收到 idempotency conflict；t2 尝试原订单会先被租户检查拒绝，收到 denied。末尾 len(ledger)==1 把“只产生一次记录”变成可检查事实。",
+    "coverage": "执行单进程字典中的金额检查、租户检查、幂等和模拟超时；未调用LLM、支付API、数据库事务、认证服务、并发锁或实际网络。identity 是测试传入的可信身份占位。",
+    "question_sections": [
+      "三层校验各管什么",
+      "已解例：超时为什么不等于失败",
+      "已解例：超时为什么不等于失败",
+      "关联标识与并行边界"
+    ],
+    "coverage_summary": "单进程字典模拟扣额、幂等与响应丢失；真实支付还需持久化和原子事务。"
+  }
+}

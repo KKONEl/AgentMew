@@ -1,0 +1,233 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>2026-10 Agent 面试题索引：156 道练习题与参考答案 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-048.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/2026-10-Agent面试题索引.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-Agent%E9%9D%A2%E8%AF%95%E9%A2%98%E7%B4%A2%E5%BC%95.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-Agent%E9%9D%A2%E8%AF%95%E9%A2%98%E7%B4%A2%E5%BC%95.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E6%94%BE%E7%BD%AE%E8%A7%84%E5%88%99%E4%B8%8E%E9%98%85%E8%AF%BB%E5%85%A5%E5%8F%A3">放置规则与阅读入口</a><a href="#%E8%AF%81%E6%8D%AE%E6%97%A5%E6%9C%9F%E4%B8%8E%E4%BD%BF%E7%94%A8%E8%BE%B9%E7%95%8C">证据、日期与使用边界</a><a href="#%E6%8C%89%E6%8A%A5%E9%81%93%E5%85%AC%E5%8F%B8%E6%9F%A5%E6%9D%A5%E6%BA%90%E4%B8%8D%E6%98%AF%E5%85%AC%E5%8F%B8%E7%9C%9F%E9%A2%98%E5%88%86%E7%B1%BB">按报道公司查来源（不是公司真题分类）</a><a href="#%E6%95%B0%E6%8D%AE%E4%B8%8E%E5%A4%8D%E7%8E%B0">数据与复现</a></nav></details><article class="prose source-prose"><h1 id="2026-10-agent-面试题索引156-道练习题与参考答案">2026-10 Agent 面试题索引：156 道练习题与参考答案</h1>
+<blockquote>
+<p>来源快照：2026-10-22；答案整理：2026-10-23。此次迁入不代表重新抓取。
+本批题目按公开面经报道主题改写，是练习题，不是公司官方真题；答案为编辑综合参考，未经独立专家逐题复核，不是公司标准答案。</p>
+</blockquote>
+<h2 id="放置规则与阅读入口">放置规则与阅读入口</h2>
+<p>遵循仓库原有目录：通用技术按主题放入 <code>通用知识/</code>，算法放入 <code>面试算法题/</code>，项目表达与研发放入 <code>项目实战/</code>。不把改写题拆入公司“真实面经”目录，也不计入高频题信号榜。</p>
+<p>新版交互题库使用根目录 <code>data.json</code>，本批作为独立的「2026-10 跨公司主题练习（非真题）」分组，可搜索并折叠答案；旧分组保持不变。</p>
+<table>
+<thead>
+<tr>
+<th>分类</th>
+<th>题数</th>
+<th>文档</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent架构</td>
+<td>12</td>
+<td><a href="doc-046.html">题目与答案</a></td>
+</tr>
+<tr>
+<td>工具与MCP</td>
+<td>12</td>
+<td><a href="doc-054.html">题目与答案</a></td>
+</tr>
+<tr>
+<td>状态与恢复</td>
+<td>12</td>
+<td><a href="doc-057.html">题目与答案</a></td>
+</tr>
+<tr>
+<td>上下文与记忆</td>
+<td>12</td>
+<td><a href="doc-050.html">题目与答案</a></td>
+</tr>
+<tr>
+<td>RAG与检索</td>
+<td>18</td>
+<td><a href="doc-049.html">题目与答案</a></td>
+</tr>
+<tr>
+<td>评测与归因</td>
+<td>12</td>
+<td><a href="doc-058.html">题目与答案</a></td>
+</tr>
+<tr>
+<td>多Agent协作</td>
+<td>10</td>
+<td><a href="doc-052.html">题目与答案</a></td>
+</tr>
+<tr>
+<td>安全与治理</td>
+<td>10</td>
+<td><a href="doc-053.html">题目与答案</a></td>
+</tr>
+<tr>
+<td>性能与成本</td>
+<td>10</td>
+<td><a href="doc-055.html">题目与答案</a></td>
+</tr>
+<tr>
+<td>后端基础</td>
+<td>13</td>
+<td><a href="doc-051.html">题目与答案</a></td>
+</tr>
+<tr>
+<td>算法与手写</td>
+<td>15</td>
+<td><a href="doc-096.html">题目与答案</a></td>
+</tr>
+<tr>
+<td>项目与研发</td>
+<td>14</td>
+<td><a href="doc-103.html">题目与答案</a></td>
+</tr>
+<tr>
+<td>模型与算法</td>
+<td>6</td>
+<td><a href="doc-056.html">题目与答案</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="证据日期与使用边界">证据、日期与使用边界</h2>
+<ul>
+<li>共 156 题、13 类，均保留稳定 ID、得分点、追问和易错点。</li>
+<li>共 63 条来源，其中 30 条曾定位公开原帖、33 条为聚合线索；14 条检测为付费预览范围。</li>
+<li>只处理公开内容，不解锁、搬运付费全文。曾定位不代表当前能读到全文；最近一次抓取不可读的状态原样保留。</li>
+<li>B/C 是本批研究证据标签，不等同于仓库其他来源的 high/medium/low；迁入来源统一保守标为 aggregation / low，不自动升级一手或高置信度。</li>
+<li>原帖发帖日期、报道的面试日期、聚合站月份不同；聚合站每月 1 日占位值不当成准确发布日期。</li>
+<li>公司标签仅为报道主题关联；同一来源可支持多个练习角度，不代表多场独立面试，不计算出现频率或招聘热度。</li>
+<li>算法测试只证明固定契约内的离线结果，不证明生产可靠性；其余答案为编辑参考，未做逐题独立专家复核。</li>
+<li>99 题附外部机制资料；其余题明确标注未单列外部资料，不宣称全部答案均获文献验证。</li>
+</ul>
+<p><a href="doc-047.html">完整来源与答案资料</a></p>
+<h2 id="按报道公司查来源不是公司真题分类">按报道公司查来源（不是公司真题分类）</h2>
+<table>
+<thead>
+<tr>
+<th>报道公司（别名归一化，归属未认证）</th>
+<th>来源条数（未按面试事件去重）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>58同城</td>
+<td>1</td>
+</tr>
+<tr>
+<td>SHEIN</td>
+<td>1</td>
+</tr>
+<tr>
+<td>vivo</td>
+<td>2</td>
+</tr>
+<tr>
+<td>中兴</td>
+<td>1</td>
+</tr>
+<tr>
+<td>九方智投</td>
+<td>2</td>
+</tr>
+<tr>
+<td>京东</td>
+<td>2</td>
+</tr>
+<tr>
+<td>作业帮</td>
+<td>1</td>
+</tr>
+<tr>
+<td>字节跳动</td>
+<td>13</td>
+</tr>
+<tr>
+<td>小米</td>
+<td>3</td>
+</tr>
+<tr>
+<td>小红书</td>
+<td>1</td>
+</tr>
+<tr>
+<td>度小满</td>
+<td>2</td>
+</tr>
+<tr>
+<td>快手</td>
+<td>3</td>
+</tr>
+<tr>
+<td>拼多多</td>
+<td>1</td>
+</tr>
+<tr>
+<td>携程</td>
+<td>2</td>
+</tr>
+<tr>
+<td>未知公司</td>
+<td>2</td>
+</tr>
+<tr>
+<td>水滴公司</td>
+<td>1</td>
+</tr>
+<tr>
+<td>海康威视</td>
+<td>2</td>
+</tr>
+<tr>
+<td>牛客网用户分享</td>
+<td>1</td>
+</tr>
+<tr>
+<td>百度</td>
+<td>5</td>
+</tr>
+<tr>
+<td>科大讯飞</td>
+<td>3</td>
+</tr>
+<tr>
+<td>绿盟科技</td>
+<td>1</td>
+</tr>
+<tr>
+<td>网易</td>
+<td>2</td>
+</tr>
+<tr>
+<td>美团</td>
+<td>4</td>
+</tr>
+<tr>
+<td>腾讯</td>
+<td>1</td>
+</tr>
+<tr>
+<td>迅雷</td>
+<td>1</td>
+</tr>
+<tr>
+<td>金蝶</td>
+<td>1</td>
+</tr>
+<tr>
+<td>长鑫存储</td>
+<td>1</td>
+</tr>
+<tr>
+<td>阳光保险</td>
+<td>1</td>
+</tr>
+<tr>
+<td>阿里巴巴</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>阿里巴巴 / 蚂蚁混称等归属疑点见来源逐条备注，不推断为官方公司题。</p>
+<h2 id="数据与复现">数据与复现</h2>
+<p><a href="../../source/data/practice-2026-10/questions.json">题目、答案与路径映射</a> · <a href="../../source/data/interviews.json">面经来源主目录</a> · <a href="../../source/data/practice-2026-10/answer-references.json">答案资料</a></p>
+<pre><code class="language-bash"># 从仓库根目录运行；同步器不联网、不重新采集
+python3 scripts/sync_practice_2026_10.py --check
+python3 scripts/validate_data.py
+python3 scripts/validate_practice_2026_10.py
+python3 -m pytest -q 面试算法题/python/test_algorithm_answers.py
+python3 scripts/build_site.py
+</code></pre></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

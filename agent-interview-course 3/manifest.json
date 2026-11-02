@@ -1,0 +1,1340 @@
+{
+  "repository": "https://github.com/Zchary1106/agent-interview-hub",
+  "commit": "e5b92617455e5ecc105162a22a42796c3041162d",
+  "snapshot_date": "2026-11-01",
+  "source_files": 174,
+  "markdown_pages": 109,
+  "lessons": 26,
+  "files": [
+    {
+      "source": ".github/workflows/pages.yml",
+      "bytes": 1038,
+      "sha256": "7cd304b7ac113107c92df196127844a01204a985e7fabea9272a0cddbc8e6b44",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": ".github/workflows/validate.yml",
+      "bytes": 1692,
+      "sha256": "a15de0cedf8454372a12bb3a1c9dba0f0933da2cbf8a6517657ef3fa3bc6877a",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": ".gitignore",
+      "bytes": 98,
+      "sha256": "6f75783793a99a5b7e502426dea0caee5459f8fa99adcb4ff8915e4ea187a44c",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "Agent工程师学习路线图.md",
+      "bytes": 66409,
+      "sha256": "7f1d4038e541bc75470529f885ca2011fa10096c2ce5d8e7a5c4d0d0fec88ce6",
+      "html": "library/doc-001.html",
+      "lessons": []
+    },
+    {
+      "source": "Agent工程师知识地图.canvas",
+      "bytes": 3816,
+      "sha256": "19cd536f00f1c2472d446dfc7adda1acf73c1ac62e8c3fb433d3535adbcb3030",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "Anthropic/岗位要求.md",
+      "bytes": 6650,
+      "sha256": "26dc4eb1b0a5319f1819a58faf57f4f6c0378fb158c2b0d9098081924c4145cd",
+      "html": "library/doc-002.html",
+      "lessons": []
+    },
+    {
+      "source": "Anthropic/面试题与面经.md",
+      "bytes": 9163,
+      "sha256": "ef9d010f47b7257b52826520b98d576a813819f9b6cc4e9efb03bd5f1eb300da",
+      "html": "library/doc-003.html",
+      "lessons": []
+    },
+    {
+      "source": "LICENSE",
+      "bytes": 1067,
+      "sha256": "389552c070223abc3a2946264aae9a5fb80adbff464ab65528f1723cafacf00e",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "OpenAI/岗位要求.md",
+      "bytes": 5823,
+      "sha256": "d805725a128e290eaf0f654b6a104a11195614d934f4f43176ca04b5d1e35adc",
+      "html": "library/doc-004.html",
+      "lessons": []
+    },
+    {
+      "source": "OpenAI/面试题与面经.md",
+      "bytes": 5756,
+      "sha256": "46ca86d39670d2aa2747d9c8936b47967622ef4a16a25ec5a64d090cf87d6fdb",
+      "html": "library/doc-005.html",
+      "lessons": []
+    },
+    {
+      "source": "README.md",
+      "bytes": 16556,
+      "sha256": "b784a31bdd2954c3a5388be5cac5edf057f9cd341d253459fadcbbb3c0ac4dda",
+      "html": "library/doc-006.html",
+      "lessons": []
+    },
+    {
+      "source": "agents/interview-collector/AGENT.md",
+      "bytes": 4439,
+      "sha256": "cce4e60e05c38043820238dc5498d4dd42389e37d6653de106150818383eef6f",
+      "html": "library/doc-007.html",
+      "lessons": []
+    },
+    {
+      "source": "agents/interview-collector/README.md",
+      "bytes": 4983,
+      "sha256": "3b35e0afb134f7d697950e8cf532a0b986745e98d1420e59e8deb0a4aac64208",
+      "html": "library/doc-008.html",
+      "lessons": []
+    },
+    {
+      "source": "agents/interview-collector/install.sh",
+      "bytes": 3308,
+      "sha256": "50c687521b2d947acc04c8075cbea6339e33f0a501cab17e770ae1dcfe6788b0",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "agents/interview-collector/templates/claude/SKILL.md",
+      "bytes": 2011,
+      "sha256": "d7746324d6e48e5b2e194d1209b3d6c390af38d584c6a054295690b2e0d23853",
+      "html": "library/doc-009.html",
+      "lessons": []
+    },
+    {
+      "source": "agents/interview-collector/templates/copilot/interview-collector.instructions.md",
+      "bytes": 1853,
+      "sha256": "9ba44b786cb8ea84e9863d8cd7d851ee51bfcc6ff3f45cffa2c94c06d8cd7594",
+      "html": "library/doc-010.html",
+      "lessons": []
+    },
+    {
+      "source": "agents/interview-collector/templates/cursor/interview-collector.mdc",
+      "bytes": 1231,
+      "sha256": "de41f787bffcde7df8953d2ea8857d3dd1a2b8f2477c16b76267d702807129a0",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "agents/interview-collector/templates/generic/AGENT.md",
+      "bytes": 1769,
+      "sha256": "74c412676c74a2e2319cd169f047184a26c69b27eff573710b10e1972af3d557",
+      "html": "library/doc-011.html",
+      "lessons": []
+    },
+    {
+      "source": "data/interviews.json",
+      "bytes": 164455,
+      "sha256": "8e2329ceb4e07279c836a33b2c97c5c9a146f90f33ffa5e3da754775135ed090",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "data/practice-2026-10/README.md",
+      "bytes": 2509,
+      "sha256": "17e706311b7478ba3698caa663f22fc742d790514223d52e2133e33701b92131",
+      "html": "library/doc-012.html",
+      "lessons": []
+    },
+    {
+      "source": "data/practice-2026-10/answer-references.json",
+      "bytes": 5410,
+      "sha256": "e6117f3749cc068ea5c294585cb602466d705f3b25ff57a43a11a468adb8e7af",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "data/practice-2026-10/questions.json",
+      "bytes": 280127,
+      "sha256": "729289b1ad21678a33c0e765d4aa2127d0d63071c273103de4c69867de70538d",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "data/question_signals.json",
+      "bytes": 10853,
+      "sha256": "5089bd91f457be40c08aebab1d4c4f0fbe167816ae862639056a2d41b0441640",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "data.json",
+      "bytes": 279768,
+      "sha256": "bcd2e738671e0c7f0b01610b59c8be41006c42468715cd88bbd0722c57694e1f",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/agent-architecture.svg",
+      "bytes": 6566,
+      "sha256": "444d632ee56d7e8301b557a2e582869c66be895b23c8cdb63397b441d70b487c",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/agent-engineer-competency-model.svg",
+      "bytes": 2638,
+      "sha256": "c19396ccc6d48a3a44e0bd6716d78bfb60a033a7c6e380b730e2b899d563eaa2",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/agent-framework-selection-tree.svg",
+      "bytes": 4556,
+      "sha256": "1fab0384fc1e698354521195e6c9b7d6459a86cb9af064e710af6acb8bae91b4",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/agent-loop-cycle.svg",
+      "bytes": 2133,
+      "sha256": "52774bdf63062732fac60e6928cdf07f7cea64c8422280163b575c5d19cce091",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/agentic-coding-stack.svg",
+      "bytes": 2505,
+      "sha256": "c1f4aab3574553a17b444ff3a566ffacd512a587f3601dd2a4ceddf76c662e04",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/agentic-rag-loop-flow.svg",
+      "bytes": 4708,
+      "sha256": "8f4068e6af4e67ed8ea16b644cb7f6534b88103cb26a88fd556ab5e905250618",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/autogen-group-chat.svg",
+      "bytes": 2601,
+      "sha256": "90c85d77e215fd736e58a500fe16500c841a4a66df732b9359b4e26816ba4427",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/customer-service-agent-architecture.svg",
+      "bytes": 2251,
+      "sha256": "7755f3a3704e99c53ecbba041fb52ee75a211cec918e8b5bcddf97f58e099ff4",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/deepspeed-zero-stages.svg",
+      "bytes": 6677,
+      "sha256": "5fe77aa59864f15c060971d79e4ff961b88ed16e738e15e4abd7045fca179552",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/dify-platform-overview.svg",
+      "bytes": 2469,
+      "sha256": "cf140ac80be12d512b90acb557b1dd13c5a14a2bdba6a4e88c7b753ba9dffe19",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/document-ingestion-pipeline.svg",
+      "bytes": 3357,
+      "sha256": "6536168c856350469ed8f0be58a9868977526d99ee169fd701ad72900de93ca1",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/finetune-memory-estimation.svg",
+      "bytes": 3437,
+      "sha256": "c24db8e729b8e7c9271ee559c4bf2efa547382f9b453cb822f9203130d6f1a1a",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/finetune-method-comparison.svg",
+      "bytes": 7044,
+      "sha256": "a330639ce33acb0a339bea6c23fa0d922a739835d8e24a5c2e7dc48c2bfe13e7",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/finetuning-evolution-timeline.svg",
+      "bytes": 2769,
+      "sha256": "60a9fef209fc9db27c7ae0ac37c71957e7a0f8630d8834f7979c66804ab8f8e9",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/framework-decision-tree.svg",
+      "bytes": 6004,
+      "sha256": "385bf1edd0658432f5e35f3b4bda7980148b84c36548c5cbc9e2520d5553d6ad",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/langchain-core-architecture.svg",
+      "bytes": 4078,
+      "sha256": "689f292569e061f9aa72e020021d3cab86d35897d7540753cea54230382d0203",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/langgraph-architecture.svg",
+      "bytes": 7271,
+      "sha256": "d035956f25f02204059fa5f68b7139220763efcaa70a59c281bb8884bab97a40",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/langgraph-stategraph-flow.svg",
+      "bytes": 3198,
+      "sha256": "f5508f72ac23dd8515abb570d05a6d177a1e1a62c8afcb1d949a98651ca3cb31",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/learning-rate-warmup-cosine.svg",
+      "bytes": 1522,
+      "sha256": "b773a5db93bfda5f3cf9c998948ba853ca84769298b773f140d59c601c3eac57",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/llm-serving-topology.svg",
+      "bytes": 3442,
+      "sha256": "0ae3510106200ac245a5a872681629407c181d87a31fe4b47eb2ac4df1bdb70f",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/lora-adapter-flow.svg",
+      "bytes": 2791,
+      "sha256": "95699a1b741d3463933bb8df72285c5e90ae2b4efda3ea32caa322de2e95d1de",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/mcp-architecture.svg",
+      "bytes": 3582,
+      "sha256": "d8de71a4854fba40855f838e462281c7e6d3caba09c3f0208722243dd6df8155",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/mcp-integration-comparison.svg",
+      "bytes": 3034,
+      "sha256": "84f701635e103f35ba2777996e7508e6bd384ade6539d22590388e0470f87a6b",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/multi-agent-langgraph.svg",
+      "bytes": 4435,
+      "sha256": "70b8c3eb7eea8df77af4757c710d2f00805085235d0ef9a5d63e7f8ab96f2362",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/multi-agent-patterns.svg",
+      "bytes": 9237,
+      "sha256": "0d4395906ca664b31061e2203eeef7a5d93d16efc2f5b333e21781603b8aabe0",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/openai-agents-loop.svg",
+      "bytes": 3089,
+      "sha256": "25fc1b55416eaac02f8c536c69a53a026ae045d8eb1bf4a48e86f5430d7336d3",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/personalized-rag-flow.svg",
+      "bytes": 3266,
+      "sha256": "46e56f673d7e9d42d581a59e592b04dc534331431c2cacc37879e143add79917",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/plan-and-execute.svg",
+      "bytes": 2972,
+      "sha256": "56b869897f3f13101629a692d79dc1798d3c193366086896dab22ca70d667b62",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/ppo-training-loop.svg",
+      "bytes": 2843,
+      "sha256": "c237213867e3b090bde37d26bc084cdc0b1d89da17c8fd8654aec4ec6c4864ee",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/production-agent-pipeline.svg",
+      "bytes": 6229,
+      "sha256": "171190b47864a25ae285a2bed8b0a79817a8f907c79ad30190328554bf75c17c",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/qlora-training-stack.svg",
+      "bytes": 2343,
+      "sha256": "24a9b06f0f317e057feb931ed278808453617bcc1b5955df0897cda406ea7579",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/rag-deployment-topology.svg",
+      "bytes": 3047,
+      "sha256": "062d7d098d2517cce348760b33090b5a6ac7966ad42cf4cd206dc0202cbe88d7",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/rag-hybrid-retrieval-flow.svg",
+      "bytes": 3934,
+      "sha256": "6cd5b6aeb1c8d7ca71519786a7c7cd09788eaa7bf11e9293d40c3676bc86b31c",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/rag-pipeline.svg",
+      "bytes": 7205,
+      "sha256": "7843b2c0ba6c37cab726cc7d81779589780507ddc4646fc77bcdbc8c3b48a7b3",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/rag-vs-finetune.svg",
+      "bytes": 7260,
+      "sha256": "e5080f3c5fcec56b9ac14da182a51bec48f80bb7fdb8c4f42764f1ee9c2473bb",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/react-loop.svg",
+      "bytes": 5419,
+      "sha256": "338ca9b4b924925314d76055bc6e20ddeac8f21525abde5e366b1bfbe898c0fd",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/rlhf-three-stage-flow.svg",
+      "bytes": 2035,
+      "sha256": "3e33b8cb8274b2744a296b67879eb57f7004e0b686f067b8ee85376e90a658d3",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/supervisor-agent-team.svg",
+      "bytes": 2820,
+      "sha256": "96a7de770cd6ad848ef62bd32b88ad4c4f943cc7807284269ff7157eeb9da2d0",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/supervisor-multi-agent-simple.svg",
+      "bytes": 2020,
+      "sha256": "b1e71a0c75eed0381935a6da57fae1fbee2f97e806426eab59ba6b6ba277fb74",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/tool-permission-layers.svg",
+      "bytes": 3153,
+      "sha256": "a3858e5dca32d7db17eeb5f81748d24c3c3f90d6445515a966228743d17f01b3",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "diagrams/training-scale-playbook.svg",
+      "bytes": 6748,
+      "sha256": "4735435f63dd5f81be6ad7bcda2800d04368df4a7c65a55bd7972fbfc83d3af5",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "legacy/index.html",
+      "bytes": 1356052,
+      "sha256": "38cc39f8b5240dfffc41f89731a2ae171fd440b33fc214f0417d2e6567f09b20",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "legacy/interview-questions.html",
+      "bytes": 85277,
+      "sha256": "4de19be81554c3cd2afed08030a21c02d20a65a94b12794313a75ca5d3fe73ae",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "requirements.txt",
+      "bytes": 47,
+      "sha256": "359248287f03940e2d089180c142d1d0c646ec61eb6d1646b623497e1b462637",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "scripts/build_site.py",
+      "bytes": 68875,
+      "sha256": "dde49aa7591657b9dbf14415e18c4cb33179d5296622369122c30b9065761132",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "scripts/collect_interviews.py",
+      "bytes": 22668,
+      "sha256": "22ed82869285ae1dddefdadde3db1a5a6913fb6ad72fbdb566e31c95882e5f5c",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "scripts/sync_practice_2026_10.py",
+      "bytes": 15596,
+      "sha256": "d31e9b782c6d75543d58046ad3317ee65c464b8f0f566df75778a53104c1004d",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "scripts/test_practice_2026_10.py",
+      "bytes": 2711,
+      "sha256": "cdef240b55143d7ef7a7ee534bb88cdd4db7dc41a088ee88bbbeea1cec4032aa",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "scripts/validate_data.py",
+      "bytes": 8323,
+      "sha256": "82fe00a2835de85bdc3d1f8a5bb8b3eb6512cbca1152498c978ca530eefaa461",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "scripts/validate_practice_2026_10.py",
+      "bytes": 8123,
+      "sha256": "f2241aa60790a0f0098dca4cdb58f364cacc7688eb8bb730a95a93482c391e86",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "初创公司/岗位要求.md",
+      "bytes": 68,
+      "sha256": "09b2aa9fb3fe05b4611b2a70439d854ec616066f32a780fa1edbf7727a2e0835",
+      "html": "library/doc-013.html",
+      "lessons": []
+    },
+    {
+      "source": "初创公司/面试题与面经.md",
+      "bytes": 5588,
+      "sha256": "4924dc208fa1b64009cf1bf2d68c3f08e7ec81f09c08bbaa389229c53c9812ce",
+      "html": "library/doc-014.html",
+      "lessons": []
+    },
+    {
+      "source": "华为/岗位要求.md",
+      "bytes": 4109,
+      "sha256": "cb2ab332ad3d58ea10f205342b3d5d38f486e288c227b7a7212ec848e022184f",
+      "html": "library/doc-015.html",
+      "lessons": []
+    },
+    {
+      "source": "华为/真实面经-网络实录.md",
+      "bytes": 16469,
+      "sha256": "2b7cb50d74d7753a4e362d6fdbddbf84eff1f801aa32085ca8c3a4f2742e56eb",
+      "html": "library/doc-016.html",
+      "lessons": []
+    },
+    {
+      "source": "华为/面试题与面经.md",
+      "bytes": 6210,
+      "sha256": "d904edcb1aa27b531d83c0d0f16817f979a0d87b1a0f89cc9fc2829a2b5ac397",
+      "html": "library/doc-017.html",
+      "lessons": []
+    },
+    {
+      "source": "商汤科技/岗位要求.md",
+      "bytes": 68,
+      "sha256": "00ebb4a041bd36b433d100a6262c72f3d107260d8117284f966455c5f9d7ed3f",
+      "html": "library/doc-018.html",
+      "lessons": []
+    },
+    {
+      "source": "商汤科技/面试题与面经.md",
+      "bytes": 5678,
+      "sha256": "483f855d4ff2218e44f1ffea103227d6bd36cc416601c36039c94515fcddd513",
+      "html": "library/doc-019.html",
+      "lessons": []
+    },
+    {
+      "source": "字节跳动/岗位要求.md",
+      "bytes": 1251,
+      "sha256": "510a3eda1f063ef777d6d57eee49fafc9ab74df2289bee4cebc58139c62d28ee",
+      "html": "library/doc-020.html",
+      "lessons": []
+    },
+    {
+      "source": "字节跳动/真实面经-牛客实录.md",
+      "bytes": 7619,
+      "sha256": "5d685b6442e6f0cb81b09a1992ac01400c694d9974c6c9ec48784d9bb2566fa8",
+      "html": "library/doc-021.html",
+      "lessons": []
+    },
+    {
+      "source": "字节跳动/面试题与面经.md",
+      "bytes": 4477,
+      "sha256": "06f5aaa3c0f9e4dd689684e2f257867c2596ce727bc1e9da54e6cae70e9d72f7",
+      "html": "library/doc-022.html",
+      "lessons": []
+    },
+    {
+      "source": "小红书/岗位要求.md",
+      "bytes": 1391,
+      "sha256": "fa89fa90836cb012fdacd91d7a7ccfa8b7a0d46f83d214097c12022e0e1d662c",
+      "html": "library/doc-023.html",
+      "lessons": []
+    },
+    {
+      "source": "小红书/真实面经-牛客实录.md",
+      "bytes": 4550,
+      "sha256": "ea1e18e8c0e0bf574a0e859c44b91e736f4dd62fffa4966de3051fcb96d8c5d4",
+      "html": "library/doc-024.html",
+      "lessons": []
+    },
+    {
+      "source": "小红书/面试题与面经.md",
+      "bytes": 4183,
+      "sha256": "cc1483fb7afaafd5ae5948d7ef8a088c53b664da2f6ce856ee3637c6768f3ae9",
+      "html": "library/doc-025.html",
+      "lessons": []
+    },
+    {
+      "source": "微软/岗位要求.md",
+      "bytes": 62,
+      "sha256": "8ebe3394bbfae428b3fcc8ef006031f00320bb9630cb3c3aef11d09be9331534",
+      "html": "library/doc-026.html",
+      "lessons": []
+    },
+    {
+      "source": "微软/面试题与面经.md",
+      "bytes": 5642,
+      "sha256": "4c16b04305b695fa3652b55ba70414148b9a749fc56abdb24a3fe77cd9d3e48c",
+      "html": "library/doc-027.html",
+      "lessons": []
+    },
+    {
+      "source": "快手/岗位要求.md",
+      "bytes": 4008,
+      "sha256": "9385636d8dd8d3c0d221631e21a2af18bed7c6698301f2c888c4bbb7727f3de0",
+      "html": "library/doc-028.html",
+      "lessons": []
+    },
+    {
+      "source": "快手/真实面经-网络实录.md",
+      "bytes": 19839,
+      "sha256": "3c59020575ba202b711b2e0df5356279b09d628bf61fba53c0112701b1d0ee86",
+      "html": "library/doc-029.html",
+      "lessons": []
+    },
+    {
+      "source": "快手/面试题与面经.md",
+      "bytes": 5424,
+      "sha256": "6290098cdf001369b0efb71f798e461b4e9cb2c6e6d187e6408f50289283bf7c",
+      "html": "library/doc-030.html",
+      "lessons": []
+    },
+    {
+      "source": "百度/岗位要求.md",
+      "bytes": 833,
+      "sha256": "3e4b006565814b763d167a1381594bda571450a8f82a68a0c57ed5d431070b0f",
+      "html": "library/doc-031.html",
+      "lessons": []
+    },
+    {
+      "source": "百度/真实面经-网络实录.md",
+      "bytes": 18071,
+      "sha256": "666b84f0569828d3b54732e6d2014797b94844b066040358f63b8bb0b1c0c259",
+      "html": "library/doc-032.html",
+      "lessons": []
+    },
+    {
+      "source": "百度/面试题与面经.md",
+      "bytes": 6467,
+      "sha256": "c5a5f441b18b1be8dfdc922188b6c1463e09ab95a3b3be8773c167609983d578",
+      "html": "library/doc-033.html",
+      "lessons": []
+    },
+    {
+      "source": "美团/岗位要求.md",
+      "bytes": 3734,
+      "sha256": "356cee2028e4b19c04761a0bc7a7c4b8e716a8a615b0a545286c87ca489fa7fb",
+      "html": "library/doc-034.html",
+      "lessons": []
+    },
+    {
+      "source": "美团/真实面经-网络实录.md",
+      "bytes": 14827,
+      "sha256": "459585fdfd220d20a4edb4f0b2e665151dd1197fe743dae4d01dd02e794ceb7c",
+      "html": "library/doc-035.html",
+      "lessons": []
+    },
+    {
+      "source": "美团/面试题与面经.md",
+      "bytes": 5453,
+      "sha256": "8087b0b65f2e1cc96fab6b01c5deb9424ab29d07ac75a41bb961faebe17fdea9",
+      "html": "library/doc-036.html",
+      "lessons": []
+    },
+    {
+      "source": "腾讯/岗位要求.md",
+      "bytes": 1470,
+      "sha256": "3bc8c4627271bfb24c0face6531e5e8827c1fe6843b96a03a16266a261ca3afb",
+      "html": "library/doc-037.html",
+      "lessons": []
+    },
+    {
+      "source": "腾讯/真实面经-网络实录.md",
+      "bytes": 16353,
+      "sha256": "3d426b2d2b881b07974fc876ce386d84a0b8db07d28d5a9f9e1443f7b66876d8",
+      "html": "library/doc-038.html",
+      "lessons": []
+    },
+    {
+      "source": "腾讯/面试题与面经.md",
+      "bytes": 6434,
+      "sha256": "c05eec2a8c1a82e40a24bda5c329755d087d9be855ecf2a0b7753318de38a225",
+      "html": "library/doc-039.html",
+      "lessons": []
+    },
+    {
+      "source": "蚂蚁集团/岗位要求.md",
+      "bytes": 3927,
+      "sha256": "bab7bef8f407211088e1b7ff8ced130aed62f74d8ad1d33c02cc640180516873",
+      "html": "library/doc-040.html",
+      "lessons": []
+    },
+    {
+      "source": "蚂蚁集团/真实面经-网络实录.md",
+      "bytes": 17376,
+      "sha256": "f12d7655c199487b04fb40e77d20d5c51f672609786bc98478586b1ce202b35d",
+      "html": "library/doc-041.html",
+      "lessons": []
+    },
+    {
+      "source": "蚂蚁集团/面试题与面经.md",
+      "bytes": 5614,
+      "sha256": "bff22250ef964f95bb3ef591b9fd604cd3408703d75951bb493f7d9733ea5025",
+      "html": "library/doc-042.html",
+      "lessons": []
+    },
+    {
+      "source": "谷歌/岗位要求.md",
+      "bytes": 62,
+      "sha256": "bd17e8ef6d6dceffa6d2d435aa772d726442c807348f70520a1bc16610a85f35",
+      "html": "library/doc-043.html",
+      "lessons": []
+    },
+    {
+      "source": "谷歌/面试题与面经.md",
+      "bytes": 5625,
+      "sha256": "01d52b7126b9eed0c92ad9d8fd6b5a58401096049aea3bb34a8cd69d6dd40e4e",
+      "html": "library/doc-044.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/12周Agent工程师进阶路线.md",
+      "bytes": 8719,
+      "sha256": "ed718ad122d86c73c7b525f1bdc820228fd8208bfcabbc79f1ef92f684c73e03",
+      "html": "library/doc-045.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/2026-10-Agent架构面试题与参考答案.md",
+      "bytes": 14987,
+      "sha256": "a157fd1a9cacc1c4e8486e866e98458d668810e7fbd4c4c818615264a820dea7",
+      "html": "library/doc-046.html",
+      "lessons": [
+        "02",
+        "03"
+      ]
+    },
+    {
+      "source": "通用知识/2026-10-Agent面经来源与答案资料.md",
+      "bytes": 54754,
+      "sha256": "8b70d875360dcac39f19fea98e39231d1f6026b2359d0cacc99131873aace67f",
+      "html": "library/doc-047.html",
+      "lessons": [
+        "26"
+      ]
+    },
+    {
+      "source": "通用知识/2026-10-Agent面试题索引.md",
+      "bytes": 4625,
+      "sha256": "5fc849bc914b3f79bb50cbe8cb8e883bcf6a016f22fbc2d0b741d211a36e0d43",
+      "html": "library/doc-048.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/2026-10-RAG与检索面试题与参考答案.md",
+      "bytes": 19700,
+      "sha256": "ba122d0c6c368794d936749ad58c208bfeb925cb83f8fed7e0308aafcb148f4b",
+      "html": "library/doc-049.html",
+      "lessons": [
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14"
+      ]
+    },
+    {
+      "source": "通用知识/2026-10-上下文与记忆面试题与参考答案.md",
+      "bytes": 13807,
+      "sha256": "0f429f2da8d0794f2936063aba298112caddd7edd561ccde62db747facf194a3",
+      "html": "library/doc-050.html",
+      "lessons": [
+        "05",
+        "06"
+      ]
+    },
+    {
+      "source": "通用知识/2026-10-后端基础面试题与参考答案.md",
+      "bytes": 15131,
+      "sha256": "2d59519e37f0f5a13f9cf9a33f0a629215f43cdb124e6c1edc5ae38fe30d1cb0",
+      "html": "library/doc-051.html",
+      "lessons": [
+        "19",
+        "22"
+      ]
+    },
+    {
+      "source": "通用知识/2026-10-多Agent协作面试题与参考答案.md",
+      "bytes": 11597,
+      "sha256": "e631d5496e3f160464af0b64ccfe833990a0e30bcb3442a444ddab2372d75705",
+      "html": "library/doc-052.html",
+      "lessons": [
+        "16"
+      ]
+    },
+    {
+      "source": "通用知识/2026-10-安全与治理面试题与参考答案.md",
+      "bytes": 11561,
+      "sha256": "bdd1b1fd2f328ee82ec0b6c283779398b064b4d49b81e2928f58d5e143103ba5",
+      "html": "library/doc-053.html",
+      "lessons": [
+        "18"
+      ]
+    },
+    {
+      "source": "通用知识/2026-10-工具与MCP面试题与参考答案.md",
+      "bytes": 14706,
+      "sha256": "1fb8c0306f2d803daaeb6ceb476fca9c89b630b954edf853a1c786f81c947b55",
+      "html": "library/doc-054.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/2026-10-性能与成本面试题与参考答案.md",
+      "bytes": 10873,
+      "sha256": "f49b7b29949df3b6e5385d47ed24c0d67a4e5f7e5c94eb32f23dfda38e16f0a5",
+      "html": "library/doc-055.html",
+      "lessons": [
+        "20"
+      ]
+    },
+    {
+      "source": "通用知识/2026-10-模型与算法面试题与参考答案.md",
+      "bytes": 7097,
+      "sha256": "7dad82b8886413e75880697d7c84dc314ef2e0023f8e337b32438b430cb64ef4",
+      "html": "library/doc-056.html",
+      "lessons": [
+        "21",
+        "22"
+      ]
+    },
+    {
+      "source": "通用知识/2026-10-状态与恢复面试题与参考答案.md",
+      "bytes": 14310,
+      "sha256": "9c21a1f4b73f409b7a7623d3ae235394703e43ddb08469e09f62d3504928393d",
+      "html": "library/doc-057.html",
+      "lessons": [
+        "15",
+        "19"
+      ]
+    },
+    {
+      "source": "通用知识/2026-10-评测与归因面试题与参考答案.md",
+      "bytes": 13047,
+      "sha256": "ee4a6e79175bb490eb3cdaac83eb9b34ee4f7dc34578d7dd842a28fccec9333d",
+      "html": "library/doc-058.html",
+      "lessons": [
+        "17"
+      ]
+    },
+    {
+      "source": "通用知识/2026-Agent工程化新考点.md",
+      "bytes": 16399,
+      "sha256": "8c02e308ebb692fa045fa7a6255080cca8a1efe915fed935d0ada878c521c3db",
+      "html": "library/doc-059.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/AI协作与工程化面试题-进阶篇.md",
+      "bytes": 1937,
+      "sha256": "0d0f100bd0f7500a11e83dd4f5e5e0a548649855262e3b7c106a259109b93542",
+      "html": "library/doc-060.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/Agent Harness与编码代理测评.md",
+      "bytes": 25829,
+      "sha256": "30d1e0fa230d6be0e9a3863ea921b78c10016e2a602145968bef9513ea9881a6",
+      "html": "library/doc-061.html",
+      "lessons": [
+        "17",
+        "25"
+      ]
+    },
+    {
+      "source": "通用知识/Agent-Harness评测与发布门禁.md",
+      "bytes": 6684,
+      "sha256": "14f82f38c94d8da7917ecd3ae0965e99f86d2abe3615c194122b01313ed537bb",
+      "html": "library/doc-062.html",
+      "lessons": [
+        "17",
+        "24",
+        "25"
+      ]
+    },
+    {
+      "source": "通用知识/Agentic Coding与AI编程工具.md",
+      "bytes": 14267,
+      "sha256": "b46fb6f9c06f700694bdbc60a290bbf38e9446971383dd93dacc7b4a3036b56f",
+      "html": "library/doc-063.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/Agentic RAG与GraphRAG深度解析.md",
+      "bytes": 61717,
+      "sha256": "a4260757ead2879a9cf07c8fe8abdee1493ac06ab7ec2ad30b52ab553d2f023f",
+      "html": "library/doc-064.html",
+      "lessons": [
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14"
+      ]
+    },
+    {
+      "source": "通用知识/Agent安全与评估体系.md",
+      "bytes": 43053,
+      "sha256": "8476c13f5ab021b1cbef79d5b85bdaccdfbbc4abebaddc5e4cb42fe6e31160bb",
+      "html": "library/doc-065.html",
+      "lessons": [
+        "18"
+      ]
+    },
+    {
+      "source": "通用知识/Agent核心概念与设计模式.md",
+      "bytes": 39628,
+      "sha256": "3875ac6c53557bb405b0bf6c82d18aef9ecd173b1780fb3d06fcf214c780823b",
+      "html": "library/doc-066.html",
+      "lessons": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "06"
+      ]
+    },
+    {
+      "source": "通用知识/Agent核心概念面试题-进阶篇.md",
+      "bytes": 3058,
+      "sha256": "662dab1d5c650a765d590a9c6c1d94baa9a5a92b4f470a84584d4170243b1555",
+      "html": "library/doc-067.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/Agent框架全景.md",
+      "bytes": 34499,
+      "sha256": "8e31016479f5b92e7cda008bbb27b01aaeaf0ab3fef7c9447fc2d5de1f4143b5",
+      "html": "library/doc-068.html",
+      "lessons": [
+        "23"
+      ]
+    },
+    {
+      "source": "通用知识/Agent项目深挖与压力面试.md",
+      "bytes": 5118,
+      "sha256": "ca90ef17c72092160d9d403013bc9a28983acba353c9ca93fb86e06fed8764f2",
+      "html": "library/doc-069.html",
+      "lessons": [
+        "26"
+      ]
+    },
+    {
+      "source": "通用知识/Agent项目简历与STAR表达.md",
+      "bytes": 5450,
+      "sha256": "0d5d02dce48666251f20fad70ab9f4629b8f9a517c52223f6022dc4064dc5faf",
+      "html": "library/doc-070.html",
+      "lessons": [
+        "26"
+      ]
+    },
+    {
+      "source": "通用知识/Agent高频题证据模型.md",
+      "bytes": 4126,
+      "sha256": "5c178beaf47f4bb08ed2557eae3ef56454ff43a15d9dd5c1e193cff33e3e5cb7",
+      "html": "library/doc-071.html",
+      "lessons": [
+        "26"
+      ]
+    },
+    {
+      "source": "通用知识/Context Engineering上下文工程.md",
+      "bytes": 65855,
+      "sha256": "1743ca7c568ab9ef1cc70b51799bde74ed0b8def5623db30fe487dca1ca1b696",
+      "html": "library/doc-072.html",
+      "lessons": [
+        "05"
+      ]
+    },
+    {
+      "source": "通用知识/Function Calling与Tool Use专题.md",
+      "bytes": 16289,
+      "sha256": "1530647d4183774faa96e5d3f5b0d37946c62ddb37e4d86a0c186db32b4c1a07",
+      "html": "library/doc-073.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/GitHub热门Agent资源整理.md",
+      "bytes": 6453,
+      "sha256": "2eac9a81fdf8855f87b007cdb3eaa3558a07786213c4fa3bc9abbf3596d2060b",
+      "html": "library/doc-074.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/LangChain与LangGraph深度解析.md",
+      "bytes": 6198,
+      "sha256": "ee0fc583f2a06730897119787b8bb0cd962c760db2301714d9256fe786ff389b",
+      "html": "library/doc-075.html",
+      "lessons": [
+        "15",
+        "23"
+      ]
+    },
+    {
+      "source": "通用知识/MCP与工具生态.md",
+      "bytes": 14474,
+      "sha256": "3f72107299a44c89c00cd22dde6fbb9c6c19776b265ff5c1885759d7f1a2dc37",
+      "html": "library/doc-076.html",
+      "lessons": [
+        "18"
+      ]
+    },
+    {
+      "source": "通用知识/RAG核心知识与面试题.md",
+      "bytes": 5679,
+      "sha256": "b64c8652b222bfcead9cfe9fd489ebe138c296bbf92521da3a6c70c855549b9f",
+      "html": "library/doc-077.html",
+      "lessons": [
+        "07",
+        "22",
+        "24"
+      ]
+    },
+    {
+      "source": "通用知识/企业级Agent平台与AgentOS.md",
+      "bytes": 4795,
+      "sha256": "73ce9bbd6f23f57b9e24a5970b170798d5446c9c1e111ebba38d2b0dfe4d97af",
+      "html": "library/doc-078.html",
+      "lessons": [
+        "23"
+      ]
+    },
+    {
+      "source": "通用知识/八股文完整答案集.md",
+      "bytes": 67307,
+      "sha256": "88baa20f705cfe65ab1d48d630c71ad89caef49fa325427d3883694dbbfe345d",
+      "html": "library/doc-079.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/八股文题库-DataWhale开源.md",
+      "bytes": 4028,
+      "sha256": "abbf447b6a8c6d26e428a4e6bfb75b758c66968657a8f38ec17015a9f5c47d83",
+      "html": "library/doc-080.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/其他公司面经-快手携程等.md",
+      "bytes": 3243,
+      "sha256": "e1fbfaa7371450d6716eee89aa2ac51c1324e8ecc57532cc109390379978daf7",
+      "html": "library/doc-081.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/大模型推理优化与部署.md",
+      "bytes": 53276,
+      "sha256": "3c543b8dc0dab81fe0b61771c7bb4b6599dbe70fb55c032c2fe3db9222cb565b",
+      "html": "library/doc-082.html",
+      "lessons": [
+        "20",
+        "21"
+      ]
+    },
+    {
+      "source": "通用知识/技术知识点汇总.md",
+      "bytes": 3803,
+      "sha256": "035c6e578618545d80e48375640c8e236824064f2e60ff29ff1595bd910121df",
+      "html": "library/doc-083.html",
+      "lessons": [
+        "22"
+      ]
+    },
+    {
+      "source": "通用知识/最新AI-Agent面经索引.md",
+      "bytes": 14764,
+      "sha256": "3ffb2ddd96cb532ac55efd550c72b72bc014b0532ea53b8adc3ff2158a4df271",
+      "html": "library/doc-084.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/核心概念详解与参考答案.md",
+      "bytes": 10807,
+      "sha256": "86aca677989b0619a9b8ed70db9f98b981f55943666f268fda32baacf57a2e40",
+      "html": "library/doc-085.html",
+      "lessons": [
+        "01",
+        "04"
+      ]
+    },
+    {
+      "source": "通用知识/模型微调完全指南.md",
+      "bytes": 55950,
+      "sha256": "574202d3b20855822bda8b98521d33b02b4b8d72bd2dc6e9cd7b72c21badd74b",
+      "html": "library/doc-086.html",
+      "lessons": [
+        "21"
+      ]
+    },
+    {
+      "source": "通用知识/海外顶级AI公司面试攻略-2026.md",
+      "bytes": 9515,
+      "sha256": "af57e8036d8ec773134331a12e4b5bb0f89d1c76b5f6e30c6c4e2ec99930c689",
+      "html": "library/doc-087.html",
+      "lessons": [
+        "26"
+      ]
+    },
+    {
+      "source": "通用知识/系统设计面试题-进阶篇.md",
+      "bytes": 2782,
+      "sha256": "07e8a71b180c62d84a68173371575105c65f7005a887e4ac9922c9c1c54e0c0b",
+      "html": "library/doc-088.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/自进化Agent与Skill生命周期.md",
+      "bytes": 4575,
+      "sha256": "ab09fbdec22a18eb48869f61d94950ebab7aabbd0ada96fb0dff02af614e5cdb",
+      "html": "library/doc-089.html",
+      "lessons": [
+        "23"
+      ]
+    },
+    {
+      "source": "通用知识/跨公司Agent岗位能力矩阵.md",
+      "bytes": 4148,
+      "sha256": "1c4bee3847f08e200010d3ecd72cfbe1c4f850a5f5325b6aca1f6331bc3ec95d",
+      "html": "library/doc-090.html",
+      "lessons": [
+        "26"
+      ]
+    },
+    {
+      "source": "通用知识/高频拷打题-牛客热帖.md",
+      "bytes": 27962,
+      "sha256": "dbdcc607733c3857fe9593cc0cf85362ad4f38de872068c79658e742328e9fd1",
+      "html": "library/doc-091.html",
+      "lessons": []
+    },
+    {
+      "source": "通用知识/高频面试新题-2025.md",
+      "bytes": 9349,
+      "sha256": "87a14743d9d6b44ebe49656628f3bc51d2cc834deb2d2447de81918ce41e23e6",
+      "html": "library/doc-092.html",
+      "lessons": []
+    },
+    {
+      "source": "阿里巴巴/岗位要求.md",
+      "bytes": 1371,
+      "sha256": "dc07e2ed4c3e6abd4d8e599eb99722510d681901f4c3e76452dbd1f3f7366319",
+      "html": "library/doc-093.html",
+      "lessons": []
+    },
+    {
+      "source": "阿里巴巴/真实面经-牛客实录.md",
+      "bytes": 6096,
+      "sha256": "2ecf35c661e57413b58256f5439cf6b5427af55312feeb84efa16e79c842d070",
+      "html": "library/doc-094.html",
+      "lessons": []
+    },
+    {
+      "source": "阿里巴巴/面试题与面经.md",
+      "bytes": 5716,
+      "sha256": "2685276ecf068fa35ad99ad63a0859cc9e14809a1fb3ba6a34978a586ce1344f",
+      "html": "library/doc-095.html",
+      "lessons": []
+    },
+    {
+      "source": "面试算法题/2026-10-算法与手写面试题与参考答案.md",
+      "bytes": 17907,
+      "sha256": "27e30c9312cb23416684f9a18a8d12203e3ff09cf597ef1f6e4412f6c693bc10",
+      "html": "library/doc-096.html",
+      "lessons": []
+    },
+    {
+      "source": "面试算法题/AI模型与Agent手撕题.md",
+      "bytes": 8162,
+      "sha256": "c6e3ffcf769b73341a65207e47d7c25881c9269206a8333e0ea08ea78ed50778",
+      "html": "library/doc-097.html",
+      "lessons": []
+    },
+    {
+      "source": "面试算法题/README.md",
+      "bytes": 826,
+      "sha256": "12637517822ba33cd02e76868635aeb1658abb51d99d358547c8f0c15f670545",
+      "html": "library/doc-098.html",
+      "lessons": []
+    },
+    {
+      "source": "面试算法题/index.html",
+      "bytes": 71486,
+      "sha256": "4fb690f3e88a0b6bfd2bd46641ff60c4b72718c6dc62fb1a607e676032e30133",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "面试算法题/python/README.md",
+      "bytes": 1792,
+      "sha256": "7a5009af327c335d8f59d03cc75129eeb40c48fe43a8674c80ac4eda3ecc799b",
+      "html": "library/doc-099.html",
+      "lessons": []
+    },
+    {
+      "source": "面试算法题/python/algorithm_answers.py",
+      "bytes": 15416,
+      "sha256": "297171676d1e81c9ebc418c670d7c18e92dc9c37d6025b4a69d87fae382b2e53",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "面试算法题/python/test_algorithm_answers.py",
+      "bytes": 10769,
+      "sha256": "2c39e34b01969aaa8f062a621564a4d1e8009f1a705ad6c6f989fbd19c9cbb14",
+      "html": null,
+      "lessons": []
+    },
+    {
+      "source": "项目实战/01-RAG知识问答系统.md",
+      "bytes": 26225,
+      "sha256": "bd32536de74dac421ae292c9eb50c5ccb293f69a9925ec3a4a1c2b7a6045e924",
+      "html": "library/doc-100.html",
+      "lessons": [
+        "07",
+        "24"
+      ]
+    },
+    {
+      "source": "项目实战/02-多Agent协作系统.md",
+      "bytes": 28926,
+      "sha256": "3e392868984c4442c53e38b34c96ddd409809d149db34d5c23a3753b249623bb",
+      "html": "library/doc-101.html",
+      "lessons": [
+        "16",
+        "25"
+      ]
+    },
+    {
+      "source": "项目实战/03-生产级Agent应用.md",
+      "bytes": 43583,
+      "sha256": "e576625fbb06b7916ebb55ca4bbc8938b47686824f068ac50657acfbb75e7942",
+      "html": "library/doc-102.html",
+      "lessons": [
+        "24"
+      ]
+    },
+    {
+      "source": "项目实战/2026-10-项目与研发面试题与参考答案.md",
+      "bytes": 15278,
+      "sha256": "924be1a6a3f4aaacacaf7e19872b7c5dc93cc7e5bd171abc443d7fdb0396f4c9",
+      "html": "library/doc-103.html",
+      "lessons": []
+    },
+    {
+      "source": "项目实战/实操考题/01-智能文档问答Agent.md",
+      "bytes": 1845,
+      "sha256": "cbc3ebe00172b8efd64b06460133fb8c23ea7eb517652fff514a0364af89a90a",
+      "html": "library/doc-104.html",
+      "lessons": [
+        "24"
+      ]
+    },
+    {
+      "source": "项目实战/实操考题/02-多Agent团队协作.md",
+      "bytes": 1550,
+      "sha256": "43ded15be2bb5d607a101a72b946f0eaa7ceb03425e04ca37b384e09f4cb39c3",
+      "html": "library/doc-105.html",
+      "lessons": [
+        "25"
+      ]
+    },
+    {
+      "source": "项目实战/实操考题/03-ReAct模式Agent.md",
+      "bytes": 1256,
+      "sha256": "cc64792c01a47aa53cfd240bd4c1ca4e8139a0fed6e7c2bf6f2c3957771c198a",
+      "html": "library/doc-106.html",
+      "lessons": []
+    },
+    {
+      "source": "项目实战/实操考题/04-AI限时全栈开发.md",
+      "bytes": 1886,
+      "sha256": "af92fae5042e6cee5a7cdc23dcab32a52f59c05d59719c7805e984110abc5089",
+      "html": "library/doc-107.html",
+      "lessons": [
+        "25"
+      ]
+    },
+    {
+      "source": "项目实战/实操考题/05-AI调试挑战.md",
+      "bytes": 1477,
+      "sha256": "42a56a7aff96ae6441bd0e4e729e2dcbc73dda5b5a18d4c61529e7bf43c15557",
+      "html": "library/doc-108.html",
+      "lessons": [
+        "25"
+      ]
+    },
+    {
+      "source": "项目实战/实操考题/06-AI-CodeReview-Agent.md",
+      "bytes": 1296,
+      "sha256": "e83a6648f78619b20a43b3f91d9adf837d14f8c1bf95c89c6a77eb6896e9b445",
+      "html": "library/doc-109.html",
+      "lessons": [
+        "25"
+      ]
+    }
+  ]
+}

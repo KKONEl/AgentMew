@@ -1,0 +1,279 @@
+{
+  "id": "10",
+  "slug": "10-agentic-rag",
+  "title": "Agentic RAG：用证据缺口驱动有界决策",
+  "stage": "04 Agentic RAG 与 GraphRAG",
+  "prerequisites": [
+    "09"
+  ],
+  "minutes": 75,
+  "goals": [
+    "从证据缺口设计动作",
+    "区分控制流与图索引",
+    "审查示意代码的状态与终止缺口"
+  ],
+  "sources": [
+    "通用知识/Agentic RAG与GraphRAG深度解析.md",
+    "通用知识/2026-10-RAG与检索面试题与参考答案.md"
+  ],
+  "body": "## 从“查一次”到“下一步查什么”\n问题：“张老师指导过哪些参加项目X的学生？”首次检索只知道张老师的学生名单，缺少项目成员。固定单次RAG可能直接列出所有学生，或说不知道。Agentic RAG把检索作为工具，允许控制器根据当前证据选择下一步：查询项目成员、交叉验证名单、再生成结果。关键变化是信息缺口参与控制流，而不是仅仅加一层for循环。\n\nAgentic与GraphRAG描述两个不同维度：前者关注谁决定下一步，后者关注知识如何组织和检索。Agent可调用向量、SQL、图查询；图检索也能放在固定流程里。它们可以组合，不能理解为单一升级阶梯。普通RAG的生成模型也有推理能力，“Naive RAG没有推理”是把检索管道与模型能力混为一谈。\n\n## 控制器最少要知道什么\n状态可以包含原始问题、约束、已确认事实、证据列表、尚缺字段、历史检索指纹、迭代次数、剩余token/时间预算和当前阶段。原问题不能被改写覆盖，否则系统会逐轮漂移。证据对象带source_id、适用条件和可信度，而不是不断拼字符串。历史指纹用于识别同一查询与同一结果的无进展循环。\n\n候选动作包括直接回答、检索某源、改写query、拆分子问题、澄清、拒答和转人工。动作选择可由规则、分类器或LLM提出，执行层仍要做权限、参数和预算校验。控制器不能绕过底层授权；所有分支共享同一租户和数据访问边界。\n\n## 相关、充分、支持是三次不同检查\n检索评估先问文档与问题是否相关；覆盖检查问所需字段/子问题是否已满足；生成后支持检查问每个结论是否被证据支撑。检索到一篇有关老师的文章不等于掌握其全部学生，更不等于知道项目成员。资料充分也不保证生成不漏条件，必须分层验证。\n\n已解例：状态needs={学生名单,项目成员}。第一次检索得到学生A、B，needs剩项目成员；第二次查到项目成员B、C，交集为B。此时才能生成“B”，同时引用两份名单。如果只有不完整项目报道，答案应是“已查证B参与；现有材料不足以列全”，不能把未检索到A当作A未参与的证明。\n\n## 如何保证循环有意义地停止\n正常停止是证据充分并通过输出校验；异常停止包括无可用数据源、预算耗尽、重复无进展、工具故障或权限拒绝。次数上限只是护栏，达到上限不意味着答案自动可用。保留已确认事实、说明缺口并拒绝不支持部分。不同故障需要不同恢复：空结果可尝试查询改写；权限拒绝不应换路径越权；外部写工具超时要先查询结果，不能盲目重试。\n\n不要把“自我反思”当可靠性证明。模型自评可能重复确认自己的错误，必要时用确定性字段检查、独立证据或人工复核。复杂策略是否值得，应比较固定流程基线的质量、平均轮数、p95延迟和每成功任务成本，而不是把更多工具调用当更聪明。\n\n## 审查教材中的示意代码\n原文LangGraph代码属于思路草图：retry_count没有递增，refined_query没有明确初始化和更新，datasource没有真正控制检索器；generate到check的边缺失，check节点函数返回字符串却被当作状态节点使用；幻觉检查提示也没有把原证据明确传入。有文档即生成的判据混淆相关与充分。这些都是阅读即可发现的契约缺口，不能直接把原文当可运行参考实现。\n\n本课用纯Python状态循环演示缺口如何缩小，避免框架API掩盖控制流。后面选择框架时再把相同状态和转移映射到具体节点；没有必要为了学习Agentic RAG先安装整套服务。",
+  "diagram": {
+    "nodes": [
+      "准备同一份资料和状态",
+      "首次预算检查",
+      "写入第一份证据",
+      "写入第二份证据",
+      "检查字段是否齐全",
+      "求交集并输出"
+    ],
+    "caption": "本图只展开《根据缺失字段推进检索》的代码机制；每一帧与下方程序、当前正文概念对应。",
+    "walkthrough": {
+      "scenario": "沿《根据缺失字段推进检索》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "正常：逐行对照参考程序",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "title": "准备同一份资料和状态",
+              "section": "控制器最少要知道什么",
+              "code_lines": [
+                1,
+                2
+              ],
+              "input": "students={A,B}；project={B,C}",
+              "action": "创建facts空字典、attempts=0和trace空列表。",
+              "output": "资料还没写入任务状态",
+              "state": "facts={}; attempts=0; trace=[]",
+              "why": "资料存在于sources不代表系统已完成获取；facts记录本次确实得到什么。",
+              "failure": false,
+              "node": 0
+            },
+            {
+              "title": "首次预算检查",
+              "section": "如何保证循环有意义地停止",
+              "code_lines": [
+                3,
+                5
+              ],
+              "input": "need=students；attempts=0",
+              "action": "0>=2为假，允许执行本轮。",
+              "output": "可以获取学生名单",
+              "state": "attempts=0; next_need=students",
+              "why": "在动作前检查，才能保证不会先超额执行再统计。",
+              "failure": false,
+              "node": 1
+            },
+            {
+              "title": "写入第一份证据",
+              "section": "相关、充分、支持是三次不同检查",
+              "code_lines": [
+                6,
+                9
+              ],
+              "input": "sources[students]={A,B}",
+              "action": "attempts加1，将资料写入facts，再追加trace。",
+              "output": "step1: retrieve students",
+              "state": "facts={students:{A,B}}; attempts=1; trace=[students]",
+              "why": "有一份相关资料还不够，问题仍需要项目成员集合。",
+              "failure": false,
+              "node": 2
+            },
+            {
+              "title": "写入第二份证据",
+              "section": "相关、充分、支持是三次不同检查",
+              "code_lines": [
+                3,
+                9
+              ],
+              "input": "need=project；attempts=1",
+              "action": "1>=2为假，第二轮写入project并记录轨迹。",
+              "output": "step2: retrieve project",
+              "state": "facts={students:{A,B},project:{B,C}}; attempts=2",
+              "why": "只有这一步后，交集所需的两个输入才都在facts里。",
+              "failure": false,
+              "node": 3
+            },
+            {
+              "title": "检查字段是否齐全",
+              "section": "相关、充分、支持是三次不同检查",
+              "code_lines": [
+                10,
+                10
+              ],
+              "input": "facts有students和project两个键",
+              "action": "判断所需键集合是否是facts.keys的子集。",
+              "output": "条件为真，允许进入求交集分支",
+              "state": "required_keys_present=true",
+              "why": "非空不等于充分；此处明确定义了充分的两个字段。",
+              "failure": false,
+              "node": 4
+            },
+            {
+              "title": "求交集并输出",
+              "section": "相关、充分、支持是三次不同检查",
+              "code_lines": [
+                11,
+                16
+              ],
+              "input": "学生{A,B}与项目{B,C}",
+              "action": "求交、排序、打印，并检查结果和次数。",
+              "output": "answer: B",
+              "state": "answer=[B]; attempts=2",
+              "why": "同一个B既在正文的已解例里，也在程序断言和输出里。",
+              "failure": false,
+              "node": 5
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "边界变式：对照同一份程序",
+          "basis": "边界分支沿用同一实验。若列出替换行，代码片段展示替换后的变式；下方完整参考程序仍保留正常版本。",
+          "steps": [
+            {
+              "title": "准备同一份资料和状态",
+              "section": "控制器最少要知道什么",
+              "code_lines": [
+                1,
+                2
+              ],
+              "input": "students={A,B}；project={B,C}",
+              "action": "创建facts空字典、attempts=0和trace空列表。",
+              "output": "资料还没写入任务状态",
+              "state": "facts={}; attempts=0; trace=[]",
+              "why": "资料存在于sources不代表系统已完成获取；facts记录本次确实得到什么。",
+              "failure": false,
+              "node": 0
+            },
+            {
+              "title": "首次预算检查",
+              "section": "如何保证循环有意义地停止",
+              "code_lines": [
+                3,
+                5
+              ],
+              "input": "need=students；attempts=0；本变式上限1",
+              "action": "0>=1为假，允许唯一一次获取。",
+              "output": "本轮可继续，之后没有第二次额度",
+              "state": "attempts=0; limit=1",
+              "why": "在动作前检查，才能保证不会先超额执行再统计。",
+              "failure": false,
+              "node": 1
+            },
+            {
+              "title": "写入第一份证据",
+              "section": "相关、充分、支持是三次不同检查",
+              "code_lines": [
+                6,
+                9
+              ],
+              "input": "sources[students]={A,B}",
+              "action": "attempts加1，将资料写入facts，再追加trace。",
+              "output": "step1: retrieve students",
+              "state": "facts={students:{A,B}}; attempts=1; trace=[students]",
+              "why": "有一份相关资料还不够，问题仍需要项目成员集合。",
+              "failure": false,
+              "node": 2
+            },
+            {
+              "title": "写入第二份证据",
+              "section": "相关、充分、支持是三次不同检查",
+              "code_lines": [
+                3,
+                9
+              ],
+              "input": "第二次循环need=project；attempts=1",
+              "action": "变式第4行检查1>=1为真，break，未写入project。",
+              "output": "不执行第二次retrieve",
+              "state": "facts={students:{A,B}}; attempts=1; trace=[students]",
+              "why": "只有这一步后，交集所需的两个输入才都在facts里。",
+              "failure": false,
+              "node": 3
+            },
+            {
+              "title": "检查字段是否齐全",
+              "section": "相关、充分、支持是三次不同检查",
+              "code_lines": [
+                10,
+                16
+              ],
+              "input": "facts只有students，没有project",
+              "action": "第10行条件为假，进入else，第15行说明资料不足。",
+              "output": "insufficient evidence",
+              "state": "answer_not_computed=true; attempts=1",
+              "why": "这正对应正文的预算边界：循环可以结束，但不能假装第二份证据已经到手。",
+              "failure": true,
+              "node": 4
+            }
+          ],
+          "code_overrides": {
+            "4": "    if state[\"attempts\"] >= 1:"
+          },
+          "verified_result": {
+            "returncode": 0,
+            "stdout": "step1: retrieve students\ninsufficient evidence\n",
+            "exception": null
+          }
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "一次检索为空，就不断改写到成功，有什么问题？",
+      "a": "没有预算和无进展判据会无限循环；知识库根本没答案时改写无法创造证据。应限次数/时间、检测重复、评估可用数据源，最后说明缺口或澄清，而不是为了结束而编答案。",
+      "rubric": "需有异常终止语义。"
+    },
+    {
+      "q": "为什么GraphRAG不一定是Agentic RAG？",
+      "a": "图是知识表示与检索方式，Agentic是运行时控制策略。固定接收问题→图查询→生成没有动态选择下一步；Agent也可动态选择图或SQL检索，两者可组合。",
+      "rubric": "用两个维度解释。"
+    },
+    {
+      "q": "所有检索段落都相关，能否生成完整答案？",
+      "a": "相关不代表覆盖所有子问题、例外与时间条件。需先定义回答所需证据，检查覆盖和冲突；有缺口时继续查或限定答案范围。",
+      "rubric": "必须说明覆盖而非只增加数量。"
+    },
+    {
+      "q": "达到3轮上限，但只找到学生名单，该输出什么？",
+      "a": "说明已找到的名单及引用，明确缺少项目成员资料，无法可靠给出交集或完整结论。允许部分回答需产品策略；不能把名单全部当项目成员。",
+      "rubric": "不将预算停止当成功。"
+    }
+  ],
+  "lab": {
+    "title": "根据缺失字段推进检索",
+    "task": "运行两步检索，观察只有集合交齐才能回答；将预算改为1，确认输出证据不足。",
+    "code": "sources = {\"students\":{\"A\",\"B\"}, \"project\":{\"B\",\"C\"}}\nstate = {\"facts\":{}, \"attempts\":0, \"trace\":[]}\nfor need in (\"students\", \"project\"):\n    if state[\"attempts\"] >= 2:\n        break\n    state[\"attempts\"] += 1\n    state[\"facts\"][need] = sources[need]\n    state[\"trace\"].append(need)\n    print(f\"step{state['attempts']}: retrieve {need}\")\nif {\"students\",\"project\"} <= state[\"facts\"].keys():\n    answer = sorted(state[\"facts\"][\"students\"] & state[\"facts\"][\"project\"])\n    print(\"answer:\", \",\".join(answer))\n    assert answer == [\"B\"]\nelse:\n    print(\"insufficient evidence\")\nassert state[\"attempts\"] <= 2\n",
+    "expected": "step1: retrieve students\nstep2: retrieve project\nanswer: B\n",
+    "explanation": "代码用确定性需求清单替代LLM规划，展示相同核心契约：动作前检查预算、结果写入状态、充分性与成功分开判断。它不是完整自主规划器。",
+    "extensions": [
+      "project返回None，应该如何区别于空集合？",
+      "同一查询返回相同结果时怎样停止？"
+    ],
+    "extension_answers": [
+      "None表示无法获取，不能完成证据需求；空集合若源声明是完整成员列表则可支持无人参与。状态需要记录完整性与获取状态。",
+      "记录(query,source,result_version)或结果指纹；重复且needs没有缩小时触发no_progress，不再盲目检索。"
+    ]
+  },
+  "pitfalls": [
+    "有文档就生成",
+    "用固定轮数证明自治",
+    "把模型自评作为硬保证"
+  ],
+  "checkpoint": "独立设计正常、缺证据、预算耗尽、无进展四条结束路径。",
+  "alignment": {
+    "case_title": "根据缺失字段推进检索",
+    "insert_after": "相关、充分、支持是三次不同检查",
+    "bridge": "正文的集合例子就是这份程序：张老师的学生是`{A,B}`，项目成员是`{B,C}`，答案应为交集`{B}`。为把机制看清楚，实验把两份资料放在` sources`字典里，取代真实检索工具；`state`保存已得到的`facts`、尝试次数`attempts`和检索轨迹`trace`。接下来逐步观察这三个状态字段怎样改变。\n\n循环先处理`students`，再处理`project`。第4行在行动前查预算，第6行递增次数，第7行把本次结果写进facts。第一次完成后只有students，第二次完成后两个字段才齐全。第10行检查字段覆盖，第11行求交集，最后打印`answer: B`。你可以在每一步同时看上方状态快照和下方对应代码，不需要想象它们如何对应。\n\n边界分支只改第4行的上限，从2改成1。于是第一份资料取得后，第二次循环会直接break，facts里没有project；同一第10行条件不成立，进入第15行打印`insufficient evidence`。这正是正文“达到上限不是完成”的具体例子。实验没有自主LLM规划器，所以它训练的是证据覆盖与有界循环，不是宣称复现了自主研究Agent。",
+    "coverage": "sources为人工资料字典，子问题顺序写死。实验只验证状态、预算和集合覆盖，不执行真实检索、LLM路由、图数据库或生成质量裁判。",
+    "question_sections": [
+      "如何保证循环有意义地停止",
+      "从“查一次”到“下一步查什么”",
+      "相关、充分、支持是三次不同检查",
+      "如何保证循环有意义地停止"
+    ],
+    "coverage_summary": "人工字典替代检索工具，子问题顺序固定；实验只观察状态、证据覆盖和次数上限。"
+  }
+}

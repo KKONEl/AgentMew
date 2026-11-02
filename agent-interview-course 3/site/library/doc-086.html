@@ -1,0 +1,1649 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>模型微调完全指南（SFT / LoRA / QLoRA / RLHF） · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-086.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/模型微调完全指南.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/21-model-training.html">21 模型训练：从 SFT、LoRA 到偏好优化与显存预算</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/%E6%A8%A1%E5%9E%8B%E5%BE%AE%E8%B0%83%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/%E6%A8%A1%E5%9E%8B%E5%BE%AE%E8%B0%83%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80%E5%BE%AE%E8%B0%83%E5%9F%BA%E7%A1%80">一、微调基础</a><a href="#11-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%BE%AE%E8%B0%83">1.1 为什么需要微调？</a><a href="#12-%E5%BE%AE%E8%B0%83%E8%8C%83%E5%BC%8F%E6%BC%94%E8%BF%9B">1.2 微调范式演进</a><a href="#%E4%BA%8Csftsupervised-fine-tuning">二、SFT（Supervised Fine-Tuning）</a><a href="#21-%E5%8E%9F%E7%90%86">2.1 原理</a><a href="#22-%E8%AE%AD%E7%BB%83%E6%95%B0%E6%8D%AE%E6%9E%84%E5%BB%BA%E9%87%8D%E7%82%B9">2.2 训练数据构建（重点！）</a><a href="#23-%E8%AE%AD%E7%BB%83%E6%8A%80%E5%B7%A7">2.3 训练技巧</a><a href="#%E4%B8%89loralow-rank-adaptation">三、LoRA（Low-Rank Adaptation）</a><a href="#31-%E5%8E%9F%E7%90%86%E8%AF%A6%E8%A7%A3">3.1 原理详解</a><a href="#32-lora-%E5%8F%98%E4%BD%93">3.2 LoRA 变体</a><a href="#33-%E5%AE%9E%E6%88%98%E9%85%8D%E7%BD%AE">3.3 实战配置</a><a href="#%E5%9B%9Bqlora">四、QLoRA</a><a href="#41-%E5%8E%9F%E7%90%86">4.1 原理</a><a href="#42-%E4%BC%98%E5%8A%BF%E4%B8%8E%E5%B1%80%E9%99%90">4.2 优势与局限</a><a href="#43-%E5%AE%9E%E6%88%98">4.3 实战</a><a href="#%E4%BA%94rlhf-dpo-grpo">五、RLHF / DPO / GRPO</a><a href="#51-rlhf-%E4%B8%89%E9%98%B6%E6%AE%B5">5.1 RLHF 三阶段</a><a href="#52-dpodirect-preference-optimization">5.2 DPO（Direct Preference Optimization）</a><a href="#53-deepseek-grpo">5.3 DeepSeek GRPO</a><a href="#54-%E5%81%8F%E5%A5%BD%E6%95%B0%E6%8D%AE%E6%9E%84%E5%BB%BA">5.4 偏好数据构建</a><a href="#%E5%85%AD%E8%AE%AD%E7%BB%83%E5%B7%A5%E5%85%B7%E9%93%BE">六、训练工具链</a><a href="#61-%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94">6.1 框架对比</a><a href="#62-%E8%AE%AD%E7%BB%83%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD">6.2 训练基础设施</a><a href="#%E4%B8%83%E9%9D%A2%E8%AF%95%E9%A2%9820%E9%A2%98-%E5%AE%8C%E6%95%B4%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88">七、面试题（20题）+ 完整参考答案</a><a href="#1-lora%E7%9A%84%E5%8E%9F%E7%90%86rank-r%E6%80%8E%E4%B9%88%E9%80%89">1. LoRA的原理？rank r怎么选？</a><a href="#2-qlora%E7%9B%B8%E6%AF%94lora%E5%A4%9A%E4%BA%86%E4%BB%80%E4%B9%88%E4%B8%BA%E4%BB%80%E4%B9%88%E8%83%BD%E7%9C%81%E6%98%BE%E5%AD%98">2. QLoRA相比LoRA多了什么？为什么能省显存？</a><a href="#3-sft%E7%9A%84%E8%AE%AD%E7%BB%83%E6%95%B0%E6%8D%AE%E5%A6%82%E4%BD%95%E6%9E%84%E5%BB%BA%E6%95%B0%E6%8D%AE%E8%B4%A8%E9%87%8F%E5%92%8C%E6%95%B0%E9%87%8F%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81">3. SFT的训练数据如何构建？数据质量和数量哪个更重要？</a><a href="#4-%E5%85%A8%E5%8F%82%E5%BE%AE%E8%B0%83-vs-lora-%E5%90%84%E8%87%AA%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF">4. 全参微调 vs LoRA 各自适用场景？</a><a href="#5-%E5%BE%AE%E8%B0%83-vs-rag%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9">5. 微调 vs RAG，如何选择？</a><a href="#6-rlhf%E4%B8%89%E9%98%B6%E6%AE%B5%E8%AF%A6%E8%A7%A3">6. RLHF三阶段详解</a><a href="#7-dpo%E5%92%8Cppo%E7%9A%84%E6%9C%AC%E8%B4%A8%E5%8C%BA%E5%88%AB">7. DPO和PPO的本质区别？</a><a href="#8-deepseek%E7%9A%84grpo%E6%98%AF%E4%BB%80%E4%B9%88">8. DeepSeek的GRPO是什么？</a><a href="#9-lora%E7%9A%84target_modules%E6%80%8E%E4%B9%88%E9%80%89">9. LoRA的target_modules怎么选？</a><a href="#10-alpha%E5%92%8Crank%E7%9A%84%E5%85%B3%E7%B3%BB">10. alpha和rank的关系？</a><a href="#11-%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83bf16-vs-fp16%E7%9A%84%E5%8C%BA%E5%88%AB">11. 混合精度训练（bf16 vs fp16）的区别？</a><a href="#12-deepspeed-zero%E4%B8%89%E4%B8%AAstage%E5%88%86%E5%88%AB%E4%BC%98%E5%8C%96%E4%BB%80%E4%B9%88">12. DeepSpeed ZeRO三个Stage分别优化什么？</a><a href="#13-%E5%BE%AE%E8%B0%83%E5%90%8E%E6%A8%A1%E5%9E%8B%E6%95%88%E6%9E%9C%E5%8F%98%E5%B7%AE%E7%81%BE%E9%9A%BE%E6%80%A7%E9%81%97%E5%BF%98%E6%80%8E%E4%B9%88%E5%8A%9E">13. 微调后模型效果变差（灾难性遗忘）怎么办？</a><a href="#14-%E5%A6%82%E4%BD%95%E8%AF%84%E4%BC%B0%E5%BE%AE%E8%B0%83%E6%95%88%E6%9E%9C">14. 如何评估微调效果？</a><a href="#15-%E8%AE%AD%E7%BB%83%E6%95%B0%E6%8D%AE%E6%9C%89%E5%81%8F%E8%A7%81%E5%99%AA%E5%A3%B0%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86">15. 训练数据有偏见/噪声怎么处理？</a><a href="#16-%E5%A6%82%E4%BD%95%E4%BC%B0%E7%AE%97%E5%BE%AE%E8%B0%83%E6%89%80%E9%9C%80%E7%9A%84gpu%E8%B5%84%E6%BA%90">16. 如何估算微调所需的GPU资源？</a><a href="#17-lora%E6%9D%83%E9%87%8D%E5%A6%82%E4%BD%95%E5%90%88%E5%B9%B6%E5%88%B0%E5%9F%BA%E7%A1%80%E6%A8%A1%E5%9E%8B">17. LoRA权重如何合并到基础模型？</a><a href="#18-%E5%A4%9A%E8%BD%AE%E5%AF%B9%E8%AF%9D%E6%95%B0%E6%8D%AE%E7%9A%84loss-mask%E6%98%AF%E4%BB%80%E4%B9%88">18. 多轮对话数据的loss mask是什么？</a><a href="#19-%E6%8C%87%E4%BB%A4%E5%BE%AE%E8%B0%83%E5%92%8C%E5%AF%B9%E9%BD%90%E5%BE%AE%E8%B0%83%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB">19. 指令微调和对齐微调有什么区别？</a><a href="#20-2025%E5%B9%B4%E5%BE%AE%E8%B0%83%E6%8A%80%E6%9C%AF%E7%9A%84%E5%89%8D%E6%B2%BF%E6%96%B9%E5%90%91">20. 2025年微调技术的前沿方向？</a></nav></details><article class="prose source-prose"><h1 id="模型微调完全指南sft-lora-qlora-rlhf">模型微调完全指南（SFT / LoRA / QLoRA / RLHF）</h1>
+<blockquote>
+<p>2025年Agent工程师必考内容，涵盖从原理到实战的完整知识体系。</p>
+</blockquote>
+<hr>
+<h2 id="一微调基础">一、微调基础</h2>
+<h3 id="11-为什么需要微调">1.1 为什么需要微调？</h3>
+<h4 id="预训练模型的局限">预训练模型的局限</h4>
+<p>预训练模型（如 LLaMA、Qwen、Mistral）通过海量通用语料训练，具备强大的语言理解和生成能力，但存在以下局限：</p>
+<table>
+<thead>
+<tr>
+<th>局限</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>领域知识不足</strong></td>
+<td>医疗、法律、金融等垂直领域的专业知识覆盖不够深</td>
+</tr>
+<tr>
+<td><strong>输出格式不可控</strong></td>
+<td>无法稳定输出 JSON、特定模板等结构化格式</td>
+</tr>
+<tr>
+<td><strong>风格不匹配</strong></td>
+<td>语气、角色、回复长度难以精确控制</td>
+</tr>
+<tr>
+<td><strong>指令遵循差</strong></td>
+<td>base 模型不擅长遵循复杂指令</td>
+</tr>
+<tr>
+<td><strong>幻觉问题</strong></td>
+<td>对特定领域事实容易编造</td>
+</tr>
+<tr>
+<td><strong>安全对齐缺失</strong></td>
+<td>base 模型没有安全边界</td>
+</tr>
+</tbody>
+</table>
+<h4 id="微调-vs-rag-vs-prompt-engineering-的选择决策树">微调 vs RAG vs Prompt Engineering 的选择决策树</h4>
+<pre><code>需求分析
+├── 需要注入新知识/实时数据？
+│   ├── 是 → RAG（检索增强生成）
+│   └── 否 ↓
+├── 需要改变模型行为/风格/格式？
+│   ├── 是 → 微调（Fine-tuning）
+│   └── 否 ↓
+├── 简单任务调整即可？
+│   ├── 是 → Prompt Engineering
+│   └── 否 ↓
+└── 复杂场景 → 微调 + RAG 混合方案
+</code></pre>
+<p><strong>详细对比：</strong></p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Prompt Engineering</th>
+<th>RAG</th>
+<th>微调</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>成本</td>
+<td>最低</td>
+<td>中等</td>
+<td>最高</td>
+</tr>
+<tr>
+<td>开发周期</td>
+<td>小时级</td>
+<td>天级</td>
+<td>周级</td>
+</tr>
+<tr>
+<td>新知识注入</td>
+<td>❌</td>
+<td>✅</td>
+<td>⚠️ 需重新训练</td>
+</tr>
+<tr>
+<td>行为改变</td>
+<td>有限</td>
+<td>有限</td>
+<td>✅ 深度改变</td>
+</tr>
+<tr>
+<td>推理延迟</td>
+<td>低</td>
+<td>中（检索开销）</td>
+<td>低</td>
+</tr>
+<tr>
+<td>可维护性</td>
+<td>高</td>
+<td>中</td>
+<td>低</td>
+</tr>
+<tr>
+<td>适合场景</td>
+<td>简单任务</td>
+<td>知识密集型</td>
+<td>行为定制型</td>
+</tr>
+</tbody>
+</table>
+<h4 id="什么时候该微调什么时候不该">什么时候该微调、什么时候不该</h4>
+<p><strong>✅ 应该微调的场景：</strong>
+- 需要模型学会特定的输出格式（如 Function Calling、Agent 工具调用格式）
+- 需要特定领域的专业语言风格（如医疗报告生成）
+- 需要模型遵循复杂的业务规则
+- 有高质量的领域标注数据（&gt;1000条）
+- 需要降低推理成本（用小模型替代大模型+长 prompt）
+- 安全对齐和价值观定制</p>
+<p><strong>❌ 不应该微调的场景：</strong>
+- 知识会频繁更新（用 RAG）
+- 数据量太少（&lt;100条，用 few-shot）
+- Prompt Engineering 已经能解决
+- 没有 GPU 资源
+- 任务太简单，不值得投入</p>
+<h3 id="12-微调范式演进">1.2 微调范式演进</h3>
+<p><img alt="模型微调技术演进时间线" src="../../source/diagrams/finetuning-evolution-timeline.svg" loading="lazy" decoding="async"></p>
+<h4 id="全参数微调full-fine-tuning">全参数微调（Full Fine-tuning）</h4>
+<ul>
+<li>更新模型的<strong>所有参数</strong></li>
+<li>优点：效果上限最高，充分利用模型容量</li>
+<li>缺点：显存需求巨大，7B模型全参微调需要 ~120GB 显存（AdamW优化器）</li>
+<li>计算公式：显存 ≈ 模型参数量 × (2 + 2 + 2×4) = 参数量 × 12 字节（fp16 + AdamW）</li>
+<li>例：7B × 12 = 84GB（加上激活值约 120GB）</li>
+</ul>
+<h4 id="参数高效微调peft">参数高效微调（PEFT）</h4>
+<p>核心思想：<strong>冻结大部分参数，只训练少量新增或选定参数</strong></p>
+<p>主要方法：
+| 方法 | 原理 | 可训练参数占比 |
+|------|------|---------------|
+| <strong>LoRA</strong> | 低秩矩阵分解 | 0.1% - 1% |
+| <strong>Prefix Tuning</strong> | 在输入前加可学习前缀 | &lt;0.1% |
+| <strong>Adapter</strong> | 在层间插入小型网络 | 1% - 3% |
+| <strong>IA³</strong> | 学习激活值的缩放向量 | &lt;0.01% |
+| <strong>Prompt Tuning</strong> | 学习连续的 soft prompt | &lt;0.01% |</p>
+<h4 id="指令微调instruction-tuning">指令微调（Instruction Tuning）</h4>
+<ul>
+<li>目标：让模型学会<strong>遵循人类指令</strong></li>
+<li>数据形式：(instruction, input, output) 三元组</li>
+<li>代表工作：FLAN、InstructGPT、Alpaca</li>
+<li>关键发现：少量高质量指令数据（~1000条）就能显著提升指令遵循能力（LIMA论文）</li>
+</ul>
+<h4 id="对齐微调alignment">对齐微调（Alignment）</h4>
+<ul>
+<li>目标：让模型的输出<strong>符合人类价值观和偏好</strong></li>
+<li>方法：RLHF、DPO、KTO、ORPO、GRPO</li>
+<li>核心：从"能力"到"对齐"——不是让模型更聪明，而是让它更安全、更有用、更诚实</li>
+<li>HHH原则：Helpful（有用）、Honest（诚实）、Harmless（无害）</li>
+</ul>
+<hr>
+<h2 id="二sftsupervised-fine-tuning">二、SFT（Supervised Fine-Tuning）</h2>
+<h3 id="21-原理">2.1 原理</h3>
+<h4 id="监督学习范式">监督学习范式</h4>
+<p>SFT 本质上是一个<strong>条件语言建模</strong>任务：给定输入序列 x，生成目标序列 y。</p>
+<p>训练目标：最大化条件概率 P(y|x)</p>
+<pre><code>输入: [系统提示] + [用户指令] + [输入]
+输出: [模型回复]
+
+模型学习：在给定输入的条件下，生成正确回复的概率最大化
+</code></pre>
+<h4 id="损失函数cross-entropy">损失函数（Cross-Entropy）</h4>
+<p>$$L = -\frac{1}{T}\sum_{t=1}^{T} \log P(y_t | y_{&lt;t}, x)$$</p>
+<ul>
+<li>T: 目标序列长度</li>
+<li>$y_t$: 第 t 个 token</li>
+<li>$y_{&lt;t}$: 前 t-1 个 token</li>
+<li>x: 输入序列</li>
+</ul>
+<p><strong>关键细节 —— Loss Mask：</strong></p>
+<pre><code>输入tokens:  [BOS] 你 是 谁 ？ [SEP] 我 是 AI 助 手 [EOS]
+Loss mask:    0   0  0  0  0   0   1  1  1  1  1   1
+                  不计算loss          计算loss
+</code></pre>
+<p>只对<strong>输出部分</strong>计算 loss，输入部分被 mask 掉。这是 SFT 区别于预训练的核心。</p>
+<h4 id="训练流程">训练流程</h4>
+<pre><code>1. 准备数据 → 2. 数据预处理（Tokenize + Padding/Packing）
+→ 3. 选择基础模型 → 4. 配置训练参数
+→ 5. 训练（带验证集监控） → 6. 评估
+→ 7. 合并权重（如LoRA） → 8. 部署
+</code></pre>
+<h3 id="22-训练数据构建重点">2.2 训练数据构建（重点！）</h3>
+<h4 id="数据格式">数据格式</h4>
+<p><strong>1. Alpaca 格式（最简单）</strong></p>
+<pre><code class="language-json">{
+  &quot;instruction&quot;: &quot;将以下文本翻译成英文&quot;,
+  &quot;input&quot;: &quot;今天天气很好&quot;,
+  &quot;output&quot;: &quot;The weather is nice today.&quot;
+}
+</code></pre>
+<p><strong>2. ShareGPT 格式（多轮对话）</strong></p>
+<pre><code class="language-json">{
+  &quot;conversations&quot;: [
+    {&quot;from&quot;: &quot;human&quot;, &quot;value&quot;: &quot;解释一下什么是机器学习&quot;},
+    {&quot;from&quot;: &quot;gpt&quot;, &quot;value&quot;: &quot;机器学习是人工智能的一个分支...&quot;},
+    {&quot;from&quot;: &quot;human&quot;, &quot;value&quot;: &quot;那深度学习呢？&quot;},
+    {&quot;from&quot;: &quot;gpt&quot;, &quot;value&quot;: &quot;深度学习是机器学习的一个子集...&quot;}
+  ]
+}
+</code></pre>
+<p><strong>3. ChatML 格式（OpenAI 标准）</strong></p>
+<pre><code>&lt;|im_start|&gt;system
+你是一个有用的AI助手。&lt;|im_end|&gt;
+&lt;|im_start|&gt;user
+什么是微调？&lt;|im_end|&gt;
+&lt;|im_start|&gt;assistant
+微调是在预训练模型基础上...&lt;|im_end|&gt;
+</code></pre>
+<p><strong>4. LLaMA-3 格式</strong></p>
+<pre><code>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+你是一个AI助手。&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+什么是LoRA？&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+LoRA是一种参数高效微调方法...&lt;|eot_id|&gt;
+</code></pre>
+<h4 id="数据质量-vs-数据数量">数据质量 vs 数据数量</h4>
+<p><strong>质量 &gt;&gt; 数量</strong>，这是2023-2025年的核心共识。</p>
+<table>
+<thead>
+<tr>
+<th>研究</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LIMA (2023)</strong></td>
+<td>仅 1000 条精选数据微调 LLaMA-65B，效果接近 GPT-4</td>
+</tr>
+<tr>
+<td><strong>Alpaca (2023)</strong></td>
+<td>52K 条合成数据，效果显著但有天花板</td>
+</tr>
+<tr>
+<td><strong>Deita (2024)</strong></td>
+<td>6K 条精选数据 &gt; 100K 条随机数据</td>
+</tr>
+<tr>
+<td><strong>质量指标</strong></td>
+<td>多样性 &gt; 复杂度 &gt; 数量</td>
+</tr>
+</tbody>
+</table>
+<p><strong>高质量数据的特征：</strong>
+- ✅ 指令清晰、无歧义
+- ✅ 回复准确、详细、有逻辑
+- ✅ 覆盖多种任务类型和难度
+- ✅ 格式一致
+- ❌ 避免重复、矛盾、过时信息</p>
+<h4 id="数据清洗和去重">数据清洗和去重</h4>
+<pre><code class="language-python"># 1. 基于 MinHash 的近似去重
+from datasketch import MinHash, MinHashLSH
+
+def create_minhash(text, num_perm=128):
+    m = MinHash(num_perm=num_perm)
+    for word in text.split():
+        m.update(word.encode('utf8'))
+    return m
+
+lsh = MinHashLSH(threshold=0.8, num_perm=128)
+# 插入和查询去重...
+
+# 2. 基于规则的清洗
+def clean_data(item):
+    # 去除过短的回复
+    if len(item['output']) &lt; 20:
+        return None
+    # 去除含有不当内容的
+    if contains_toxic(item['output']):
+        return None
+    # 去除指令和回复不匹配的
+    if not is_relevant(item['instruction'], item['output']):
+        return None
+    return item
+
+# 3. 基于嵌入的语义去重
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('all-MiniLM-L6-v2')
+embeddings = model.encode(texts)
+# 聚类后每簇保留一条代表性样本
+</code></pre>
+<h4 id="合成数据生成">合成数据生成</h4>
+<p><strong>Self-Instruct（斯坦福 Alpaca）</strong></p>
+<pre><code>1. 准备种子任务（175条人工编写）
+2. 用 GPT-4 基于种子生成新指令
+3. 过滤低质量、重复的指令
+4. 用 GPT-4 生成对应的回复
+5. 迭代扩充数据集
+</code></pre>
+<p><strong>Evol-Instruct（WizardLM）</strong></p>
+<pre><code>原始指令: &quot;写一个排序算法&quot;
+    ↓ 深度进化
+进化指令: &quot;用Python实现一个混合排序算法，对小数组用插入排序，
+          大数组用快排，并分析时间复杂度，写单元测试&quot;
+    ↓ 广度进化
+进化指令: &quot;比较5种排序算法在不同数据分布下的性能表现&quot;
+</code></pre>
+<p><strong>2024-2025年数据合成趋势：</strong>
+- <strong>Magpie</strong>：直接从对齐模型中提取高质量指令
+- <strong>Persona-driven</strong>：用不同人格生成多样化数据
+- <strong>Rejection Sampling</strong>：生成多个回复，选最好的</p>
+<h4 id="多轮对话数据构建">多轮对话数据构建</h4>
+<pre><code class="language-json">{
+  &quot;conversations&quot;: [
+    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;你是一个编程助手&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;帮我写一个快排&quot;},
+    {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;```python\ndef quicksort(arr):\n    ...```&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;加上注释&quot;},
+    {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;```python\ndef quicksort(arr):\n    # 基准情况...\n    ...```&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;时间复杂度是多少？&quot;},
+    {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;平均O(n log n)，最坏O(n²)...&quot;}
+  ]
+}
+</code></pre>
+<p><strong>多轮数据的 Loss Mask 策略：</strong>
+- <strong>全部assistant轮计算loss</strong>：最常见，每轮回复都参与训练
+- <strong>仅最后一轮计算loss</strong>：适合对话式推理，防止中间轮过拟合
+- <strong>加权loss</strong>：后面轮次权重更大</p>
+<h3 id="23-训练技巧">2.3 训练技巧</h3>
+<h4 id="学习率调度">学习率调度</h4>
+<pre><code class="language-python"># Cosine 退火（最常用）
+from transformers import get_cosine_schedule_with_warmup
+
+scheduler = get_cosine_schedule_with_warmup(
+    optimizer,
+    num_warmup_steps=100,      # warmup 步数
+    num_training_steps=10000   # 总步数
+)
+
+# 推荐学习率范围
+# 全参微调: 1e-5 ~ 5e-5
+# LoRA:     1e-4 ~ 3e-4
+# QLoRA:    1e-4 ~ 2e-4
+</code></pre>
+<p><img alt="Warmup + Cosine 学习率曲线" src="../../source/diagrams/learning-rate-warmup-cosine.svg" loading="lazy" decoding="async"></p>
+<h4 id="batch-size-选择">Batch Size 选择</h4>
+<ul>
+<li><strong>经验法则</strong>：有效 batch size = 实际 batch size × 梯度累积步数 × GPU数量</li>
+<li>推荐有效 batch size：32 ~ 128</li>
+<li>小 batch size（&lt;16）：训练不稳定，loss 抖动大</li>
+<li>大 batch size（&gt;256）：可能影响泛化，收敛到更尖锐的最小值</li>
+</ul>
+<h4 id="梯度累积">梯度累积</h4>
+<pre><code class="language-python"># 显存不够时，用梯度累积模拟大 batch
+training_args = TrainingArguments(
+    per_device_train_batch_size=2,     # 每GPU实际batch
+    gradient_accumulation_steps=16,     # 累积16步
+    # 有效 batch = 2 × 16 = 32
+)
+</code></pre>
+<h4 id="混合精度训练bf16fp16">混合精度训练（bf16/fp16）</h4>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>fp32</th>
+<th>fp16</th>
+<th>bf16</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>位数</td>
+<td>32</td>
+<td>16</td>
+<td>16</td>
+</tr>
+<tr>
+<td>指数位</td>
+<td>8</td>
+<td>5</td>
+<td>8</td>
+</tr>
+<tr>
+<td>尾数位</td>
+<td>23</td>
+<td>10</td>
+<td>7</td>
+</tr>
+<tr>
+<td>数值范围</td>
+<td>大</td>
+<td>小（易溢出）</td>
+<td>大（同fp32）</td>
+</tr>
+<tr>
+<td>精度</td>
+<td>高</td>
+<td>中</td>
+<td>较低</td>
+</tr>
+<tr>
+<td>显存节省</td>
+<td>基准</td>
+<td>50%</td>
+<td>50%</td>
+</tr>
+<tr>
+<td>推荐</td>
+<td>❌太慢</td>
+<td>⚠️需loss scaling</td>
+<td>✅ 首选</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">training_args = TrainingArguments(
+    bf16=True,  # A100/H100 推荐
+    # fp16=True,  # V100/T4 使用（需 loss scaling）
+)
+</code></pre>
+<h4 id="deepspeed-zero-stage-123">DeepSpeed ZeRO Stage 1/2/3</h4>
+<p><img alt="DeepSpeed ZeRO 三阶段对比" src="../../source/diagrams/deepspeed-zero-stages.svg" loading="lazy" decoding="async"></p>
+<pre><code class="language-json">// ds_config_zero3.json
+{
+  &quot;zero_optimization&quot;: {
+    &quot;stage&quot;: 3,
+    &quot;offload_optimizer&quot;: {&quot;device&quot;: &quot;cpu&quot;},
+    &quot;offload_param&quot;: {&quot;device&quot;: &quot;cpu&quot;},
+    &quot;overlap_comm&quot;: true,
+    &quot;contiguous_gradients&quot;: true,
+    &quot;reduce_bucket_size&quot;: 5e8
+  },
+  &quot;bf16&quot;: {&quot;enabled&quot;: true},
+  &quot;train_batch_size&quot;: 32,
+  &quot;gradient_accumulation_steps&quot;: 8
+}
+</code></pre>
+<hr>
+<h2 id="三loralow-rank-adaptation">三、LoRA（Low-Rank Adaptation）</h2>
+<h3 id="31-原理详解">3.1 原理详解</h3>
+<h4 id="低秩分解的数学原理">低秩分解的数学原理</h4>
+<p>LoRA 的核心思想：预训练权重矩阵的<strong>更新量</strong>是低秩的。</p>
+<pre><code>原始: Y = W₀X        (W₀ ∈ ℝ^{d×k}, 冻结)
+LoRA: Y = W₀X + BAX  (B ∈ ℝ^{d×r}, A ∈ ℝ^{r×k}, 可训练)
+
+其中 r &lt;&lt; min(d, k)
+
+例如: d=4096, k=4096, r=16
+- W₀ 参数量: 4096 × 4096 = 16,777,216 (冻结)
+- BA 参数量: 4096 × 16 + 16 × 4096 = 131,072 (可训练)
+- 参数占比: 131072 / 16777216 = 0.78%
+</code></pre>
+<p><img alt="LoRA 低秩适配器结构" src="../../source/diagrams/lora-adapter-flow.svg" loading="lazy" decoding="async"></p>
+<p><strong>初始化：</strong>
+- A：高斯随机初始化（或 Kaiming 初始化）
+- B：零初始化
+- 保证训练开始时 BA = 0，即不改变原模型行为</p>
+<h4 id="为什么有效内在维度假说">为什么有效？（内在维度假说）</h4>
+<p>Aghajanyan et al. (2021) 的研究表明：</p>
+<blockquote>
+<p>预训练模型的任务适应过程具有很低的<strong>内在维度（intrinsic dimension）</strong>。即使参数空间是百万维的，有效的适应只需要在一个很低维的子空间中进行。</p>
+</blockquote>
+<p>直觉理解：
+- 预训练已经学到了通用的语言知识
+- 微调只需要在这个基础上做<strong>小幅调整</strong>
+- 这些调整可以用低秩矩阵近似</p>
+<p>实验证据：
+- LoRA rank=8 在大多数任务上就能达到全参微调 90%+ 的效果
+- rank 从 4 增到 64，边际收益递减
+- 不同任务的最优 rank 不同（简单任务低 rank，复杂任务高 rank）</p>
+<h4 id="rank-r-的选择">rank r 的选择</h4>
+<table>
+<thead>
+<tr>
+<th>rank</th>
+<th>参数量（7B模型）</th>
+<th>适用场景</th>
+<th>效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4</td>
+<td>~4M</td>
+<td>简单任务（分类、情感）</td>
+<td>够用</td>
+</tr>
+<tr>
+<td>8</td>
+<td>~8M</td>
+<td>通用指令微调</td>
+<td>✅ 常用</td>
+</tr>
+<tr>
+<td>16</td>
+<td>~17M</td>
+<td>复杂任务（代码、推理）</td>
+<td>✅ 推荐</td>
+</tr>
+<tr>
+<td>32</td>
+<td>~34M</td>
+<td>领域深度定制</td>
+<td>好</td>
+</tr>
+<tr>
+<td>64</td>
+<td>~67M</td>
+<td>接近全参效果</td>
+<td>最佳但性价比降低</td>
+</tr>
+<tr>
+<td>128+</td>
+<td>~134M+</td>
+<td>特殊需求</td>
+<td>考虑全参微调</td>
+</tr>
+</tbody>
+</table>
+<p><strong>选择建议：</strong>
+- 默认从 r=16 开始
+- 如果数据少（&lt;1K），用 r=8
+- 如果效果不够，先提高数据质量，再考虑增加 rank</p>
+<h4 id="alpha-参数的作用">alpha 参数的作用</h4>
+<pre><code>实际缩放: ΔW = (α/r) × BA
+
+α（alpha）控制 LoRA 更新的缩放系数：
+- α = r: 缩放因子 = 1，标准缩放
+- α = 2r: 缩放因子 = 2，更大的更新（常用设置）
+- α = 16, r = 16: 缩放 = 1
+- α = 32, r = 16: 缩放 = 2（推荐）
+</code></pre>
+<p><strong>最佳实践：</strong> alpha 通常设为 rank 的 1-2 倍。常见配置：
+- r=16, alpha=32
+- r=8, alpha=16
+- r=64, alpha=128</p>
+<h4 id="target_modules-的选择">target_modules 的选择</h4>
+<pre><code class="language-python"># Transformer 注意力层的组成（以 LLaMA 为例）
+# Q, K, V, O: 注意力投影
+# gate_proj, up_proj, down_proj: FFN层
+
+# 常见配置策略：
+# 1. 最小配置（只训练注意力查询和值）
+target_modules = [&quot;q_proj&quot;, &quot;v_proj&quot;]  # 参数最少，效果不错
+
+# 2. 标准配置（推荐）
+target_modules = [&quot;q_proj&quot;, &quot;k_proj&quot;, &quot;v_proj&quot;, &quot;o_proj&quot;]
+
+# 3. 完整配置（含FFN，效果最好）
+target_modules = [
+    &quot;q_proj&quot;, &quot;k_proj&quot;, &quot;v_proj&quot;, &quot;o_proj&quot;,
+    &quot;gate_proj&quot;, &quot;up_proj&quot;, &quot;down_proj&quot;
+]
+
+# 4. all-linear（所有线性层，2024年推荐做法）
+target_modules = &quot;all-linear&quot;
+</code></pre>
+<p><strong>研究结论：</strong>
+- 只训练 q_proj + v_proj 是 LoRA 论文的原始建议
+- 2024年共识：<strong>训练更多模块 + 更低 rank</strong> 效果优于 <strong>少模块 + 高 rank</strong>
+- 加入 FFN 层（gate/up/down_proj）能显著提升复杂任务的效果</p>
+<h3 id="32-lora-变体">3.2 LoRA 变体</h3>
+<h4 id="lora">LoRA+</h4>
+<ul>
+<li><strong>核心改进</strong>：A 和 B 矩阵使用<strong>不同的学习率</strong></li>
+<li>B 的学习率设为 A 的 λ 倍（论文推荐 λ = 16）</li>
+<li>理论依据：B 初始化为零，需要更大的学习率来快速学习</li>
+<li>效果：在相同训练步数下收敛更快，最终效果提升 1-2%</li>
+</ul>
+<pre><code class="language-python"># LoRA+ 配置
+from peft import LoraConfig
+lora_config = LoraConfig(
+    r=16,
+    lora_alpha=32,
+    # LoRA+ 通过不同学习率组实现
+    # 需要手动设置优化器参数组
+)
+</code></pre>
+<h4 id="doraweight-decomposed-low-rank-adaptation">DoRA（Weight-Decomposed Low-Rank Adaptation）</h4>
+<pre><code>标准 LoRA:  W' = W + BA
+DoRA:       W' = m × (W + BA) / ||W + BA||
+
+将权重分解为：幅度（magnitude）m × 方向（direction）V/||V||
+</code></pre>
+<ul>
+<li>灵感来自权重归一化（Weight Normalization）</li>
+<li>分离了权重的"大小"和"方向"的学习</li>
+<li>效果：在多数基准测试上比 LoRA 提升 1-3%</li>
+<li>代价：略增加计算量</li>
+</ul>
+<h4 id="adalora自适应-rank-分配">AdaLoRA（自适应 rank 分配）</h4>
+<ul>
+<li><strong>核心思想</strong>：不同层/模块的重要性不同，<strong>动态分配 rank</strong></li>
+<li>训练时用 SVD 分解监控每个模块的重要性</li>
+<li>重要模块分配更高的 rank，不重要的降低</li>
+<li>总参数量预算固定，实现更优的参数利用</li>
+</ul>
+<pre><code>Layer 1: 不太重要 → rank=4
+Layer 5: 中等重要 → rank=16
+Layer 15: 非常重要 → rank=32
+Layer 31: 中等重要 → rank=8
+</code></pre>
+<h4 id="rslorarank-stabilized-lora">rsLoRA（Rank-Stabilized LoRA）</h4>
+<ul>
+<li>修改缩放因子从 α/r 为 α/√r</li>
+<li>使得 LoRA 在不同 rank 下的训练动态更稳定</li>
+<li>特别是在高 rank（r=64, 128）时效果更好</li>
+<li>2024年被集成到 HuggingFace PEFT 中</li>
+</ul>
+<h3 id="33-实战配置">3.3 实战配置</h3>
+<h4 id="huggingface-peft-库使用">HuggingFace PEFT 库使用</h4>
+<pre><code class="language-python">import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments
+from peft import LoraConfig, get_peft_model, TaskType
+from trl import SFTTrainer
+
+# 1. 加载基础模型
+model_name = &quot;meta-llama/Llama-3.1-8B&quot;
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    torch_dtype=torch.bfloat16,
+    device_map=&quot;auto&quot;,
+    attn_implementation=&quot;flash_attention_2&quot;  # 使用 Flash Attention
+)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer.pad_token = tokenizer.eos_token
+
+# 2. 配置 LoRA
+lora_config = LoraConfig(
+    task_type=TaskType.CAUSAL_LM,
+    r=16,                          # rank
+    lora_alpha=32,                 # alpha = 2 * r
+    lora_dropout=0.05,             # dropout
+    target_modules=[               # 目标模块
+        &quot;q_proj&quot;, &quot;k_proj&quot;, &quot;v_proj&quot;, &quot;o_proj&quot;,
+        &quot;gate_proj&quot;, &quot;up_proj&quot;, &quot;down_proj&quot;
+    ],
+    bias=&quot;none&quot;,                   # 不训练 bias
+    # use_rslora=True,             # 使用 rsLoRA
+    # use_dora=True,               # 使用 DoRA
+)
+
+# 3. 应用 LoRA
+model = get_peft_model(model, lora_config)
+model.print_trainable_parameters()
+# 输出: trainable params: 83,886,080 || all params: 8,030,261,248 || trainable%: 1.04%
+
+# 4. 训练参数
+training_args = TrainingArguments(
+    output_dir=&quot;./output&quot;,
+    num_train_epochs=3,
+    per_device_train_batch_size=4,
+    gradient_accumulation_steps=8,
+    learning_rate=2e-4,
+    lr_scheduler_type=&quot;cosine&quot;,
+    warmup_ratio=0.05,
+    bf16=True,
+    logging_steps=10,
+    save_strategy=&quot;steps&quot;,
+    save_steps=200,
+    eval_strategy=&quot;steps&quot;,
+    eval_steps=200,
+    save_total_limit=3,
+    gradient_checkpointing=True,    # 节省显存
+    optim=&quot;adamw_torch&quot;,
+    report_to=&quot;wandb&quot;,
+)
+
+# 5. 使用 SFTTrainer
+trainer = SFTTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=eval_dataset,
+    tokenizer=tokenizer,
+    max_seq_length=2048,
+    packing=True,                   # 样本打包，提高GPU利用率
+)
+
+trainer.train()
+
+# 6. 保存 LoRA 权重
+model.save_pretrained(&quot;./lora_weights&quot;)
+
+# 7. 合并权重并保存完整模型
+merged_model = model.merge_and_unload()
+merged_model.save_pretrained(&quot;./merged_model&quot;)
+</code></pre>
+<h4 id="超参数最佳实践">超参数最佳实践</h4>
+<table>
+<thead>
+<tr>
+<th>超参数</th>
+<th>推荐值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rank</td>
+<td>16-32</td>
+<td>复杂任务用 32-64</td>
+</tr>
+<tr>
+<td>alpha</td>
+<td>2×rank</td>
+<td>常见设置</td>
+</tr>
+<tr>
+<td>dropout</td>
+<td>0.05</td>
+<td>数据少时可增到 0.1</td>
+</tr>
+<tr>
+<td>lr</td>
+<td>1e-4 ~ 3e-4</td>
+<td>LoRA 比全参微调大10倍</td>
+</tr>
+<tr>
+<td>epochs</td>
+<td>2-5</td>
+<td>数据少多跑几轮</td>
+</tr>
+<tr>
+<td>batch_size</td>
+<td>32-128（有效）</td>
+<td>通过梯度累积达到</td>
+</tr>
+<tr>
+<td>max_seq_len</td>
+<td>2048-4096</td>
+<td>根据数据分布选择</td>
+</tr>
+<tr>
+<td>warmup</td>
+<td>3-10%</td>
+<td>总步数的比例</td>
+</tr>
+<tr>
+<td>weight_decay</td>
+<td>0.01-0.1</td>
+<td>防止过拟合</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="四qlora">四、QLoRA</h2>
+<h3 id="41-原理">4.1 原理</h3>
+<p>QLoRA（Quantized LoRA）是 2023 年由 Dettmers et al. 提出的方法，核心创新是<strong>在 4-bit 量化的模型上做 LoRA 训练</strong>。</p>
+<h4 id="4-bit-normalfloat-nf4-量化">4-bit NormalFloat (NF4) 量化</h4>
+<pre><code>传统量化: 均匀分布的量化级别
+NF4量化: 基于正态分布的量化级别
+
+权重通常服从正态分布 N(0, σ²)，NF4 的量化级别按照
+正态分布的分位数设计，使信息损失最小化。
+
+fp16 → NF4:
+16 bit/参数 → 4 bit/参数 → 显存节省 75%
+</code></pre>
+<p>NF4 的 16 个量化级别（4 bit = 2⁴ = 16 个值）：</p>
+<pre><code>[-1.0, -0.6962, -0.5251, -0.3949, -0.2844, -0.1848, -0.0911, 0.0,
+  0.0796, 0.1609, 0.2461, 0.3379, 0.4407, 0.5626, 0.7230, 1.0]
+</code></pre>
+<h4 id="双重量化double-quantization">双重量化（Double Quantization）</h4>
+<pre><code>第一层量化: 模型权重 fp16 → NF4 (每64个权重共享一个 fp32 缩放因子)
+第二层量化: 缩放因子 fp32 → fp8 (进一步压缩)
+
+显存节省计算:
+- 第一层: 4bit/参数 + 32bit/64参数 = 4 + 0.5 = 4.5 bit/参数
+- 加双重量化: 4bit/参数 + 8bit/64参数 = 4 + 0.125 = 4.125 bit/参数
+- 节省: 0.375 bit/参数 → 7B模型省约 0.33GB
+</code></pre>
+<h4 id="分页优化器paged-optimizer">分页优化器（Paged Optimizer）</h4>
+<pre><code>问题: 训练中的显存峰值（前向+反向传播时）可能超出GPU显存
+解决: 利用 NVIDIA 统一内存（Unified Memory）机制
+
+当GPU显存不足时:
+GPU显存 ←→ CPU内存 自动分页交换
+
+类似操作系统的虚拟内存/swap，但用于GPU显存管理
+</code></pre>
+<h4 id="在量化模型上做-lora">在量化模型上做 LoRA</h4>
+<p><img alt="QLoRA 训练结构" src="../../source/diagrams/qlora-training-stack.svg" loading="lazy" decoding="async"></p>
+<h3 id="42-优势与局限">4.2 优势与局限</h3>
+<h4 id="显存节省数据">显存节省数据</h4>
+<table>
+<thead>
+<tr>
+<th>模型大小</th>
+<th>全参微调</th>
+<th>LoRA (fp16)</th>
+<th>QLoRA (NF4)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7B</td>
+<td>~120GB</td>
+<td>~18GB</td>
+<td><strong>~6GB</strong></td>
+</tr>
+<tr>
+<td>13B</td>
+<td>~220GB</td>
+<td>~32GB</td>
+<td><strong>~10GB</strong></td>
+</tr>
+<tr>
+<td>30B</td>
+<td>~480GB</td>
+<td>~70GB</td>
+<td><strong>~24GB</strong></td>
+</tr>
+<tr>
+<td>70B</td>
+<td>~1120GB</td>
+<td>~160GB</td>
+<td><strong>~48GB</strong></td>
+</tr>
+</tbody>
+</table>
+<p>💡 QLoRA 使得 <strong>70B 模型在单张 A100 80GB 上可训练</strong>！</p>
+<h4 id="精度损失分析">精度损失分析</h4>
+<table>
+<thead>
+<tr>
+<th>对比</th>
+<th>MMLU</th>
+<th>GSM8K</th>
+<th>HumanEval</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全参微调</td>
+<td>63.5</td>
+<td>52.1</td>
+<td>35.4</td>
+</tr>
+<tr>
+<td>LoRA fp16</td>
+<td>63.1</td>
+<td>51.5</td>
+<td>34.8</td>
+</tr>
+<tr>
+<td>QLoRA NF4</td>
+<td>62.8</td>
+<td>50.8</td>
+<td>34.1</td>
+</tr>
+<tr>
+<td>损失</td>
+<td><strong>~1%</strong></td>
+<td><strong>~2.5%</strong></td>
+<td><strong>~3.6%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>结论：QLoRA 精度损失在 1-4% 范围内，对大多数应用可接受。</p>
+<h4 id="训练速度影响">训练速度影响</h4>
+<ul>
+<li>QLoRA 比 LoRA fp16 慢约 <strong>30-50%</strong>（反量化计算开销）</li>
+<li>但由于显存节省，可以用更大的 batch size 部分弥补</li>
+<li>综合性价比：<strong>QLoRA 是资源受限场景的最优选择</strong></li>
+</ul>
+<h3 id="43-实战">4.3 实战</h3>
+<h4 id="bitsandbytes-配置">bitsandbytes 配置</h4>
+<pre><code class="language-python">import torch
+from transformers import AutoModelForCausalLM, BitsAndBytesConfig
+
+# QLoRA 量化配置
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,                     # 4-bit 量化
+    bnb_4bit_quant_type=&quot;nf4&quot;,             # NF4 量化类型
+    bnb_4bit_compute_dtype=torch.bfloat16, # 计算时用 bf16
+    bnb_4bit_use_double_quant=True,        # 双重量化
+)
+
+# 加载量化模型
+model = AutoModelForCausalLM.from_pretrained(
+    &quot;meta-llama/Llama-3.1-70B&quot;,
+    quantization_config=bnb_config,
+    device_map=&quot;auto&quot;,
+    attn_implementation=&quot;flash_attention_2&quot;,
+)
+
+# 准备训练
+from peft import prepare_model_for_kbit_training
+model = prepare_model_for_kbit_training(model)
+
+# 后续 LoRA 配置和训练与标准 LoRA 相同
+from peft import LoraConfig, get_peft_model
+lora_config = LoraConfig(
+    r=64,                # QLoRA 通常用更高的 rank
+    lora_alpha=128,
+    target_modules=&quot;all-linear&quot;,
+    lora_dropout=0.05,
+    bias=&quot;none&quot;,
+    task_type=&quot;CAUSAL_LM&quot;,
+)
+model = get_peft_model(model, lora_config)
+</code></pre>
+<h4 id="与-lora-的对比实验数据">与 LoRA 的对比实验数据</h4>
+<p><img alt="微调方法资源对比" src="../../source/diagrams/finetune-method-comparison.svg" loading="lazy" decoding="async"></p>
+<hr>
+<h2 id="五rlhf-dpo-grpo">五、RLHF / DPO / GRPO</h2>
+<h3 id="51-rlhf-三阶段">5.1 RLHF 三阶段</h3>
+<h4 id="总体流程">总体流程</h4>
+<p><img alt="RLHF 三阶段训练流程" src="../../source/diagrams/rlhf-three-stage-flow.svg" loading="lazy" decoding="async"></p>
+<h4 id="阶段1-sft已在前面详述">阶段1: SFT（已在前面详述）</h4>
+<p>用指令数据训练基础模型，获得初始的指令遵循能力。</p>
+<h4 id="阶段2-奖励模型训练">阶段2: 奖励模型训练</h4>
+<pre><code>输入: prompt x + response y
+输出: 标量奖励分数 r(x, y)
+
+训练数据格式:
+(prompt, chosen_response, rejected_response)
+&quot;写一首诗&quot; → chosen: [优美的诗] vs rejected: [低质量的诗]
+
+损失函数 (Bradley-Terry模型):
+L = -log σ(r(x, y_w) - r(x, y_l))
+
+其中 y_w 是偏好的回复，y_l 是不偏好的回复
+σ 是 sigmoid 函数
+</code></pre>
+<pre><code class="language-python"># 奖励模型训练（简化版）
+from trl import RewardTrainer, RewardConfig
+
+reward_config = RewardConfig(
+    output_dir=&quot;./reward_model&quot;,
+    num_train_epochs=1,
+    per_device_train_batch_size=8,
+    learning_rate=1e-5,
+    bf16=True,
+)
+
+reward_trainer = RewardTrainer(
+    model=reward_model,           # 通常用 SFT 模型初始化
+    args=reward_config,
+    train_dataset=preference_data, # (chosen, rejected) 对
+    tokenizer=tokenizer,
+)
+reward_trainer.train()
+</code></pre>
+<h4 id="阶段3-ppo-优化">阶段3: PPO 优化</h4>
+<pre><code>目标函数:
+max E[R(x, y)] - β × KL(π_θ || π_ref)
+
+其中:
+- R(x, y): 奖励模型给出的分数
+- π_θ: 当前策略（正在训练的模型）
+- π_ref: 参考策略（SFT模型，冻结）
+- β: KL 惩罚系数（通常 0.01-0.2）
+- KL散度: 防止模型偏离太远，避免 reward hacking
+</code></pre>
+<p><img alt="PPO 训练循环" src="../../source/diagrams/ppo-training-loop.svg" loading="lazy" decoding="async"></p>
+<p><strong>PPO 的 KL 惩罚为什么重要？</strong></p>
+<p>没有 KL 惩罚时：
+- 模型会学会"欺骗"奖励模型（reward hacking）
+- 例如生成冗长但无意义的回复来获得高分
+- 输出会变得不自然</p>
+<h3 id="52-dpodirect-preference-optimization">5.2 DPO（Direct Preference Optimization）</h3>
+<h4 id="核心思想跳过奖励模型">核心思想：跳过奖励模型</h4>
+<pre><code>RLHF: 数据 → 训练RM → PPO训练 (复杂、不稳定)
+DPO:  数据 → 直接优化偏好 (简单、稳定)
+</code></pre>
+<p>DPO 的关键洞察：奖励函数可以用最优策略的闭式解表示，从而跳过显式奖励建模。</p>
+<h4 id="数学推导简化版">数学推导（简化版）</h4>
+<pre><code>RLHF 的最优解:
+π*(y|x) = (1/Z(x)) × π_ref(y|x) × exp(r(x,y)/β)
+
+反推奖励函数:
+r(x,y) = β × log(π*(y|x)/π_ref(y|x)) + β × log Z(x)
+
+代入 Bradley-Terry 偏好模型:
+P(y_w &gt; y_l | x) = σ(r(x,y_w) - r(x,y_l))
+
+最终 DPO 损失:
+L_DPO = -E[log σ(β × (log π_θ(y_w|x)/π_ref(y_w|x) 
+                      - log π_θ(y_l|x)/π_ref(y_l|x)))]
+
+直觉: 增大 chosen 回复的概率，减小 rejected 回复的概率
+      同时用参考模型约束不要偏离太远
+</code></pre>
+<h4 id="优缺点">优缺点</h4>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>DPO</th>
+<th>PPO (RLHF)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>实现复杂度</td>
+<td>✅ 简单</td>
+<td>❌ 复杂（4个模型）</td>
+</tr>
+<tr>
+<td>训练稳定性</td>
+<td>✅ 稳定</td>
+<td>❌ 不稳定</td>
+</tr>
+<tr>
+<td>显存需求</td>
+<td>✅ 2个模型</td>
+<td>❌ 4个模型</td>
+</tr>
+<tr>
+<td>超参数敏感度</td>
+<td>✅ 少（主要是β）</td>
+<td>❌ 多</td>
+</tr>
+<tr>
+<td>效果上限</td>
+<td>⚠️ 受限于离线数据</td>
+<td>✅ 在线探索更强</td>
+</tr>
+<tr>
+<td>奖励过优化</td>
+<td>⚠️ 可能</td>
+<td>⚠️ 可能但可控</td>
+</tr>
+</tbody>
+</table>
+<h4 id="代码思路">代码思路</h4>
+<pre><code class="language-python">from trl import DPOTrainer, DPOConfig
+
+# DPO 数据格式
+# {&quot;prompt&quot;: &quot;...&quot;, &quot;chosen&quot;: &quot;...&quot;, &quot;rejected&quot;: &quot;...&quot;}
+
+dpo_config = DPOConfig(
+    output_dir=&quot;./dpo_output&quot;,
+    num_train_epochs=3,
+    per_device_train_batch_size=4,
+    gradient_accumulation_steps=4,
+    learning_rate=5e-7,            # DPO 学习率要小！
+    beta=0.1,                      # KL 惩罚系数
+    bf16=True,
+    loss_type=&quot;sigmoid&quot;,           # 标准 DPO loss
+    # loss_type=&quot;ipo&quot;,             # IPO 变体
+    max_length=2048,
+    max_prompt_length=1024,
+)
+
+dpo_trainer = DPOTrainer(
+    model=sft_model,               # SFT 后的模型
+    ref_model=ref_model,           # 参考模型（通常是 SFT 模型的副本）
+    args=dpo_config,
+    train_dataset=preference_data,
+    tokenizer=tokenizer,
+)
+
+dpo_trainer.train()
+</code></pre>
+<h3 id="53-deepseek-grpo">5.3 DeepSeek GRPO</h3>
+<h4 id="group-relative-policy-optimization">Group Relative Policy Optimization</h4>
+<p>GRPO 是 DeepSeek 在 DeepSeek-R1 中使用的对齐方法，核心改进：</p>
+<pre><code>PPO:  一个样本 → 一个奖励值 → 需要 Critic 网络估计基线
+GRPO: 一个问题 → 生成G个回复 → 组内相对排序作为奖励
+
+关键区别: GRPO 不需要单独的 Critic 网络（价值函数）！
+</code></pre>
+<pre><code>GRPO 流程:
+1. 给定 prompt x, 用当前模型采样 G 个回复 {y₁, y₂, ..., yG}
+2. 用奖励模型（或规则）给每个回复打分 {r₁, r₂, ..., rG}
+3. 组内标准化: r̂ᵢ = (rᵢ - mean(r)) / std(r)
+4. 用标准化后的奖励作为优势函数更新模型
+
+损失函数:
+L_GRPO = -E[Σᵢ min(ρᵢ × Âᵢ, clip(ρᵢ, 1-ε, 1+ε) × Âᵢ)]
+         - β × KL(π_θ || π_ref)
+
+其中 ρᵢ = π_θ(yᵢ|x) / π_old(yᵢ|x)
+     Âᵢ = r̂ᵢ (组内标准化奖励)
+</code></pre>
+<h4 id="为什么-deepseek-选择-grpo">为什么 DeepSeek 选择 GRPO？</h4>
+<ol>
+<li><strong>省资源</strong>：不需要 Critic 网络，减少 ~25% 显存</li>
+<li><strong>更稳定</strong>：组内相对排序比绝对奖励更鲁棒</li>
+<li><strong>适合推理任务</strong>：可以用规则奖励（如数学答案正确性）替代奖励模型</li>
+<li><strong>可扩展</strong>：G 越大，梯度估计越准确</li>
+</ol>
+<pre><code>DeepSeek-R1 的奖励设计:
+- 准确性奖励: 答案正确 = +1, 错误 = -1
+- 格式奖励: 按要求格式输出 = +0.5
+- 无需复杂的神经网络奖励模型!
+</code></pre>
+<h3 id="54-偏好数据构建">5.4 偏好数据构建</h3>
+<h4 id="人工标注-vs-ai标注rlaif">人工标注 vs AI标注（RLAIF）</h4>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>成本</th>
+<th>质量</th>
+<th>规模</th>
+<th>代表</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>人工标注</td>
+<td>$$$$</td>
+<td>✅ 最高</td>
+<td>小（千级）</td>
+<td>InstructGPT</td>
+</tr>
+<tr>
+<td>AI标注（RLAIF）</td>
+<td>$</td>
+<td>较高</td>
+<td>大（万级）</td>
+<td>Constitutional AI</td>
+</tr>
+<tr>
+<td>混合方案</td>
+<td>$$</td>
+<td>高</td>
+<td>中等</td>
+<td>LLaMA-2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>AI标注（RLAIF）流程：</strong></p>
+<pre><code>1. 给同一个 prompt 生成多个回复（不同模型或不同采样）
+2. 用 GPT-4/Claude 作为裁判，选择更好的回复
+3. 构建 (prompt, chosen, rejected) 三元组
+
+评判 prompt 示例:
+&quot;以下是对问题'{question}'的两个回复。
+回复A: {response_a}
+回复B: {response_b}
+哪个回复更好？请从准确性、有用性、安全性三个维度评判。&quot;
+</code></pre>
+<h4 id="数据格式_1">数据格式</h4>
+<pre><code class="language-json">// 标准偏好数据格式
+{
+  &quot;prompt&quot;: &quot;解释量子纠缠&quot;,
+  &quot;chosen&quot;: &quot;量子纠缠是量子力学中一种神奇的现象...(详细准确的解释)&quot;,
+  &quot;rejected&quot;: &quot;量子纠缠就是两个粒子心灵感应...(不准确的解释)&quot;
+}
+
+// 多轮对话偏好数据
+{
+  &quot;prompt&quot;: [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;什么是LoRA？&quot;},
+    {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;LoRA是...&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;怎么选rank？&quot;}
+  ],
+  &quot;chosen&quot;: &quot;rank的选择取决于任务复杂度...(详细建议)&quot;,
+  &quot;rejected&quot;: &quot;rank越大越好...(误导性建议)&quot;
+}
+</code></pre>
+<hr>
+<h2 id="六训练工具链">六、训练工具链</h2>
+<h3 id="61-框架对比">6.1 框架对比</h3>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>HuggingFace TRL</th>
+<th>LLaMA-Factory</th>
+<th>Axolotl</th>
+<th>OpenRLHF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SFT</strong></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>LoRA/QLoRA</strong></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>DPO</strong></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>RLHF/PPO</strong></td>
+<td>✅</td>
+<td>✅（基础）</td>
+<td>❌</td>
+<td>✅（专精）</td>
+</tr>
+<tr>
+<td><strong>GRPO</strong></td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Web UI</strong></td>
+<td>❌</td>
+<td>✅（LLaMA Board）</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>多模态</strong></td>
+<td>✅</td>
+<td>✅</td>
+<td>⚠️ 有限</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>上手难度</strong></td>
+<td>中</td>
+<td>✅ 最简单</td>
+<td>中</td>
+<td>较难</td>
+</tr>
+<tr>
+<td><strong>配置方式</strong></td>
+<td>Python代码</td>
+<td>YAML/Web</td>
+<td>YAML</td>
+<td>Python</td>
+</tr>
+<tr>
+<td><strong>分布式</strong></td>
+<td>✅ DeepSpeed/FSDP</td>
+<td>✅ DeepSpeed</td>
+<td>✅ DeepSpeed</td>
+<td>✅ Ray+vLLM</td>
+</tr>
+<tr>
+<td><strong>社区活跃度</strong></td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>⭐⭐⭐⭐</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td><strong>适合场景</strong></td>
+<td>研究/灵活定制</td>
+<td>快速上手/生产</td>
+<td>灵活配置</td>
+<td>大规模RLHF</td>
+</tr>
+</tbody>
+</table>
+<p><strong>推荐选择：</strong>
+- 🔰 入门/快速实验 → <strong>LLaMA-Factory</strong>（YAML 配置，带 Web UI）
+- 🔬 研究/自定义 → <strong>HuggingFace TRL</strong>（灵活，文档最全）
+- 🏗️ 大规模 RLHF → <strong>OpenRLHF</strong>（Ray 分布式，支持 70B+ 模型 PPO/GRPO）
+- ⚙️ 多实验配置管理 → <strong>Axolotl</strong>（YAML 配置管理优秀）</p>
+<h3 id="62-训练基础设施">6.2 训练基础设施</h3>
+<h4 id="单卡-vs-多卡-vs-多机">单卡 vs 多卡 vs 多机</h4>
+<p><img alt="训练规模与典型配置" src="../../source/diagrams/training-scale-playbook.svg" loading="lazy" decoding="async"></p>
+<h4 id="deepspeed-vs-fsdp">DeepSpeed vs FSDP</h4>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>DeepSpeed</th>
+<th>PyTorch FSDP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>维护方</td>
+<td>微软</td>
+<td>PyTorch 官方</td>
+</tr>
+<tr>
+<td>ZeRO 支持</td>
+<td>Stage 1/2/3</td>
+<td>等效 Stage 2/3</td>
+</tr>
+<tr>
+<td>CPU Offload</td>
+<td>✅ 成熟</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>配置方式</td>
+<td>JSON 配置文件</td>
+<td>Python API</td>
+</tr>
+<tr>
+<td>生态集成</td>
+<td>HuggingFace/各框架</td>
+<td>PyTorch 原生</td>
+</tr>
+<tr>
+<td>推荐</td>
+<td>✅ 目前更成熟</td>
+<td>🔄 快速追赶中</td>
+</tr>
+</tbody>
+</table>
+<h4 id="显存需求计算公式">显存需求计算公式</h4>
+<p><img alt="微调显存估算速查" src="../../source/diagrams/finetune-memory-estimation.svg" loading="lazy" decoding="async"></p>
+<hr>
+<h2 id="七面试题20题-完整参考答案">七、面试题（20题）+ 完整参考答案</h2>
+<h3 id="1-lora的原理rank-r怎么选">1. LoRA的原理？rank r怎么选？</h3>
+<p><strong>答：</strong> LoRA（Low-Rank Adaptation）的核心思想是将微调过程中的权重更新矩阵 ΔW 分解为两个低秩矩阵的乘积：ΔW = BA，其中 B ∈ ℝ^{d×r}，A ∈ ℝ^{r×k}，r &lt;&lt; min(d, k)。前向传播时 Y = W₀X + BAX，其中 W₀ 冻结，只训练 A 和 B。初始化时 B=0 保证训练起点不改变原模型。</p>
+<p><strong>为什么有效？</strong> 基于内在维度假说——预训练模型的任务适应只需在一个低维子空间中进行。Aghajanyan et al. 实验表明，即使将微调限制在很低维的子空间，仍能保留 90%+ 的全参微调性能。</p>
+<p><strong>rank r 选择策略：</strong>
+- r=8：简单分类、情感分析等任务足够
+- r=16：通用指令微调的推荐起点
+- r=32-64：复杂任务（代码生成、数学推理）
+- 2024年最佳实践：<strong>用 <code>target_modules="all-linear"</code> + 较低 rank (8-16)</strong>，效果优于少模块 + 高 rank</p>
+<p>实际操作：先用 r=16 跑 baseline，如果欠拟合则增加 rank；如果过拟合则减小 rank 或增加 dropout。一般 r=16 + alpha=32 覆盖 80% 场景。</p>
+<h3 id="2-qlora相比lora多了什么为什么能省显存">2. QLoRA相比LoRA多了什么？为什么能省显存？</h3>
+<p><strong>答：</strong> QLoRA 在 LoRA 基础上增加了三项关键技术：</p>
+<p><strong>1. NF4 量化：</strong> 将基础模型从 fp16（16 bit）量化到 NF4（4 bit）。NF4 是专为正态分布权重设计的量化类型，其 16 个量化级别按正态分布分位数排列，信息损失最小。一个 7B 模型从 14GB (fp16) 降到 3.5GB (NF4)。</p>
+<p><strong>2. 双重量化（Double Quantization）：</strong> 量化过程中每 64 个权重需要一个 fp32 的缩放因子（scale），双重量化把这些缩放因子进一步量化到 fp8，额外节省约 0.4GB/7B参数。</p>
+<p><strong>3. 分页优化器（Paged Optimizer）：</strong> 利用 NVIDIA 统一内存机制，当 GPU 显存不足时自动将优化器状态临时转移到 CPU 内存，类似操作系统的 swap。</p>
+<p><strong>显存节省原理：</strong> LoRA fp16 中基础模型仍然以 fp16 存储（7B×2=14GB），QLoRA 将其压缩到 NF4（7B×0.5=3.5GB），LoRA 的 A/B 矩阵仍用 bf16 训练但参数量只有全模型的 ~1%。结果是 7B 模型从 ~18GB 降到 ~6GB，70B 模型可以在单张 A100 80GB 上训练。代价是训练速度慢 30-50%（反量化计算开销）。</p>
+<h3 id="3-sft的训练数据如何构建数据质量和数量哪个更重要">3. SFT的训练数据如何构建？数据质量和数量哪个更重要？</h3>
+<p><strong>答：</strong> <strong>数据质量远比数量重要</strong>，这是 2023-2025 年的核心共识。</p>
+<p><strong>数据构建流程：</strong>
+1. <strong>确定任务类型</strong>：指令遵循、对话、代码、推理等
+2. <strong>种子数据收集</strong>：人工编写 200-500 条高质量样本
+3. <strong>数据扩充</strong>：用 Self-Instruct 或 Evol-Instruct 合成更多数据
+4. <strong>质量过滤</strong>：去重（MinHash）、去短回复、去低质量样本
+5. <strong>多样性保证</strong>：覆盖不同任务类型、难度级别、输出格式</p>
+<p><strong>关键数据格式</strong>：Alpaca 格式 <code>{instruction, input, output}</code> 用于简单任务；ShareGPT/ChatML 格式用于多轮对话。</p>
+<p><strong>质量 vs 数量的研究证据：</strong>
+- LIMA 论文：仅 1000 条精选数据微调 LLaMA-65B，媲美 GPT-4
+- Deita 研究：6K 精选 &gt; 100K 随机
+- 数据质量三要素：准确性 &gt; 多样性 &gt; 复杂度</p>
+<p><strong>实践建议：</strong> 先用 1000-5000 条高质量数据训练，评估效果，再决定是否扩充。扩充时优先提高多样性而非数量。使用 GPT-4 生成数据后必须人工审核至少 10%。</p>
+<h3 id="4-全参微调-vs-lora-各自适用场景">4. 全参微调 vs LoRA 各自适用场景？</h3>
+<p><strong>答：</strong></p>
+<p><strong>全参微调适用场景：</strong>
+- 需要模型深度领域适配（如训练一个医疗专用模型）
+- 训练数据量大（&gt;100K 条）
+- 有充足 GPU 资源（多卡或大显存）
+- 追求效果上限，对成本不敏感
+- 任务与预训练分布差异大（如新语言或特殊领域）</p>
+<p><strong>LoRA 适用场景：</strong>
+- 资源受限（单卡或消费级 GPU）
+- 快速实验迭代（训练快，可以多跑几组超参）
+- 需要多个任务特化版本（每个任务一个 LoRA adapter，共享基座模型）
+- 部署灵活性（可以在推理时动态加载不同 LoRA）
+- 数据量适中（1K-50K）</p>
+<p><strong>效果对比：</strong> 在大多数下游任务上，LoRA 可以达到全参微调 95%+ 的效果。当 rank 增大到 64-128 时差距更小。但在需要模型学习全新知识分布的场景（如从英文模型训中文能力），全参微调仍然明显更优。</p>
+<p><strong>2025年趋势：</strong> LoRA 已成为默认选择，全参微调仅在特定场景使用。多 LoRA 服务（如 S-LoRA、PunicaV2）使得单基座模型可同时服务数百个 LoRA 适配器。</p>
+<h3 id="5-微调-vs-rag如何选择">5. 微调 vs RAG，如何选择？</h3>
+<p><strong>答：</strong> 这是最高频的架构决策问题，核心在于区分<strong>知识注入</strong>和<strong>行为改变</strong>。</p>
+<p><strong>选 RAG 的场景：</strong>
+- 知识频繁更新（新闻、商品信息、法规变化）
+- 需要引用来源（可追溯性要求）
+- 知识量大且不断增长
+- 需要精确的事实性回答（减少幻觉）
+- 快速上线（天级别）</p>
+<p><strong>选微调的场景：</strong>
+- 需要改变模型的输出风格/格式/语气
+- 让模型学会特定的推理模式
+- 需要降低推理延迟（无需检索步骤）
+- 需要降低成本（用小模型+微调替代大模型+长prompt）
+- 安全对齐和价值观定制</p>
+<p><strong>两者结合的场景（最强方案）：</strong>
+- 微调让模型学会使用检索结果的能力
+- RAG 提供实时知识，微调提供行为模式
+- 例：微调模型学会 Agent 工具调用格式 + RAG 提供工具调用需要的文档</p>
+<p><strong>决策矩阵：</strong> 问自己两个问题——① 是否需要新知识？→ RAG；② 是否需要新行为？→ 微调。都需要 → 两者结合。</p>
+<h3 id="6-rlhf三阶段详解">6. RLHF三阶段详解</h3>
+<p><strong>答：</strong> RLHF（Reinforcement Learning from Human Feedback）包含三个阶段：</p>
+<p><strong>阶段1 — SFT：</strong> 用指令-回复对 (x, y) 训练基础模型，使其具备基本的指令遵循能力。通常用 1K-100K 高质量指令数据，训练 1-3 个 epoch。这一步是后续对齐的基础。</p>
+<p><strong>阶段2 — 奖励模型训练：</strong> 收集偏好数据 (x, y_w, y_l)，其中 y_w 是人类偏好的回复，y_l 是不偏好的。用 Bradley-Terry 模型训练奖励模型：<code>L = -log σ(r(x, y_w) - r(x, y_l))</code>。奖励模型通常用 SFT 模型初始化，去掉最后的 LM head，换成输出标量的线性层。数据量一般需要 50K-500K 偏好对。</p>
+<p><strong>阶段3 — PPO优化：</strong> 这是最复杂的部分。训练循环为：① 用当前策略 π_θ 生成回复；② 用奖励模型打分；③ 用 GAE 计算优势函数；④ 用 PPO 目标函数更新模型。同时加入 KL 惩罚 <code>β × KL(π_θ || π_ref)</code> 防止模型偏离 SFT 基线太远（reward hacking）。整个过程需要同时维护 4 个模型：当前策略、参考策略（冻结的SFT模型）、奖励模型、价值模型（Critic），显存需求巨大。</p>
+<p><strong>InstructGPT 的成果：</strong> 1.3B 的 RLHF 模型效果优于 175B 的 GPT-3。</p>
+<h3 id="7-dpo和ppo的本质区别">7. DPO和PPO的本质区别？</h3>
+<p><strong>答：</strong> <strong>PPO（Proximal Policy Optimization）</strong> 是一种在线强化学习方法，需要四个模型：策略模型、参考模型、奖励模型、Critic模型。训练过程中策略模型会生成新的回复，由奖励模型实时评分，形成"探索-反馈-更新"的循环。优点是能持续探索新的回复空间，缺点是实现复杂、训练不稳定、资源消耗大。</p>
+<p><strong>DPO（Direct Preference Optimization）</strong> 将强化学习问题转化为分类问题。核心洞察：最优奖励函数可以用策略的闭式解表示，因此不需要显式训练奖励模型。只需两个模型（策略模型+参考模型），直接在偏好数据上优化，增大 chosen 回复的概率，减小 rejected 回复的概率。</p>
+<p><strong>本质区别：</strong>
+- <strong>PPO 是在线的</strong>：每步生成新数据 → 评分 → 更新，可以探索
+- <strong>DPO 是离线的</strong>：直接在静态偏好数据上优化，不生成新数据
+- PPO 理论上限更高（能探索到数据集未覆盖的好回复），但实践中 DPO 更容易获得稳定的好结果
+- 2024-2025 年实践：大多数团队选择 DPO 或其变体（SimPO、ORPO）作为默认方案</p>
+<h3 id="8-deepseek的grpo是什么">8. DeepSeek的GRPO是什么？</h3>
+<p><strong>答：</strong> GRPO（Group Relative Policy Optimization）是 DeepSeek 在 DeepSeek-R1 中使用的强化学习算法，核心创新是<strong>用组内相对排序代替 Critic 网络</strong>。</p>
+<p><strong>流程：</strong> 给定一个 prompt x，用当前策略采样 G 个回复（如 G=64）。用奖励函数（可以是规则或模型）给每个回复打分。然后在组内做标准化：<code>r̂ᵢ = (rᵢ - mean) / std</code>，将标准化后的分数直接作为优势函数，跳过 Critic 网络的估计。</p>
+<p><strong>与 PPO 的关键区别：</strong>
+1. <strong>无需 Critic</strong>：PPO 需要额外的价值网络估计基线，GRPO 用组内均值作为基线，节省 ~25% 显存
+2. <strong>相对评估</strong>：不关心绝对分数，只关心组内相对好坏，更鲁棒
+3. <strong>规则奖励兼容</strong>：DeepSeek-R1 用简单规则（答案正确+1，错误-1，格式正确+0.5）代替神经网络奖励模型</p>
+<p><strong>DeepSeek 选择 GRPO 的原因：</strong> 在数学/代码推理任务中，正确性可以通过规则验证，不需要复杂的奖励模型。GRPO 简化了训练流水线，降低了资源需求，同时效果不输 PPO。这也是 DeepSeek-R1 能以较低成本训出强推理能力的关键技术之一。</p>
+<h3 id="9-lora的target_modules怎么选">9. LoRA的target_modules怎么选？</h3>
+<p><strong>答：</strong> target_modules 决定了 LoRA 应用于模型的哪些权重矩阵。</p>
+<p><strong>Transformer 中的可选模块：</strong>
+- <strong>注意力层</strong>：q_proj, k_proj, v_proj, o_proj
+- <strong>FFN 层</strong>：gate_proj (或 fc1), up_proj, down_proj (或 fc2)
+- <strong>其他</strong>：embed_tokens, lm_head（通常不选）</p>
+<p><strong>选择策略演进：</strong>
+- <strong>2023 原始 LoRA</strong>：只选 q_proj + v_proj（论文实验结果）
+- <strong>2024 共识</strong>：选所有注意力层 q/k/v/o_proj
+- <strong>2025 最佳实践</strong>：<code>target_modules="all-linear"</code>（所有线性层），配合较低 rank</p>
+<p><strong>实验数据（LLaMA-3-8B, MT-Bench）：</strong>
+| target_modules | 参数量 | 分数 |
+|---|---|---|
+| q,v | 0.4% | 7.31 |
+| q,k,v,o | 0.8% | 7.52 |
+| q,k,v,o + FFN | 1.6% | 7.68 |
+| all-linear | 1.6% | 7.71 |</p>
+<p>结论是<strong>覆盖更多模块 + 较低 rank</strong> 优于<strong>少模块 + 高 rank</strong>，因为这样能更均匀地调整模型各层的表示。注意力层主要影响"关注什么"，FFN 层主要影响"如何处理"，都应该调整。</p>
+<h3 id="10-alpha和rank的关系">10. alpha和rank的关系？</h3>
+<p><strong>答：</strong> LoRA 的实际权重更新是 <code>ΔW = (α/r) × BA</code>，其中 α（alpha）和 r（rank）共同决定了更新的缩放因子 <code>α/r</code>。</p>
+<p><strong>设计意图：</strong> 当改变 rank 时，缩放因子 α/r 可以保持更新量的相对大小稳定。例如 α=16, r=16 时缩放=1；如果增大 r=32 但 α 不变，缩放=0.5，更新变小。这就是为什么通常 <strong>α = 2×r</strong> 或者固定 α 然后调整学习率。</p>
+<p><strong>常见配置模式：</strong>
+1. <strong>α = r</strong>：缩放=1，最保守
+2. <strong>α = 2r</strong>：缩放=2，推荐默认值（如 r=16, α=32）
+3. <strong>固定 α 调 rank</strong>：一些实践者固定 α=16，只调 r。此时 r 越大缩放越小，需要相应增大学习率</p>
+<p><strong>rsLoRA 的改进：</strong> 将缩放因子改为 α/√r，使得不同 rank 下训练动态更一致。这在 r 较大时（64, 128）特别有用，避免缩放因子过小导致学习不充分。</p>
+<p><strong>实践建议：</strong> 入门使用 r=16, α=32 即可。调参时先固定 α/r=2 的比例，调整 rank 大小。如果使用 rsLoRA，可以更自由地选择高 rank。</p>
+<h3 id="11-混合精度训练bf16-vs-fp16的区别">11. 混合精度训练（bf16 vs fp16）的区别？</h3>
+<p><strong>答：</strong> 两者都是 16 位浮点数，但位分配不同，导致特性差异显著：</p>
+<p><strong>fp16</strong>：5 位指数 + 10 位尾数 + 1 位符号
+- 精度高（尾数 10 位）但数值范围小（最大 65504）
+- 容易发生溢出（overflow）和下溢出（underflow）
+- <strong>必须使用 loss scaling</strong> 防止梯度下溢出
+- 适用于 V100、T4、RTX 3090 等 Ampere 之前的 GPU</p>
+<p><strong>bf16</strong>：8 位指数 + 7 位尾数 + 1 位符号
+- 精度稍低（尾数 7 位）但数值范围大（与 fp32 相同）
+- 不需要 loss scaling，训练更稳定
+- 适用于 A100、H100、RTX 4090 等 Ampere 及之后的 GPU
+- <strong>2024-2025 年的默认选择</strong></p>
+<p><strong>对训练的影响：</strong>
+- fp16 训练可能出现 loss spike（梯度溢出导致），需要仔细调参
+- bf16 训练几乎不会出现数值问题，但最终精度可能略低于 fp16（尾数少 3 位）
+- 对于 LLM 微调，bf16 的精度损失可忽略不计</p>
+<pre><code class="language-python"># 检查GPU是否支持bf16
+import torch
+print(torch.cuda.is_bf16_supported())  # True → 用 bf16
+</code></pre>
+<h3 id="12-deepspeed-zero三个stage分别优化什么">12. DeepSpeed ZeRO三个Stage分别优化什么？</h3>
+<p><strong>答：</strong> ZeRO（Zero Redundancy Optimizer）通过在多个 GPU 间<strong>分片</strong>存储来消除冗余：</p>
+<p><strong>Stage 1 — 优化器状态分片：</strong>
+- 分片内容：AdamW 的一阶动量、二阶动量、fp32 参数副本
+- 每张 GPU 只存 1/N 的优化器状态（N=GPU数量）
+- 显存节省：~4×（对于 AdamW，优化器状态占训练显存的 75%）
+- 通信开销：与 DDP 相同（只需 AllReduce 梯度）
+- 适用：2-8卡场景，简单高效</p>
+<p><strong>Stage 2 — 优化器状态 + 梯度分片：</strong>
+- 在 Stage 1 基础上，梯度也分片存储
+- 每张 GPU 只存 1/N 的梯度
+- 显存节省：~8×
+- 通信：Reduce-Scatter（梯度）+ AllGather（更新后参数）
+- 适用：中等规模模型（13B-30B）</p>
+<p><strong>Stage 3 — 优化器状态 + 梯度 + 模型参数分片：</strong>
+- 最激进的分片策略，模型参数本身也分片
+- 每张 GPU 只存 1/N 的一切
+- 显存节省：与 GPU 数量线性相关
+- 通信开销最大（前向/反向传播时需要 AllGather 拉取参数）
+- 支持 CPU Offload 进一步扩大容量
+- 适用：超大模型（70B+）或显存紧张场景</p>
+<p><strong>选择建议：</strong> 能用 Stage 1 就不用 Stage 2，能用 Stage 2 就不用 Stage 3。通信开销：Stage 1 &lt; Stage 2 &lt; Stage 3。</p>
+<h3 id="13-微调后模型效果变差灾难性遗忘怎么办">13. 微调后模型效果变差（灾难性遗忘）怎么办？</h3>
+<p><strong>答：</strong> 灾难性遗忘是微调中最常见的问题——模型学会了新任务但忘记了旧能力。解决方案：</p>
+<p><strong>1. 混合训练数据：</strong> 在微调数据中混入部分通用数据（如原始预训练数据的子集）。比例建议：专业数据 70% + 通用数据 30%。</p>
+<p><strong>2. 降低学习率：</strong> 使用更小的学习率（如从 2e-4 降到 5e-5），减少对原始权重的修改幅度。</p>
+<p><strong>3. 使用 LoRA 而非全参微调：</strong> LoRA 只修改 &lt;2% 的参数，天然具有对抗遗忘的能力。论文数据显示 LoRA 微调的遗忘程度比全参微调低 50%+。</p>
+<p><strong>4. 减少训练轮数：</strong> 过多 epoch 会加剧过拟合和遗忘。通常 2-3 个 epoch 足够，超过 5 个 epoch 风险增大。用验证集 early stopping。</p>
+<p><strong>5. L2 正则化 / 权重衰减：</strong> <code>weight_decay=0.01-0.1</code>，约束参数不要偏离预训练值太远。</p>
+<p><strong>6. EWC（弹性权重合并）：</strong> 计算每个参数对旧任务的重要性，重要的参数少更新。理论上优雅但实践中计算成本高。</p>
+<p><strong>7. 评估方法：</strong> 同时在新任务和旧任务上评估。推荐用 MMLU、GSM8K 等通用基准持续监控模型的通用能力。</p>
+<h3 id="14-如何评估微调效果">14. 如何评估微调效果？</h3>
+<p><strong>答：</strong> 评估需要覆盖多个维度：</p>
+<p><strong>1. 自动评估基准：</strong>
+| 基准 | 评估能力 | 说明 |
+|------|---------|------|
+| MMLU | 通用知识 | 57个学科，选择题 |
+| GSM8K | 数学推理 | 小学数学应用题 |
+| HumanEval | 代码能力 | 函数级代码生成 |
+| MT-Bench | 对话质量 | GPT-4 打分，1-10分 |
+| AlpacaEval | 指令遵循 | 与 GPT-4 对比胜率 |
+| IFEval | 指令遵循 | 精确指令遵循度 |</p>
+<p><strong>2. 人工评估：</strong> 抽样 100-200 条，多人盲评。评估维度：准确性、有用性、安全性、格式遵循。</p>
+<p><strong>3. A/B 测试：</strong> 将微调模型和基线模型对同一问题生成回复，让评判者（人或 GPT-4）选择更好的。</p>
+<p><strong>4. 领域特定评估：</strong> 根据具体任务设计。如 Agent 场景评估工具调用准确率、Function Calling 格式正确率等。</p>
+<p><strong>5. 过拟合检测：</strong> 监控训练 loss vs 验证 loss 的差距。如果训练 loss 很低但验证 loss 不降反升，说明过拟合。</p>
+<p><strong>6. 灾难性遗忘检测：</strong> 在 MMLU 等通用基准上对比微调前后的得分变化。</p>
+<h3 id="15-训练数据有偏见噪声怎么处理">15. 训练数据有偏见/噪声怎么处理？</h3>
+<p><strong>答：</strong></p>
+<p><strong>识别偏见/噪声：</strong>
+- <strong>统计分析</strong>：检查类别分布是否均衡，某些 pattern 是否过度出现
+- <strong>嵌入聚类</strong>：用 Sentence-BERT 编码后聚类，发现异常簇
+- <strong>人工抽样审查</strong>：随机抽取 5-10% 样本人工检查</p>
+<p><strong>处理策略：</strong></p>
+<p><strong>1. 数据清洗：</strong></p>
+<pre><code class="language-python"># 去除噪声数据
+def filter_quality(item, model):
+    # 用 GPT-4 评估数据质量（1-5分）
+    score = model.evaluate(item['instruction'], item['output'])
+    return score &gt;= 3  # 只保留 3 分以上的
+
+# 去重
+from datasketch import MinHash, MinHashLSH
+# 近似去重，threshold=0.85
+</code></pre>
+<p><strong>2. 数据均衡：</strong> 对少数类别进行上采样，或对多数类别下采样。也可以对不同类别设置不同的 loss 权重。</p>
+<p><strong>3. 对抗训练：</strong> 训练中加入对偏见的反例数据，主动纠偏。</p>
+<p><strong>4. 数据增强：</strong> 用改写、回译等方式增加多样性，稀释噪声。</p>
+<p><strong>5. 训练后去偏：</strong> 微调后用 DPO 进一步对齐，通过偏好数据纠正偏见输出。</p>
+<p><strong>核心原则：</strong> "垃圾进，垃圾出"。宁可用少量高质量数据，也不要用大量低质量数据。数据清洗的投入回报是最高的。</p>
+<h3 id="16-如何估算微调所需的gpu资源">16. 如何估算微调所需的GPU资源？</h3>
+<p><strong>答：</strong></p>
+<p><strong>快速估算公式：</strong></p>
+<pre><code>全参微调显存 ≈ 参数量(B) × 18 GB    （fp16 + AdamW）
+LoRA 显存   ≈ 参数量(B) × 2.5 GB    （fp16 冻结 + LoRA）
+QLoRA 显存  ≈ 参数量(B) × 0.8 GB    （NF4 + LoRA）
+</code></pre>
+<p><strong>详细计算（以 7B fp16 全参微调为例）：</strong>
+- 模型参数：7B × 2 bytes = 14 GB
+- 梯度：7B × 2 bytes = 14 GB
+- AdamW 优化器：7B × 12 bytes = 84 GB（fp32参数+一阶动量+二阶动量）
+- 激活值：~8 GB（取决于 batch_size 和 seq_len）
+- 总计：~120 GB → 需要 2× A100 80GB</p>
+<p><strong>不同场景的最低配置：</strong>
+| 模型 | 方法 | 最低GPU配置 |
+|------|------|------------|
+| 7B | QLoRA | 1× RTX 4090 (24GB) |
+| 7B | LoRA | 1× A100 40GB |
+| 7B | 全参 | 2× A100 80GB |
+| 13B | QLoRA | 1× RTX 4090 (24GB) |
+| 70B | QLoRA | 1× A100 80GB |
+| 70B | LoRA | 4× A100 80GB |</p>
+<p><strong>还需考虑：</strong> batch_size（增大需更多显存）、序列长度（2048 vs 4096 差别 2-3×）、是否使用梯度检查点（可省 40-60% 激活值显存）、Flash Attention（省 ~20% 显存）。</p>
+<h3 id="17-lora权重如何合并到基础模型">17. LoRA权重如何合并到基础模型？</h3>
+<p><strong>答：</strong></p>
+<p><strong>合并原理：</strong> LoRA 训练后得到 A 和 B 两个低秩矩阵。合并就是将 <code>W_merged = W₀ + (α/r) × BA</code> 计算出来，得到完整的权重矩阵。</p>
+<p><strong>代码实现：</strong></p>
+<pre><code class="language-python">from peft import PeftModel
+from transformers import AutoModelForCausalLM
+
+# 1. 加载基础模型
+base_model = AutoModelForCausalLM.from_pretrained(
+    &quot;meta-llama/Llama-3.1-8B&quot;,
+    torch_dtype=torch.bfloat16,
+    device_map=&quot;cpu&quot;,  # 合并在CPU上做，省显存
+)
+
+# 2. 加载 LoRA 权重
+model = PeftModel.from_pretrained(base_model, &quot;./lora_weights&quot;)
+
+# 3. 合并
+merged_model = model.merge_and_unload()
+
+# 4. 保存完整模型
+merged_model.save_pretrained(&quot;./merged_model&quot;)
+tokenizer.save_pretrained(&quot;./merged_model&quot;)
+
+# 现在 merged_model 可以像普通模型一样加载和部署
+</code></pre>
+<p><strong>合并 vs 不合并的取舍：</strong>
+- <strong>合并部署</strong>：推理时无额外开销，但每个任务需要一份完整模型
+- <strong>不合并部署</strong>：基座共享 + 动态加载 LoRA，适合多任务场景
+- <strong>多 LoRA 服务</strong>：S-LoRA、LoRAX 等框架支持单基座 + 数百个 LoRA 动态切换</p>
+<p><strong>注意事项：</strong> 合并后的模型无法再拆分回基座+LoRA。建议保留原始 LoRA 权重备份。QLoRA 合并需先反量化基座模型到 fp16/bf16。</p>
+<h3 id="18-多轮对话数据的loss-mask是什么">18. 多轮对话数据的loss mask是什么？</h3>
+<p><strong>答：</strong> 在多轮对话训练中，一条训练样本包含多轮 user-assistant 交替。Loss mask 决定了<strong>哪些 token 参与 loss 计算</strong>。</p>
+<p><strong>标准做法：只对 assistant 的回复计算 loss</strong></p>
+<pre><code>tokens:    [SYS] 你是AI助手 [USER] 你好 [ASST] 你好！ [USER] 天气呢？ [ASST] 今天晴天
+mask:        0    0  0  0     0    0  0    1    1  1     0    0   0      1    1   1  1
+                 不计算loss              计算loss              不计算loss      计算loss
+</code></pre>
+<p><strong>为什么要 mask？</strong>
+- 如果对 user 部分也计算 loss，模型会学着"生成用户说的话"，产生角色混乱
+- System prompt 也不应该被学习（它是条件，不是要生成的内容）
+- 只有 assistant 的回复才是模型需要学会生成的</p>
+<p><strong>实现方式：</strong></p>
+<pre><code class="language-python"># 构建 labels
+# 将 input 部分的 labels 设为 -100（CrossEntropyLoss 会忽略）
+labels = input_ids.clone()
+labels[user_token_positions] = -100
+labels[system_token_positions] = -100
+# 只保留 assistant 回复部分的 labels
+</code></pre>
+<p><strong>进阶策略：</strong>
+- <strong>权重衰减</strong>：后面轮次的 loss 权重更大（后面轮依赖前面的上下文，更难）
+- <strong>仅最后一轮 loss</strong>：适合"思考链"场景，防止中间推理步骤过拟合
+- <strong>Packing</strong>：多个样本拼接到一个序列中，需要更精细的 attention mask 防止跨样本注意力</p>
+<h3 id="19-指令微调和对齐微调有什么区别">19. 指令微调和对齐微调有什么区别？</h3>
+<p><strong>答：</strong></p>
+<p><strong>指令微调（Instruction Tuning）— 教模型"怎么做"：</strong>
+- 目标：让 base 模型学会遵循人类指令
+- 数据：(instruction, output) 对
+- 方法：标准 SFT
+- 效果：从"补全文本"变为"回答问题"
+- 类比：教一个聪明人如何理解和执行任务指令</p>
+<p><strong>对齐微调（Alignment）— 教模型"怎么做得好"：</strong>
+- 目标：让模型输出符合人类偏好和价值观
+- 数据：偏好对 (chosen, rejected)
+- 方法：RLHF、DPO、GRPO 等
+- 效果：从"能回答"变为"回答得好、安全、有用"
+- 类比：教一个能干活的人如何做得让人满意</p>
+<p><strong>关系与区别：</strong></p>
+<pre><code>预训练模型 → 指令微调(SFT) → 对齐微调(RLHF/DPO)
+&quot;会写字&quot;     &quot;会答题&quot;         &quot;答得好&quot;
+
+指令微调是基础，对齐微调是锦上添花。
+没有 SFT 直接做 RLHF 效果很差。
+只做 SFT 不做对齐，模型可用但不够&quot;好用&quot;。
+</code></pre>
+<p><strong>2025年趋势：</strong> 两者的边界在模糊化。ORPO 等方法将 SFT 和对齐合并为一步。DeepSeek-R1 证明了在某些场景下可以跳过 SFT 直接从 base 模型做 RL。但主流流程仍然是 SFT → 对齐的两步走。</p>
+<h3 id="20-2025年微调技术的前沿方向">20. 2025年微调技术的前沿方向？</h3>
+<p><strong>答：</strong></p>
+<p><strong>1. 推理时训练（Test-Time Training / Compute）：</strong>
+- 不再只依赖离线微调，推理时动态调整模型
+- 代表：o1/o3 的思维链搜索、DeepSeek-R1 的强化学习推理</p>
+<p><strong>2. 合成数据主导：</strong>
+- 高质量合成数据+自动过滤成为主流
+- Magpie、Persona-Hub 等自动从模型中"蒸馏"指令数据
+- RLAIF（用 AI 代替人类做偏好标注）成本降低 100×</p>
+<p><strong>3. 多模态微调：</strong>
+- 视觉-语言模型（VLM）的 LoRA 微调成为标配
+- 图片理解 + 视频理解 + 语音理解的统一微调
+- LLaVA-NeXT、Qwen2-VL 等开源多模态微调方案</p>
+<p><strong>4. 长上下文微调：</strong>
+- 128K-1M 上下文窗口的高效微调技术
+- Ring Attention、序列并行等分布式长序列训练
+- 位置编码外推（YaRN、NTK-aware）</p>
+<p><strong>5. MoE 模型微调：</strong>
+- Mixtral、DeepSeek-V3 等 MoE 架构的高效微调
+- 选择性专家微调、专家合并等新方法</p>
+<p><strong>6. Agent 专用微调：</strong>
+- 工具调用、多步推理、环境交互的专项微调
+- 从 trajectory data（Agent 轨迹数据）中学习
+- 强化学习 + 环境反馈的 Agent 训练（如 WebArena）</p>
+<p><strong>7. 联邦微调（Federated Fine-tuning）：</strong>
+- 数据不出域的分布式微调
+- 结合 LoRA 降低通信成本</p>
+<p><strong>8. 极端效率：</strong>
+- 1-bit LoRA、BitDelta 等极致压缩
+- 在手机/边缘设备上微调（如 Apple MLX on iPhone）
+- 训练-推理一体化优化</p>
+<hr>
+<blockquote>
+<p>📌 <strong>总结：</strong> 微调技术从2023年的"百花齐放"进入2025年的"标准化+前沿探索"阶段。LoRA/QLoRA + DPO 已成为行业标配，前沿方向聚焦于推理增强、多模态和 Agent 能力的训练。掌握本指南的内容，足以应对 2025 年 Agent 工程师面试中 90%+ 的微调相关问题。</p>
+</blockquote></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

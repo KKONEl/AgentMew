@@ -1,0 +1,127 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>美团 AI Agent 相关岗位要求（2025年） · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-034.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">美团/岗位要求.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E7%BE%8E%E5%9B%A2/%E5%B2%97%E4%BD%8D%E8%A6%81%E6%B1%82.md">GitHub 固定版本</a> · <a href="../../source/%E7%BE%8E%E5%9B%A2/%E5%B2%97%E4%BD%8D%E8%A6%81%E6%B1%82.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E5%B2%97%E4%BD%8D%E4%B8%80%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%AE%97%E6%B3%95%E5%B7%A5%E7%A8%8B%E5%B8%88">岗位一：大模型算法工程师</a><a href="#%E8%81%8C%E4%BD%8D%E6%8F%8F%E8%BF%B0">职位描述</a><a href="#%E6%8A%80%E6%9C%AF%E8%A6%81%E6%B1%82">技术要求</a><a href="#%E5%AD%A6%E5%8E%86%E8%A6%81%E6%B1%82">学历要求</a><a href="#%E8%96%AA%E8%B5%84%E8%8C%83%E5%9B%B4%E5%8F%82%E8%80%83">薪资范围（参考）</a><a href="#%E9%9D%A2%E8%AF%95%E4%BE%A7%E9%87%8D%E7%82%B9">面试侧重点</a><a href="#%E5%B2%97%E4%BD%8D%E4%BA%8Cai-agent%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91">岗位二：AI Agent应用开发</a><a href="#%E8%81%8C%E4%BD%8D%E6%8F%8F%E8%BF%B0_1">职位描述</a><a href="#%E6%8A%80%E6%9C%AF%E8%A6%81%E6%B1%82_1">技术要求</a><a href="#%E5%AD%A6%E5%8E%86%E8%A6%81%E6%B1%82_1">学历要求</a><a href="#%E8%96%AA%E8%B5%84%E8%8C%83%E5%9B%B4%E5%8F%82%E8%80%83_1">薪资范围（参考）</a><a href="#%E9%9D%A2%E8%AF%95%E4%BE%A7%E9%87%8D%E7%82%B9_1">面试侧重点</a><a href="#%E5%B2%97%E4%BD%8D%E4%B8%89ai-agent%E8%AF%84%E6%B5%8B%E5%B7%A5%E7%A8%8B%E5%B8%88">岗位三：AI Agent评测工程师</a><a href="#%E8%81%8C%E4%BD%8D%E6%8F%8F%E8%BF%B0_2">职位描述</a><a href="#%E6%8A%80%E6%9C%AF%E8%A6%81%E6%B1%82_2">技术要求</a><a href="#%E5%AD%A6%E5%8E%86%E8%A6%81%E6%B1%82_2">学历要求</a><a href="#%E8%96%AA%E8%B5%84%E8%8C%83%E5%9B%B4%E5%8F%82%E8%80%83_2">薪资范围（参考）</a><a href="#%E9%9D%A2%E8%AF%95%E4%BE%A7%E9%87%8D%E7%82%B9_2">面试侧重点</a><a href="#%E7%BE%8E%E5%9B%A2ai%E5%B2%97%E4%BD%8D%E5%85%B1%E5%90%8C%E7%89%B9%E7%82%B9">美团AI岗位共同特点</a><a href="#%E6%8A%80%E6%9C%AF%E6%A0%88">技术栈</a><a href="#%E7%89%B9%E6%AE%8A%E6%B5%81%E7%A8%8B">特殊流程</a><a href="#%E5%9B%A2%E9%98%9F%E6%96%87%E5%8C%96">团队文化</a><a href="#%E9%9D%A2%E8%AF%95%E6%B5%81%E7%A8%8B">面试流程</a></nav></details><article class="prose source-prose"><h1 id="美团-ai-agent-相关岗位要求2025年">美团 AI Agent 相关岗位要求（2025年）</h1>
+<hr>
+<h2 id="岗位一大模型算法工程师">岗位一：大模型算法工程师</h2>
+<h3 id="职位描述">职位描述</h3>
+<p>探索LLM前沿研究，参与美团大模型基座研发。工作内容包括数据建设、模型预训练、模型压缩、推理优化、逻辑推理、Agent、MoE、Scaling Law和模型评估等。</p>
+<h3 id="技术要求">技术要求</h3>
+<ul>
+<li>精通Python和PyTorch，有深度学习算法研发经验</li>
+<li>深入理解Transformer架构和主流大模型</li>
+<li>有预训练/微调/RLHF等大模型训练经验</li>
+<li>熟悉分布式训练和推理优化技术</li>
+<li>有推荐系统/搜索/NLP相关经验者优先</li>
+<li>有顶会论文者优先</li>
+</ul>
+<h3 id="学历要求">学历要求</h3>
+<ul>
+<li>硕士及以上学历，计算机/数学/统计相关专业</li>
+<li>校招要求985/211，博士优先</li>
+</ul>
+<h3 id="薪资范围参考">薪资范围（参考）</h3>
+<ul>
+<li>校招：30-50K × 15-16薪 + 股票期权</li>
+<li>社招L7：35-60K × 15-16薪 + 股票</li>
+<li>社招L8：50-80K × 15-16薪 + 股票</li>
+<li>美团已上市，股票可变现</li>
+</ul>
+<h3 id="面试侧重点">面试侧重点</h3>
+<ul>
+<li>Transformer各组件原理（RoPE/GQA/SwiGLU等）</li>
+<li>Scaling Laws和涌现能力</li>
+<li>解码策略（Greedy/Beam/Top-K/Top-P）</li>
+<li>分布式训练策略</li>
+<li>算法题Medium级别 + 系统设计</li>
+<li>项目经验和业务理解</li>
+</ul>
+<hr>
+<h2 id="岗位二ai-agent应用开发">岗位二：AI Agent应用开发</h2>
+<h3 id="职位描述_1">职位描述</h3>
+<p>将大模型和Agent技术应用于美团核心业务场景，包括智能客服、搜索增强、个人助理、商家工具等。负责Agent系统的设计、开发和优化。</p>
+<h3 id="技术要求_1">技术要求</h3>
+<ul>
+<li>精通Python/Java，有Web后端开发经验</li>
+<li>熟悉LangChain/LlamaIndex等Agent框架</li>
+<li>有RAG系统完整开发经验</li>
+<li>了解Function Calling和多Agent协作</li>
+<li>有生活服务/O2O领域经验者优先</li>
+<li>有推荐系统或搜索经验者优先</li>
+</ul>
+<h3 id="学历要求_1">学历要求</h3>
+<ul>
+<li>本科及以上学历，计算机相关专业</li>
+</ul>
+<h3 id="薪资范围参考_1">薪资范围（参考）</h3>
+<ul>
+<li>校招：25-40K × 15-16薪</li>
+<li>社招L7：30-55K × 15-16薪</li>
+<li>社招L8：45-75K × 15-16薪</li>
+</ul>
+<h3 id="面试侧重点_1">面试侧重点</h3>
+<ul>
+<li>Agent架构设计和ReAct框架</li>
+<li>Function Calling实现和优化</li>
+<li>美团业务场景下的Agent应用方案</li>
+<li>RAG系统评估方法</li>
+<li>计算机基础（网络/OS/数据库）+ 编码</li>
+<li>Java基础（如果是Java栈）</li>
+</ul>
+<hr>
+<h2 id="岗位三ai-agent评测工程师">岗位三：AI Agent评测工程师</h2>
+<h3 id="职位描述_2">职位描述</h3>
+<p>参与AI Agent的功能评测、用户体验测试及多场景测试。制定评测标准，设计和执行评测方案，进行数据分析与报告撰写。</p>
+<h3 id="技术要求_2">技术要求</h3>
+<ul>
+<li>熟悉Python，有自动化测试经验</li>
+<li>了解AI/大模型基本原理</li>
+<li>有数据分析能力（SQL/Excel/Python数据分析）</li>
+<li>有AB测试设计和分析经验者优先</li>
+<li>有QA/测试开发经验者优先</li>
+<li>良好的文档撰写和沟通能力</li>
+</ul>
+<h3 id="学历要求_2">学历要求</h3>
+<ul>
+<li>本科及以上学历</li>
+</ul>
+<h3 id="薪资范围参考_2">薪资范围（参考）</h3>
+<ul>
+<li>校招：20-35K × 15-16薪</li>
+<li>社招L6-L7：25-50K × 15-16薪</li>
+</ul>
+<h3 id="面试侧重点_2">面试侧重点</h3>
+<ul>
+<li>评测方案设计能力（覆盖率、边界case）</li>
+<li>数据分析能力（异常排查、指标分析）</li>
+<li>Agent基本概念理解</li>
+<li>测试框架和自动化测试经验</li>
+<li>沟通表达和逻辑思维</li>
+</ul>
+<hr>
+<h2 id="美团ai岗位共同特点">美团AI岗位共同特点</h2>
+<h3 id="技术栈">技术栈</h3>
+<ul>
+<li>编程语言：Java（后端主力）、Python（算法）、Go</li>
+<li>大模型：美团自研大模型 + 开源模型</li>
+<li>基础设施：K8s、Redis、MySQL、Kafka</li>
+<li>数据：Hive/Spark大数据处理</li>
+</ul>
+<h3 id="特殊流程">特殊流程</h3>
+<ul>
+<li><strong>AI面试</strong>：校招设有AI视频面试环节（15-30分钟）</li>
+<li>需要在牛客等平台完成AI面试，注意表现自然</li>
+</ul>
+<h3 id="团队文化">团队文化</h3>
+<ul>
+<li>工程文化强，注重代码质量和系统设计</li>
+<li>业务导向明确，技术要为业务创造价值</li>
+<li>工作强度中等（相比字节/华为相对balanced）</li>
+<li>技术博客（tech.meituan.com）质量高</li>
+</ul>
+<h3 id="面试流程">面试流程</h3>
+<ol>
+<li>简历筛选</li>
+<li>AI面试（校招）</li>
+<li>2-3轮技术面试</li>
+<li>主管面试</li>
+<li>HR面试
+- 周期：2-3周，效率较高</li>
+</ol></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

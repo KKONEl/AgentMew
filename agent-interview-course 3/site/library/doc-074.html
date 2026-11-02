@@ -1,0 +1,211 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>GitHub 热门 AI Agent 资源整理 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-074.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/GitHub热门Agent资源整理.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/GitHub%E7%83%AD%E9%97%A8Agent%E8%B5%84%E6%BA%90%E6%95%B4%E7%90%86.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/GitHub%E7%83%AD%E9%97%A8Agent%E8%B5%84%E6%BA%90%E6%95%B4%E7%90%86.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80%E9%9D%A2%E8%AF%95-%E9%9D%A2%E7%BB%8F%E4%B8%93%E9%A1%B9%E4%BB%93%E5%BA%93">一、面试 &amp; 面经专项仓库</a><a href="#1-datawhalechinahello-agents-317k">1. datawhalechina/hello-agents ⭐ 31.7K</a><a href="#2-adongwanaiagentguide-30k">2. adongwanai/AgentGuide ⭐ 3.0K</a><a href="#3-lau-jonathanllm-agent-interview-guide-153">3. Lau-Jonathan/LLM-Agent-Interview-Guide ⭐ 153</a><a href="#4-summerjavaawesome_agent_dev-184">4. summerjava/Awesome_Agent_Dev ⭐ 184</a><a href="#5-llmgenaillminterviewquestions-17k">5. llmgenai/LLMInterviewQuestions ⭐ 1.7K</a><a href="#6-alexeygrigorevai-engineering-field-guide-19k">6. alexeygrigorev/ai-engineering-field-guide ⭐ 1.9K</a><a href="#7-alirezadirmachine-learning-interviews-80k">7. alirezadir/machine-learning-interviews ⭐ 8.0K</a><a href="#%E4%BA%8Cagent-%E7%9F%A5%E8%AF%86%E5%BA%93-%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90">二、Agent 知识库 &amp; 学习资源</a><a href="#8-nirdiamantgenai_agents-208k">8. NirDiamant/genai_agents ⭐ 20.8K</a><a href="#9-e2b-devawesome-ai-agents-269k">9. e2b-dev/awesome-ai-agents ⭐ 26.9K</a><a href="#10-ashishpatel26500-ai-agents-projects-274k">10. ashishpatel26/500-AI-Agents-Projects ⭐ 27.4K</a><a href="#11-voltagentawesome-ai-agent-papers-399">11. VoltAgent/awesome-ai-agent-papers ⭐ 399</a><a href="#%E4%B8%89%E6%A0%B8%E5%BF%83%E6%A1%86%E6%9E%B6%E9%9D%A2%E8%AF%95%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A">三、核心框架（面试必知必会）</a><a href="#%E5%9B%9B%E6%8E%A8%E8%8D%90%E5%AD%A6%E4%B9%A0%E8%B7%AF%E5%BE%84">四、推荐学习路径</a><a href="#%E9%9D%A2%E8%AF%95%E5%86%B2%E5%88%BA1-2-%E5%91%A8">面试冲刺（1-2 周）</a><a href="#%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A03-4-%E5%91%A8">深度学习（3-4 周）</a><a href="#%E4%BA%94%E6%88%91%E4%BB%AC%E7%9A%84%E4%BC%98%E5%8A%BF%E5%AF%B9%E6%AF%94">五、我们的优势对比</a></nav></details><article class="prose source-prose"><h1 id="github-热门-ai-agent-资源整理">GitHub 热门 AI Agent 资源整理</h1>
+<blockquote>
+<p>整理于 2026-03-28，收录 GitHub 上与 AI Agent 开发、面试、学习最相关的高星仓库。</p>
+</blockquote>
+<hr>
+<h2 id="一面试-面经专项仓库">一、面试 &amp; 面经专项仓库</h2>
+<h3 id="1-datawhalechinahello-agents-317k">1. datawhalechina/hello-agents ⭐ 31.7K</h3>
+<ul>
+<li><strong>链接</strong>：https://github.com/datawhalechina/hello-agents</li>
+<li><strong>简介</strong>：《从零开始构建智能体》，DataWhale 出品的智能体原理与实践教程</li>
+<li><strong>亮点</strong>：从基础到进阶，附带面试问题总结和参考答案（Extra-Chapter 目录下）</li>
+<li><strong>适合</strong>：系统学习 Agent 开发 + 面试复习</li>
+</ul>
+<h3 id="2-adongwanaiagentguide-30k">2. adongwanai/AgentGuide ⭐ 3.0K</h3>
+<ul>
+<li><strong>链接</strong>：https://github.com/adongwanai/AgentGuide</li>
+<li><strong>简介</strong>：AI Agent 开发 × 面试求职一站式解决方案，对标 JavaGuide</li>
+<li><strong>亮点</strong>：LangGraph 实战、高级 RAG、1000+ 面试题、真实面经案例集锦、大厂面经分类</li>
+<li><strong>适合</strong>：Agent 工程师求职的"圣经级"仓库</li>
+</ul>
+<h3 id="3-lau-jonathanllm-agent-interview-guide-153">3. Lau-Jonathan/LLM-Agent-Interview-Guide ⭐ 153</h3>
+<ul>
+<li><strong>链接</strong>：https://github.com/Lau-Jonathan/LLM-Agent-Interview-Guide</li>
+<li><strong>简介</strong>：大模型 &amp; Agent 面试八股文完全指南</li>
+<li><strong>亮点</strong>：包含字节、阿里、腾讯等大厂真题，结构化整理</li>
+<li><strong>适合</strong>：快速过一遍面试八股</li>
+</ul>
+<h3 id="4-summerjavaawesome_agent_dev-184">4. summerjava/Awesome_Agent_Dev ⭐ 184</h3>
+<ul>
+<li><strong>链接</strong>：https://github.com/summerjava/Awesome_Agent_Dev</li>
+<li><strong>简介</strong>：AI Agent 工程师学习面试大全（Agent Dev Roadmap）</li>
+<li><strong>亮点</strong>：作者亲自面试获取的第一手面经，含学习路线图</li>
+<li><strong>适合</strong>：想看真实面试反馈的同学</li>
+</ul>
+<h3 id="5-llmgenaillminterviewquestions-17k">5. llmgenai/LLMInterviewQuestions ⭐ 1.7K</h3>
+<ul>
+<li><strong>链接</strong>：https://github.com/llmgenai/LLMInterviewQuestions</li>
+<li><strong>简介</strong>：100+ 道 LLM 面试题，来自头部公司</li>
+<li><strong>亮点</strong>：覆盖 Transformer、微调、RAG、推理优化等核心考点</li>
+<li><strong>适合</strong>：LLM 基础知识快速复习</li>
+</ul>
+<h3 id="6-alexeygrigorevai-engineering-field-guide-19k">6. alexeygrigorev/ai-engineering-field-guide ⭐ 1.9K</h3>
+<ul>
+<li><strong>链接</strong>：https://github.com/alexeygrigorev/ai-engineering-field-guide</li>
+<li><strong>简介</strong>：AI 工程面试实战指南，覆盖面试流程、笔试题、系统设计</li>
+<li><strong>亮点</strong>：真实公司的 take-home 挑战和面试流程拆解</li>
+<li><strong>适合</strong>：了解海外 AI 工程师面试流程</li>
+</ul>
+<h3 id="7-alirezadirmachine-learning-interviews-80k">7. alirezadir/machine-learning-interviews ⭐ 8.0K</h3>
+<ul>
+<li><strong>链接</strong>：https://github.com/alirezadir/machine-learning-interviews</li>
+<li><strong>简介</strong>：ML/AI 技术面试指南</li>
+<li><strong>亮点</strong>：2025 新增 Agentic AI Systems 专题，系统设计部分很强</li>
+<li><strong>适合</strong>：ML 基础 + Agent 方向双修</li>
+</ul>
+<hr>
+<h2 id="二agent-知识库-学习资源">二、Agent 知识库 &amp; 学习资源</h2>
+<h3 id="8-nirdiamantgenai_agents-208k">8. NirDiamant/genai_agents ⭐ 20.8K</h3>
+<ul>
+<li><strong>链接</strong>：https://github.com/NirDiamant/genai_agents</li>
+<li><strong>简介</strong>：各类 GenAI Agent 技术的教程和实现合集</li>
+<li><strong>亮点</strong>：每个 Agent 模式都有完整教程 + 代码实现，从 ReAct 到多 Agent 协作</li>
+<li><strong>适合</strong>：边学边写代码，面试前快速上手各种 Agent 模式</li>
+</ul>
+<h3 id="9-e2b-devawesome-ai-agents-269k">9. e2b-dev/awesome-ai-agents ⭐ 26.9K</h3>
+<ul>
+<li><strong>链接</strong>：https://github.com/e2b-dev/awesome-ai-agents</li>
+<li><strong>简介</strong>：AI 自主 Agent 项目大全</li>
+<li><strong>亮点</strong>：收录了几乎所有主流 Agent 项目，按类别分类（编程、研究、数据分析等）</li>
+<li><strong>适合</strong>：了解 Agent 生态全貌，面试时聊行业认知</li>
+</ul>
+<h3 id="10-ashishpatel26500-ai-agents-projects-274k">10. ashishpatel26/500-AI-Agents-Projects ⭐ 27.4K</h3>
+<ul>
+<li><strong>链接</strong>：https://github.com/ashishpatel26/500-AI-Agents-Projects</li>
+<li><strong>简介</strong>：500 个跨行业 AI Agent 用例集合</li>
+<li><strong>亮点</strong>：按行业分类（金融、医疗、教育、客服等），每个都有开源链接</li>
+<li><strong>适合</strong>：找项目灵感、了解 Agent 的实际落地场景</li>
+</ul>
+<h3 id="11-voltagentawesome-ai-agent-papers-399">11. VoltAgent/awesome-ai-agent-papers ⭐ 399</h3>
+<ul>
+<li><strong>链接</strong>：https://github.com/VoltAgent/awesome-ai-agent-papers</li>
+<li><strong>简介</strong>：2026 年 AI Agent 研究论文精选</li>
+<li><strong>亮点</strong>：覆盖多 Agent 协调、记忆与 RAG、工具使用、评估、安全等核心主题</li>
+<li><strong>适合</strong>：面试前看几篇论文提升深度</li>
+</ul>
+<hr>
+<h2 id="三核心框架面试必知必会">三、核心框架（面试必知必会）</h2>
+<table>
+<thead>
+<tr>
+<th>框架</th>
+<th>Stars</th>
+<th>一句话定位</th>
+<th>面试重点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/langchain-ai/langchain" rel="noreferrer">LangChain</a></td>
+<td>131K</td>
+<td>Agent 工程平台，最主流的 LLM 应用框架</td>
+<td>Chain/Agent/Tool 架构、LCEL、与 LangGraph 的区别</td>
+</tr>
+<tr>
+<td><a href="https://github.com/microsoft/autogen" rel="noreferrer">AutoGen</a></td>
+<td>56K</td>
+<td>微软多 Agent 对话框架</td>
+<td>多 Agent 编排、对话模式、代码执行沙箱</td>
+</tr>
+<tr>
+<td><a href="https://github.com/crewAIInc/crewAI" rel="noreferrer">CrewAI</a></td>
+<td>47K</td>
+<td>角色扮演式多 Agent 协作</td>
+<td>Agent/Task/Crew 三层抽象、角色定义、任务分配</td>
+</tr>
+<tr>
+<td><a href="https://github.com/langchain-ai/langgraph" rel="noreferrer">LangGraph</a></td>
+<td>10K+</td>
+<td>基于图的 Agent 编排框架</td>
+<td>State/Node/Edge、循环控制、Human-in-the-loop</td>
+</tr>
+<tr>
+<td><a href="https://github.com/langgenius/dify" rel="noreferrer">Dify</a></td>
+<td>114K+</td>
+<td>生产级 Agent 工作流平台</td>
+<td>可视化编排、RAG 集成、API 部署</td>
+</tr>
+<tr>
+<td><a href="https://github.com/openai/openai-agents-python" rel="noreferrer">OpenAI Agents SDK</a></td>
+<td>18K</td>
+<td>OpenAI 官方 Agent SDK</td>
+<td>Handoff、Guardrails、Tracing</td>
+</tr>
+<tr>
+<td><a href="https://github.com/google/adk-python" rel="noreferrer">Google ADK</a></td>
+<td>16.8K</td>
+<td>Google Agent 开发套件</td>
+<td>与 Gemini 集成、多 Agent 协调</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="四推荐学习路径">四、推荐学习路径</h2>
+<h3 id="面试冲刺1-2-周">面试冲刺（1-2 周）</h3>
+<ol>
+<li><strong>AgentGuide</strong> → 过一遍面试题库和大厂面经</li>
+<li><strong>hello-agents</strong> → 看面试问题总结 + 参考答案</li>
+<li><strong>LLM-Agent-Interview-Guide</strong> → 八股文查漏补缺</li>
+<li>我们的 <strong>agent-interview-hub</strong> → 9 家大厂真实面经 + 300 道题</li>
+</ol>
+<h3 id="深度学习3-4-周">深度学习（3-4 周）</h3>
+<ol>
+<li><strong>genai_agents</strong> → 每个 Agent 模式写一遍代码</li>
+<li><strong>awesome-ai-agent-papers</strong> → 精读 3-5 篇核心论文</li>
+<li>动手用 LangGraph + CrewAI 各做一个项目</li>
+<li>看 <strong>500-AI-Agents-Projects</strong> 找行业场景灵感</li>
+</ol>
+<hr>
+<h2 id="五我们的优势对比">五、我们的优势对比</h2>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>agent-interview-hub（本仓库）</th>
+<th>AgentGuide</th>
+<th>hello-agents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>大厂覆盖</td>
+<td>9 家（阿里/字节/百度/腾讯/小红书/美团/蚂蚁/华为/快手）</td>
+<td>多家但非系统化</td>
+<td>无</td>
+</tr>
+<tr>
+<td>真实面经</td>
+<td>✅ 牛客实录</td>
+<td>✅ 案例集</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>项目实战模板</td>
+<td>✅ 3 个完整项目（RAG/多Agent/生产级）</td>
+<td>✅ LangGraph 实战</td>
+<td>✅ 教程项目</td>
+</tr>
+<tr>
+<td>答案完整度</td>
+<td>✅ 300+ 题全带答案</td>
+<td>✅</td>
+<td>部分</td>
+</tr>
+<tr>
+<td>学习路线</td>
+<td>✅ 16 周计划</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>在线浏览</td>
+<td>✅ GitHub Pages</td>
+<td>✅ 文档站</td>
+<td>❌</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<blockquote>
+<p>💡 <strong>建议</strong>：把 AgentGuide 和 hello-agents 作为补充资料，它们在 LangGraph 实战教程和基础原理讲解上比我们更详细；我们的强项是大厂针对性面经和系统设计题。</p>
+</blockquote></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

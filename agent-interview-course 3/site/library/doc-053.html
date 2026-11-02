@@ -1,0 +1,169 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>2026-10 安全与治理面试题与参考答案 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-053.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/2026-10-安全与治理面试题与参考答案.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/18-security-governance.html">18 安全治理、注入防护与工具权限</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-%E5%AE%89%E5%85%A8%E4%B8%8E%E6%B2%BB%E7%90%86%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-%E5%AE%89%E5%85%A8%E4%B8%8E%E6%B2%BB%E7%90%86%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F">使用方式</a><a href="#89-%E6%A3%80%E7%B4%A2%E6%96%87%E6%A1%A3%E5%A4%B9%E5%B8%A6%E8%B6%8A%E6%9D%83%E6%8C%87%E4%BB%A4%E6%97%B6%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%AA%E5%BC%BA%E5%8C%96%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E4%BB%8D%E4%B8%8D%E5%A4%9F">89. 检索文档夹带越权指令时，为什么只强化系统提示词仍不够？</a><a href="#90-%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9E%8B%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81%E6%97%B6%E6%B2%99%E7%AE%B1%E5%BA%94%E9%99%90%E5%88%B6%E5%93%AA%E4%BA%9B%E8%B5%84%E6%BA%90%E5%92%8C%E8%AE%BF%E9%97%AE%E8%83%BD%E5%8A%9B">90. 执行模型生成代码时，沙箱应限制哪些资源和访问能力？</a><a href="#91-%E5%A4%9A%E7%A7%9F%E6%88%B7%E5%85%B1%E4%BA%AB%E8%BF%90%E8%A1%8C%E5%B9%B3%E5%8F%B0%E6%97%B6%E6%A8%A1%E5%9E%8B%E8%B0%83%E7%94%A8%E5%92%8C%E4%BB%A3%E7%A0%81%E6%B2%99%E7%AE%B1%E5%A6%82%E4%BD%95%E5%88%86%E5%88%AB%E9%9A%94%E7%A6%BB">91. 多租户共享运行平台时，模型调用和代码沙箱如何分别隔离？</a><a href="#92-%E6%84%8F%E5%9B%BE%E8%AF%86%E5%88%AB%E5%87%86%E7%A1%AE%E7%8E%87%E5%B7%B2%E6%9C%89%E6%8F%90%E5%8D%87%E4%BB%8D%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D%E9%AB%98%E9%A3%8E%E9%99%A9%E5%8A%A8%E4%BD%9C%E8%A2%AB%E8%AF%AF%E8%A7%A6%E5%8F%91">92. 意图识别准确率已有提升，仍如何避免高风险动作被误触发？</a><a href="#93-%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%89%B9%E6%94%BE%E5%9C%A8%E8%A7%84%E5%88%92%E5%8F%82%E6%95%B0%E7%A1%AE%E8%AE%A4%E8%BF%98%E6%98%AF%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E5%90%84%E6%9C%89%E4%BB%80%E4%B9%88%E8%BE%B9%E7%95%8C">93. 人工审批放在规划、参数确认还是执行阶段，各有什么边界？</a><a href="#94-%E9%AB%98%E5%90%88%E8%A7%84%E5%9C%BA%E6%99%AF%E4%B8%8B%E6%80%8E%E6%A0%B7%E9%AA%8C%E8%AF%81%E6%A8%A1%E5%9E%8B%E6%B2%A1%E6%9C%89%E7%BB%95%E8%BF%87-skill-%E7%BA%A6%E6%9D%9F%E6%89%A7%E8%A1%8C%E6%93%8D%E4%BD%9C">94. 高合规场景下，怎样验证模型没有绕过 Skill 约束执行操作？</a><a href="#95-%E7%90%86%E8%B5%94-agent-%E9%9D%A2%E5%AF%B9%E6%9D%90%E6%96%99%E7%BC%BA%E5%A4%B1%E5%8F%A3%E5%BE%84%E5%8F%8D%E5%A4%8D%E6%88%96%E9%87%91%E9%A2%9D%E7%9F%9B%E7%9B%BE%E6%97%B6%E4%BD%95%E6%97%B6%E5%BF%85%E9%A1%BB%E8%BD%AC%E4%BA%BA%E5%B7%A5">95. 理赔 Agent 面对材料缺失、口径反复或金额矛盾时，何时必须转人工？</a><a href="#96-%E9%87%91%E8%9E%8D%E4%B8%9A%E5%8A%A1%E5%8F%91%E7%94%9F%E9%94%99%E8%AF%AF%E6%89%A7%E8%A1%8C%E5%90%8E%E6%80%8E%E6%A0%B7%E4%BF%9D%E7%95%99%E5%8F%AF%E7%94%A8%E4%BA%8E%E8%BF%BD%E8%B4%A3%E7%9A%84%E5%86%B3%E7%AD%96%E4%B8%8E%E6%89%A7%E8%A1%8C%E8%AF%81%E6%8D%AE">96. 金融业务发生错误执行后，怎样保留可用于追责的决策与执行证据？</a><a href="#97-%E7%94%A8%E6%88%B7%E8%AF%95%E5%9B%BE%E8%AF%B1%E5%AF%BC%E7%B3%BB%E7%BB%9F%E6%B3%84%E9%9C%B2%E5%86%85%E9%83%A8%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%97%B6%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E6%B5%8B%E8%AF%95%E5%B9%B6%E8%AF%B4%E6%98%8E%E9%98%B2%E6%8A%A4%E8%BE%B9%E7%95%8C">97. 用户试图诱导系统泄露内部提示词时，如何设计测试并说明防护边界？</a><a href="#98-%E4%BD%A0%E4%BC%9A%E6%80%8E%E6%A0%B7%E8%AF%81%E6%98%8E%E4%B8%80%E6%AC%A1%E5%B7%A5%E5%85%B7%E6%93%8D%E4%BD%9C%E5%8F%AF%E5%AE%A1%E8%AE%A1%E8%80%8C%E4%B8%8D%E5%8F%AA%E6%98%AF%E6%97%A5%E5%BF%97%E9%87%8C%E5%87%BA%E7%8E%B0%E4%BA%86%E5%B7%A5%E5%85%B7%E5%90%8D%E7%A7%B0">98. 你会怎样证明一次工具操作可审计，而不只是日志里出现了工具名称？</a></nav></details><article class="prose source-prose"><h1 id="2026-10-安全与治理面试题与参考答案">2026-10 安全与治理面试题与参考答案</h1>
+<blockquote>
+<p>来源快照：2026-10-22；答案整理：2026-10-23。此次迁入不代表重新抓取。
+本批题目按公开面经报道主题改写，是练习题，不是公司官方真题；答案为编辑综合参考，未经独立专家逐题复核，不是公司标准答案。</p>
+</blockquote>
+<p><a href="doc-048.html">返回本批索引</a> · <a href="doc-047.html">来源分级与资料</a></p>
+<h2 id="使用方式">使用方式</h2>
+<p>先独立回答，再对照得分点、追问和易错点。难度为编辑估计，非公司定级。
+公司标签只表示来源报道过相关主题，不证明逐字问过本题。B 仅代表曾找到原帖，不保证全文可读、作者亲历或题目真实；C 为待核验聚合线索。</p>
+<p><a id="Q-e124f9a2179c"></a></p>
+<h2 id="89-检索文档夹带越权指令时为什么只强化系统提示词仍不够">89. 检索文档夹带越权指令时，为什么只强化系统提示词仍不够？</h2>
+<p><strong>题目 ID</strong>：<code>Q-e124f9a2179c</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：vivo</p>
+<p><strong>参考答案</strong></p>
+<p>注入把不受信材料伪装成控制指令，提示词只能降低风险，不能当作强制授权。需分隔数据与指令、收缩工具能力、执行时鉴权与审批、控制外发并对抗测试。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>检索结果没有系统权限</li>
+<li>把最坏行为限制在最小作用域</li>
+</ul>
+<p><strong>追问</strong>：模型仍被诱导时哪层负责阻断操作？</p>
+<p><strong>易错点</strong>：不能承诺某一句提示词能彻底防住注入。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932565368587976704?sourceSSR=post" rel="noreferrer">INT-4aea8e37ae</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/" rel="noreferrer">INJECTION：OWASP LLM01: Prompt Injection</a>；<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a></p>
+<hr>
+<p><a id="Q-684e7c1b76b2"></a></p>
+<h2 id="90-执行模型生成代码时沙箱应限制哪些资源和访问能力">90. 执行模型生成代码时，沙箱应限制哪些资源和访问能力？</h2>
+<p><strong>题目 ID</strong>：<code>Q-684e7c1b76b2</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动、百度</p>
+<p><strong>参考答案</strong></p>
+<p>按风险隔离进程或更强沙箱，限制 CPU、内存、进程、磁盘、时间及网络出口；只暴露任务所需文件和短期凭据。记录执行物与结果，任务结束清理，更新沙箱组件。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>容器不等于绝对安全边界</li>
+<li>限制宿主挂载和特权</li>
+</ul>
+<p><strong>追问</strong>：恶意程序疯狂 fork 或向内网探测如何阻止？</p>
+<p><strong>易错点</strong>：代码通过静态检查仍不能代替运行时隔离。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939623386806751232?sourceSSR=post" rel="noreferrer">INT-2bfa666e65</a>（B：曾定位公开原帖）；<a href="https://www.nowcoder.com/discuss/938540748394217472?sourceSSR=post" rel="noreferrer">INT-15d1d6b299</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://gvisor.dev/docs/architecture_guide/intro/" rel="noreferrer">SANDBOX：gVisor architecture guide</a>；<a href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/" rel="noreferrer">INJECTION：OWASP LLM01: Prompt Injection</a></p>
+<hr>
+<p><a id="Q-268ff8a24a12"></a></p>
+<h2 id="91-多租户共享运行平台时模型调用和代码沙箱如何分别隔离">91. 多租户共享运行平台时，模型调用和代码沙箱如何分别隔离？</h2>
+<p><strong>题目 ID</strong>：<code>Q-268ff8a24a12</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：小米</p>
+<p><strong>参考答案</strong></p>
+<p>模型网关按租户鉴权、配额、密钥和日志权限隔离；沙箱另管文件系统、进程、网络与资源池。所有产物、缓存及存储键均带租户作用域，阻止跨租户复用敏感状态。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>计算隔离与数据隔离分别测试</li>
+<li>共享池回收前验证清理</li>
+</ul>
+<p><strong>追问</strong>：复用一个热沙箱可能泄漏什么？</p>
+<p><strong>易错点</strong>：数据库隔离了，工作目录和缓存仍可能串租户。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938541088820695040?sourceSSR=post" rel="noreferrer">INT-91419e91fb</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://gvisor.dev/docs/architecture_guide/intro/" rel="noreferrer">SANDBOX：gVisor architecture guide</a>；<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a></p>
+<hr>
+<p><a id="Q-fde3165e4e19"></a></p>
+<h2 id="92-意图识别准确率已有提升仍如何避免高风险动作被误触发">92. 意图识别准确率已有提升，仍如何避免高风险动作被误触发？</h2>
+<p><strong>题目 ID</strong>：<code>Q-fde3165e4e19</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：美团</p>
+<p><strong>参考答案</strong></p>
+<p>把“识别到意图”与“获准执行”分开：高风险操作校验对象和业务条件，展示结构化变更并二次确认，提交时检查审批范围与版本。用风险加权指标评估误触发，而非仅平均准确率。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>默认最小权限</li>
+<li>不可逆操作更严格</li>
+</ul>
+<p><strong>追问</strong>：确认界面与最终执行参数不同如何防止？</p>
+<p><strong>易错点</strong>：总体准确率提高不能证明危险误触发已可接受。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/meituan-fullstack-first-round-931526208536182784/" rel="noreferrer">INT-0f90bd85b5</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a>；<a href="https://docs.langchain.com/oss/python/langgraph/interrupts" rel="noreferrer">INTERRUPT：LangGraph interrupts and idempotent side effects</a></p>
+<hr>
+<p><a id="Q-a4cc7dccb56a"></a></p>
+<h2 id="93-人工审批放在规划参数确认还是执行阶段各有什么边界">93. 人工审批放在规划、参数确认还是执行阶段，各有什么边界？</h2>
+<p><strong>题目 ID</strong>：<code>Q-a4cc7dccb56a</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：九方智投</p>
+<p><strong>参考答案</strong></p>
+<p>规划审批确认目的和边界，参数确认约束具体动作，执行前再校验主体权限、资源版本与有效期。越靠前越适合授权范围，越靠近提交越能防止参数与状态变化。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>审批绑定动作指纹</li>
+<li>变更后重批，支持撤销</li>
+</ul>
+<p><strong>追问</strong>：用户批准后 Agent 又改了一个参数怎么办？</p>
+<p><strong>易错点</strong>：一次模糊的“同意继续”不应授权所有后续高风险操作。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/jiufangzhitou-agent-dev-first-round-2916834/" rel="noreferrer">INT-fef75911f3</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/interrupts" rel="noreferrer">INTERRUPT：LangGraph interrupts and idempotent side effects</a>；<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a></p>
+<hr>
+<p><a id="Q-c82aec2c5e88"></a></p>
+<h2 id="94-高合规场景下怎样验证模型没有绕过-skill-约束执行操作">94. 高合规场景下，怎样验证模型没有绕过 Skill 约束执行操作？</h2>
+<p><strong>题目 ID</strong>：<code>Q-c82aec2c5e88</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：快手</p>
+<p><strong>参考答案</strong></p>
+<p>将必须遵守的规则编码为执行策略、状态机和权限检查，Skill 只提供指导。用越权工具、变更参数、跨租户、审批绕过和恢复重放的负向测试验证，并审计实际回执。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>覆盖所有执行入口</li>
+<li>说明未知风险与独立审核范围</li>
+</ul>
+<p><strong>追问</strong>：模型遵守了文字流程却调用了错误资源怎么办？</p>
+<p><strong>易错点</strong>：没有发现越权不是形式化安全证明。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938541475766206464?sourceSSR=post" rel="noreferrer">INT-bbcb367aed</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/" rel="noreferrer">INJECTION：OWASP LLM01: Prompt Injection</a>；<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a></p>
+<hr>
+<p><a id="Q-2e3279463eb1"></a></p>
+<h2 id="95-理赔-agent-面对材料缺失口径反复或金额矛盾时何时必须转人工">95. 理赔 Agent 面对材料缺失、口径反复或金额矛盾时，何时必须转人工？</h2>
+<p><strong>题目 ID</strong>：<code>Q-2e3279463eb1</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：小米</p>
+<p><strong>参考答案</strong></p>
+<p>把理赔条件、材料要求与金额计算交给经审核的规则和权威系统；材料矛盾、身份不明、超权限或规则不能确定时暂停并转人工，保留证据和原结论版本。具体阈值由业务与合规确定。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>模型用于收集、解释和辅助</li>
+<li>不自行承诺拒赔或赔付</li>
+</ul>
+<p><strong>追问</strong>：用户改口后之前的结论怎样撤销？</p>
+<p><strong>易错点</strong>：本答案是工程设计，不是保险理赔规则或法律意见。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/940357369693810688?sourceSSR=post" rel="noreferrer">INT-6c63a24bd2</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a></p>
+<hr>
+<p><a id="Q-14148b7dd4a9"></a></p>
+<h2 id="96-金融业务发生错误执行后怎样保留可用于追责的决策与执行证据">96. 金融业务发生错误执行后，怎样保留可用于追责的决策与执行证据？</h2>
+<p><strong>题目 ID</strong>：<code>Q-14148b7dd4a9</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：小米</p>
+<p><strong>参考答案</strong></p>
+<p>记录可信主体、授权/审批版本、输入来源、规则与模型版本、动作意图、参数摘要、资源版本、回执和时间；访问受控并使用防篡改存储策略。追责仍需组织流程及合规认定。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>脱敏、留存与删除按业务要求</li>
+<li>保留结果未知和人工介入</li>
+</ul>
+<p><strong>追问</strong>：只有模型说“批准了”，能当有效授权吗？</p>
+<p><strong>易错点</strong>：不能承诺普通日志或一个哈希就天然不可篡改。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/940357369693810688?sourceSSR=post" rel="noreferrer">INT-6c63a24bd2</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a></p>
+<hr>
+<p><a id="Q-87672c7f8b3d"></a></p>
+<h2 id="97-用户试图诱导系统泄露内部提示词时如何设计测试并说明防护边界">97. 用户试图诱导系统泄露内部提示词时，如何设计测试并说明防护边界？</h2>
+<p><strong>题目 ID</strong>：<code>Q-87672c7f8b3d</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>覆盖直接索取、角色伪装、翻译编码、检索注入和多轮诱导；测是否泄露受保护内容或触发敏感工具。关键秘密不放入提示词，权限独立控制，报告剩余风险。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>测试拒答之外的工具行为</li>
+<li>对日志和检索也防泄漏</li>
+</ul>
+<p><strong>追问</strong>：提示词不可泄露是否应作为唯一防线？</p>
+<p><strong>易错点</strong>：无法把所有提示词当作可靠保密容器。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939623386806751232?sourceSSR=post" rel="noreferrer">INT-2bfa666e65</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/" rel="noreferrer">INJECTION：OWASP LLM01: Prompt Injection</a></p>
+<hr>
+<p><a id="Q-74a84fb57ccb"></a></p>
+<h2 id="98-你会怎样证明一次工具操作可审计而不只是日志里出现了工具名称">98. 你会怎样证明一次工具操作可审计，而不只是日志里出现了工具名称？</h2>
+<p><strong>题目 ID</strong>：<code>Q-74a84fb57ccb</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：作业帮</p>
+<p><strong>参考答案</strong></p>
+<p>把动作提议、校验、审批、真实执行和结果提交分开记录，通过任务/操作 ID 及外部回执串联；证据可校验主体、参数和状态变化，并能回放或查询确认。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>处理重试、失败和未知结果</li>
+<li>敏感字段最小化保存</li>
+</ul>
+<p><strong>追问</strong>：日志显示成功但业务状态没变，信哪一个？</p>
+<p><strong>易错点</strong>：记录工具名称而无授权与业务回执不足以审计。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/zuoyebang-agent-dev-first-round-2916240/" rel="noreferrer">INT-aa5fb6e122</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a>；<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

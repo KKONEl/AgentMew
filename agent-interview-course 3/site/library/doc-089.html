@@ -1,0 +1,178 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>自进化 Agent 与 Skill 生命周期 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-089.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/自进化Agent与Skill生命周期.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/23-framework-selection.html">23 框架与平台选型：职责、恢复契约和 Skill 生命周期</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/%E8%87%AA%E8%BF%9B%E5%8C%96Agent%E4%B8%8ESkill%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/%E8%87%AA%E8%BF%9B%E5%8C%96Agent%E4%B8%8ESkill%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80%E8%87%AA%E8%BF%9B%E5%8C%96%E4%B8%8D%E7%AD%89%E4%BA%8E%E5%85%81%E8%AE%B8-agent-%E9%9A%8F%E6%84%8F%E4%BF%AE%E6%94%B9%E8%87%AA%E5%B7%B1">一、自进化不等于允许 Agent 随意修改自己</a><a href="#%E4%BA%8C%E7%BB%8F%E9%AA%8C%E5%BA%94%E8%AF%A5%E5%86%99%E5%88%B0%E5%93%AA%E9%87%8C">二、经验应该写到哪里</a><a href="#%E4%B8%89candidate-%E5%88%B0%E6%AD%A3%E5%BC%8F%E8%B5%84%E4%BA%A7">三、Candidate 到正式资产</a><a href="#%E5%9B%9Bcurator-%E7%9A%84%E8%81%8C%E8%B4%A3">四、Curator 的职责</a><a href="#%E4%BA%94skill-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F">五、Skill 生命周期</a><a href="#%E5%85%AD%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D%E9%94%99%E8%AF%AF%E7%BB%8F%E9%AA%8C%E5%9B%BA%E5%8C%96">六、如何避免错误经验固化</a><a href="#%E4%B8%83context-evolution">七、Context Evolution</a><a href="#%E5%85%AB%E5%90%8E%E5%8F%B0%E5%A4%8D%E7%9B%98%E4%BB%BB%E5%8A%A1">八、后台复盘任务</a><a href="#%E4%B9%9Dagentic-rl-%E7%9A%84%E8%BF%9E%E6%8E%A5%E7%82%B9">九、Agentic RL 的连接点</a><a href="#%E5%8D%81%E9%AB%98%E9%A2%91%E9%9D%A2%E8%AF%95%E9%A2%98">十、高频面试题</a></nav></details><article class="prose source-prose"><h1 id="自进化-agent-与-skill-生命周期">自进化 Agent 与 Skill 生命周期</h1>
+<h2 id="一自进化不等于允许-agent-随意修改自己">一、自进化不等于允许 Agent 随意修改自己</h2>
+<p>安全的自进化是把任务经验变成受控知识资产：</p>
+<pre><code class="language-text">Task → Trace → Reflection → Candidate
+                           ├─ Memory
+                           ├─ Skill
+                           ├─ Policy
+                           └─ Eval Case
+                                ↓
+                    Review / Version / Rollback
+</code></pre>
+<p>系统改变的不是模型权重本身，而可能是上下文、记忆、技能、路由策略和评测集。</p>
+<h2 id="二经验应该写到哪里">二、经验应该写到哪里</h2>
+<table>
+<thead>
+<tr>
+<th>经验</th>
+<th>适合载体</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户或项目事实</td>
+<td>Memory</td>
+<td>测试命令、输出格式偏好</td>
+</tr>
+<tr>
+<td>可复用操作流程</td>
+<td>Skill</td>
+<td>代码审查、数据分析流程</td>
+</tr>
+<tr>
+<td>安全约束</td>
+<td>Policy</td>
+<td>删除前确认、禁止读取密钥</td>
+</tr>
+<tr>
+<td>失败案例</td>
+<td>Eval Case</td>
+<td>工具超时、恶意网页注入</td>
+</tr>
+<tr>
+<td>临时任务状态</td>
+<td>Checkpoint</td>
+<td>当前步骤和已产生 Artifact</td>
+</tr>
+</tbody>
+</table>
+<p>不要把失败样本、临时状态和用户偏好全部写成同一类 Memory。</p>
+<h2 id="三candidate-到正式资产">三、Candidate 到正式资产</h2>
+<p>每条候选经验至少包含：</p>
+<pre><code class="language-yaml">source_run_id: run-123
+source_span_ids: [span-7, span-8]
+type: skill
+scope: repository
+confidence: 0.78
+created_by: reflector-v2
+contains_sensitive_data: false
+status: proposed
+</code></pre>
+<p>进入正式 Skill 前需要：</p>
+<ol>
+<li>去重；</li>
+<li>冲突检测；</li>
+<li>隐私与注入检查；</li>
+<li>适用范围判断；</li>
+<li>在回归任务上验证；</li>
+<li>人工或策略审批；</li>
+<li>分配版本并支持回滚。</li>
+</ol>
+<h2 id="四curator-的职责">四、Curator 的职责</h2>
+<p>Curator 是知识维护者，不是另一个无限权限 Agent。它负责：</p>
+<ul>
+<li>合并重复条目；</li>
+<li>降低过期内容权重；</li>
+<li>发现相互冲突的规则；</li>
+<li>将重复流程提升为 Skill；</li>
+<li>将失败转成 Eval Case；</li>
+<li>归档低质量或长期未使用资产；</li>
+<li>输出 Diff 和理由。</li>
+</ul>
+<p>Curator 默认不应：</p>
+<ul>
+<li>删除不可恢复的数据；</li>
+<li>扩大自身权限；</li>
+<li>修改内置安全规则；</li>
+<li>根据单次成功重写核心 Skill；</li>
+<li>直接把外部网页内容写入长期知识。</li>
+</ul>
+<h2 id="五skill-生命周期">五、Skill 生命周期</h2>
+<pre><code class="language-text">Draft → Proposed → Evaluating → Approved → Active
+                                  ↓
+                           Deprecated → Archived
+</code></pre>
+<p>每个 Skill 应记录：</p>
+<ul>
+<li>Owner；</li>
+<li>适用范围；</li>
+<li>输入输出；</li>
+<li>依赖工具；</li>
+<li>权限和风险；</li>
+<li>示例和测试；</li>
+<li>版本与变更记录；</li>
+<li>成功率、使用次数和失败模式；</li>
+<li>回滚目标。</li>
+</ul>
+<h2 id="六如何避免错误经验固化">六、如何避免错误经验固化</h2>
+<p>主要风险：</p>
+<ul>
+<li>把模型猜测当事实；</li>
+<li>一次偶然成功形成错误规则；</li>
+<li>恶意网页通过 Prompt Injection 写入 Skill；</li>
+<li>旧经验与新环境不兼容；</li>
+<li>只记录成功，不记录代价和失败。</li>
+</ul>
+<p>防护：</p>
+<ul>
+<li>来源追踪；</li>
+<li>多次独立证据；</li>
+<li>Scope 限制；</li>
+<li>置信度；</li>
+<li>沙箱评测；</li>
+<li>人工批准；</li>
+<li>灰度启用；</li>
+<li>自动回滚；</li>
+<li>TTL 和定期复审。</li>
+</ul>
+<h2 id="七context-evolution">七、Context Evolution</h2>
+<p>上下文演化不是无限追加文字，而是对条目执行：</p>
+<pre><code class="language-text">Add / Update / Merge / Split / Deprecate / Archive
+</code></pre>
+<p>评测不能只看上下文是否更短，还要看：</p>
+<ul>
+<li>任务成功率；</li>
+<li>关键事实保留率；</li>
+<li>冲突率；</li>
+<li>过期信息引用率；</li>
+<li>Token 成本；</li>
+<li>对新任务的迁移效果。</li>
+</ul>
+<p>过度摘要可能产生 <code>context collapse</code>：文本越来越短，但关键约束逐步消失。</p>
+<h2 id="八后台复盘任务">八、后台复盘任务</h2>
+<p>后台 Reflection 应使用：</p>
+<ul>
+<li>只读或受限工具；</li>
+<li>独立预算；</li>
+<li>最大运行时间；</li>
+<li>可取消任务；</li>
+<li>输出候选变更而非直接发布；</li>
+<li>完整 Trace；</li>
+<li>与前台用户任务隔离的 Worker。</li>
+</ul>
+<h2 id="九agentic-rl-的连接点">九、Agentic RL 的连接点</h2>
+<p>高质量轨迹可以用于：</p>
+<ul>
+<li>SFT 工具调用样本；</li>
+<li>偏好对；</li>
+<li>Outcome Reward；</li>
+<li>Process Reward；</li>
+<li>Tool Selection Reward；</li>
+<li>失败分类器；</li>
+<li>Curriculum 任务生成。</li>
+</ul>
+<p>但训练集、评测集和线上回流数据必须隔离，防止评测污染。</p>
+<h2 id="十高频面试题">十、高频面试题</h2>
+<ol>
+<li>自进化 Agent 与长期记忆 Agent 有什么区别？</li>
+<li>一次成功任务什么时候可以沉淀成 Skill？</li>
+<li>Memory、Skill、Policy 和 Eval Case 如何区分？</li>
+<li>Curator 为什么必须限制权限？</li>
+<li>如何防止 Prompt Injection 污染长期知识？</li>
+<li>Skill 如何做版本、灰度和回滚？</li>
+<li>如何评价一次 Context Evolution 是否有效？</li>
+<li>用户如何查看和删除 Agent 学到的个人信息？</li>
+<li>线上轨迹如何用于训练但不污染评测？</li>
+<li>Agent 能否修改自身安全 Policy？为什么？</li>
+</ol></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

@@ -1,0 +1,59 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>AI 协作能力面试题 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-060.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/AI协作与工程化面试题-进阶篇.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/AI%E5%8D%8F%E4%BD%9C%E4%B8%8E%E5%B7%A5%E7%A8%8B%E5%8C%96%E9%9D%A2%E8%AF%95%E9%A2%98-%E8%BF%9B%E9%98%B6%E7%AF%87.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/AI%E5%8D%8F%E4%BD%9C%E4%B8%8E%E5%B7%A5%E7%A8%8B%E5%8C%96%E9%9D%A2%E8%AF%95%E9%A2%98-%E8%BF%9B%E9%98%B6%E7%AF%87.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E8%80%83%E5%AF%9F%E9%87%8D%E7%82%B9%E4%BD%A0%E5%A6%82%E4%BD%95%E4%B8%8E-ai-%E5%B7%A5%E5%85%B7%E5%8D%8F%E4%BD%9C%E5%BC%80%E5%8F%91">考察重点：你如何与 AI 工具协作开发</a><a href="#1-%E6%8F%8F%E8%BF%B0%E4%BD%A0%E4%BD%BF%E7%94%A8-cursor-claude-code-codex-%E7%9A%84%E7%BB%8F%E9%AA%8C">1. 描述你使用 Cursor / Claude Code / Codex 的经验</a><a href="#2-%E5%A6%82%E4%BD%95%E8%B0%83%E8%AF%95-ai-%E7%94%9F%E6%88%90%E7%9A%84%E4%BB%A3%E7%A0%81">2. 如何调试 AI 生成的代码？</a><a href="#3-ai-%E7%94%9F%E6%88%90%E7%9A%84%E4%BB%A3%E7%A0%81%E6%9C%89%E5%AE%89%E5%85%A8%E6%BC%8F%E6%B4%9E%E4%BD%A0%E6%80%8E%E4%B9%88%E8%AF%86%E5%88%AB">3. AI 生成的代码有安全漏洞，你怎么识别？</a><a href="#4-%E5%A6%82%E4%BD%95%E5%B9%B3%E8%A1%A1-ai-%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81%E7%9A%84%E6%95%88%E7%8E%87%E4%B8%8E%E4%BB%A3%E7%A0%81%E5%8F%AF%E7%BB%B4%E6%8A%A4%E6%80%A7">4. 如何平衡 AI 生成代码的效率与代码可维护性？</a><a href="#5-%E4%BB%80%E4%B9%88%E6%98%AF-vibe-coding%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E9%81%BF%E5%85%8D">5. 什么是 Vibe Coding？为什么要避免？</a><a href="#6-%E5%A6%82%E4%BD%95%E7%BB%99-ai-%E5%86%99%E5%A5%BD%E7%9A%84-prompt">6. 如何给 AI 写好的 Prompt？</a><a href="#7-ai-%E5%8F%8D%E5%A4%8D%E7%94%9F%E6%88%90%E9%94%99%E8%AF%AF%E4%BB%A3%E7%A0%81%E6%97%B6%E4%BD%A0%E6%80%8E%E4%B9%88%E5%8A%9E">7. AI 反复生成错误代码时你怎么办？</a><a href="#8-%E5%A6%82%E4%BD%95%E5%88%A9%E7%94%A8-cursor-%E7%9A%84-agent-%E6%A8%A1%E5%BC%8F%E8%BF%9B%E8%A1%8C%E9%A1%B9%E7%9B%AE%E7%BA%A7%E4%BF%AE%E6%94%B9">8. 如何利用 Cursor 的 Agent 模式进行项目级修改？</a><a href="#9-%E4%BD%A0%E4%BC%9A%E5%A6%82%E4%BD%95%E7%A1%AE%E4%BF%9D%E5%9B%A2%E9%98%9F%E7%BB%9F%E4%B8%80%E4%BD%BF%E7%94%A8-ai-%E5%B7%A5%E5%85%B7%E7%9A%84%E8%A7%84%E8%8C%83">9. 你会如何确保团队统一使用 AI 工具的规范？</a><a href="#10-ai-%E7%94%9F%E6%88%90%E4%BA%86%E5%A4%9A%E4%B8%AA%E6%96%B9%E6%A1%88%E4%BD%A0%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9">10. AI 生成了多个方案，你如何选择？</a><a href="#11-%E5%9C%A8%E9%9D%A2%E8%AF%95%E4%B8%AD%E4%BD%BF%E7%94%A8-ai-%E5%B7%A5%E5%85%B7%E5%93%AA%E4%BA%9B%E8%A1%8C%E4%B8%BA%E4%BC%9A%E5%8A%A0%E5%88%86%E6%89%A3%E5%88%86">11. 在面试中使用 AI 工具，哪些行为会加分/扣分？</a><a href="#12-%E5%A6%82%E4%BD%95%E6%8A%8A-ai-%E5%B7%A5%E5%85%B7%E8%9E%8D%E5%85%A5-cicd-%E6%B5%81%E7%A8%8B">12. 如何把 AI 工具融入 CI/CD 流程？</a></nav></details><article class="prose source-prose"><h1 id="ai-协作能力面试题">AI 协作能力面试题</h1>
+<h2 id="考察重点你如何与-ai-工具协作开发">考察重点：你如何与 AI 工具协作开发</h2>
+<h3 id="1-描述你使用-cursor-claude-code-codex-的经验">1. 描述你使用 Cursor / Claude Code / Codex 的经验</h3>
+<p><strong>期望回答</strong>：具体项目、怎么用的、提升了什么效率</p>
+<h3 id="2-如何调试-ai-生成的代码">2. 如何调试 AI 生成的代码？</h3>
+<p><strong>考察点</strong>：不是盲目相信、不是全部重写，而是精准定位和修正</p>
+<h3 id="3-ai-生成的代码有安全漏洞你怎么识别">3. AI 生成的代码有安全漏洞，你怎么识别？</h3>
+<p><strong>考察点</strong>：SQL 注入、XSS、硬编码密钥、不安全的依赖</p>
+<h3 id="4-如何平衡-ai-生成代码的效率与代码可维护性">4. 如何平衡 AI 生成代码的效率与代码可维护性？</h3>
+<p><strong>考察点</strong>：AI 倾向于生成"能跑"的代码，但不一定是"好"的代码</p>
+<h3 id="5-什么是-vibe-coding为什么要避免">5. 什么是 Vibe Coding？为什么要避免？</h3>
+<p><strong>参考</strong>：不理解 AI 生成的代码就直接用 = 技术债务</p>
+<h3 id="6-如何给-ai-写好的-prompt">6. 如何给 AI 写好的 Prompt？</h3>
+<p><strong>考察点</strong>：上下文、约束条件、输出格式、分步指令</p>
+<h3 id="7-ai-反复生成错误代码时你怎么办">7. AI 反复生成错误代码时你怎么办？</h3>
+<p><strong>期望</strong>：换思路、给更多上下文、手动分析后精确提问</p>
+<h3 id="8-如何利用-cursor-的-agent-模式进行项目级修改">8. 如何利用 Cursor 的 Agent 模式进行项目级修改？</h3>
+<p><strong>考察点</strong>：<code>@file</code>、<code>@folder</code>、<code>@git</code>、Plan Mode 的使用</p>
+<h3 id="9-你会如何确保团队统一使用-ai-工具的规范">9. 你会如何确保团队统一使用 AI 工具的规范？</h3>
+<p><strong>考察点</strong>：.cursorrules、agent.md、团队 prompt 模板</p>
+<h3 id="10-ai-生成了多个方案你如何选择">10. AI 生成了多个方案，你如何选择？</h3>
+<p><strong>考察点</strong>：性能、可维护性、团队熟悉度、扩展性</p>
+<h3 id="11-在面试中使用-ai-工具哪些行为会加分扣分">11. 在面试中使用 AI 工具，哪些行为会加分/扣分？</h3>
+<table>
+<thead>
+<tr>
+<th>✅ 加分</th>
+<th>❌ 扣分</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>先分析需求再让 AI 写</td>
+<td>上来就让 AI 全写</td>
+</tr>
+<tr>
+<td>逐行审查 AI 输出</td>
+<td>直接 accept 不看</td>
+</tr>
+<tr>
+<td>发现错误手动修正</td>
+<td>反复让 AI 重试</td>
+</tr>
+<tr>
+<td>能解释每行代码</td>
+<td>"AI 写的我不清楚"</td>
+</tr>
+<tr>
+<td>主动补充上下文</td>
+<td>模糊一句话 prompt</td>
+</tr>
+<tr>
+<td>写测试验证</td>
+<td>改了就说好了</td>
+</tr>
+</tbody>
+</table>
+<h3 id="12-如何把-ai-工具融入-cicd-流程">12. 如何把 AI 工具融入 CI/CD 流程？</h3>
+<p><strong>考察点</strong>：自动 code review、自动生成测试、自动文档更新</p></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

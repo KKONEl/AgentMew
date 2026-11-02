@@ -1,0 +1,261 @@
+{
+  "id": "17",
+  "slug": "17-evaluation-harness",
+  "title": "评测、失败归因与发布门禁",
+  "stage": "05 生产与可靠性",
+  "prerequisites": [
+    "15",
+    "16",
+    "任务契约与工具Trace"
+  ],
+  "minutes": 60,
+  "goals": [
+    "构建可重复的离线任务集和三层判分",
+    "通过配对实验定位模型、检索、工具与运行时回归",
+    "把质量、安全、恢复、延迟与成本变成发布决策"
+  ],
+  "sources": [
+    "通用知识/2026-10-评测与归因面试题与参考答案.md",
+    "通用知识/Agent-Harness评测与发布门禁.md",
+    "通用知识/Agent Harness与编码代理测评.md"
+  ],
+  "body": "## 问题：答案看起来正确，为什么上线仍然失败\n退款 Agent 回答“已为您退款”，自然语言评审给了高分，但数据库没有退款记录；另一条任务确实退款成功，却跳过了审批。两者都不能算生产成功。评测首先要确定到底验证什么：最终产物正确、过程遵守约束、环境状态真的改变。这三个目标分别对应 outcome、trajectory 和 state，不能只让模型读最后一句回答给分。\n\n一次演示成功也不能代表可靠。模型采样、工具超时和执行环境会造成波动；单次成功率、首次成功率、多次尝试后的成功率是不同指标。若一次失败后重试十次才过，最后成功并没有抹掉延迟、花费和错误副作用。必须把尝试次数、接管和失败成本计入评价。\n\n## 机制：Harness把任务、环境、运行和判分连起来\nTask Spec描述目标、初始状态、可用工具、约束、预算和必须产物；Environment Spec固定数据快照、工具schema、权限、时间、随机种子、网络和故障注入。Expected Outcome不要求唯一中间路径，而是明确最终业务条件、禁止副作用、必须审批和可接受的部分成功。把这些变成代码执行的夹具，才有可复现的比较。\n\n判分先用规则和环境断言检查硬约束，例如不能跨租户、状态必须为refunded、必须有审批回执。代码任务用测试验证行为，同时检查是否改坏约束或伪造测试。开放文本再用模型评审支持程度、完整性和表达，并用人工样本校准评审一致性。模型评审有位置偏差、冗长偏好和版本漂移；它不能替代真实环境状态检查。人审也要给清晰rubric并记录分歧。\n\n离线数据从任务分布出发，覆盖正常、边界、无答案、证据冲突、工具失败、结果未知、取消、恢复、注入和长任务。核心路径放smoke，历史事故放regression，高风险放safety，崩溃点放recovery。数据应按来源或时间分割，避免同一文档切片同时进入调优与测试。模型合成样本要检查可回答性和证据，数量大不等于真实覆盖。\n\n## 已解例：新模型总分提高，仍然阻止发布\n下方实验固定read、write、recovery、long四个任务。baseline只有recovery的ok为False，所以成功率为3/4=0.75，全部safe为True。candidate复制这四项并令ok全为True，成功率成为1.00；但write的safe被故意改为False，表示目标虽完成却绕过审批。metrics分别计算success和critical，gate要求成功率不低于基线且关键违规为0。因此候选仍被BLOCK，Counter把这一次违规记到authorization。这里的字段是手工夹具，不是实际Agent测量；四个样本用于理解门禁逻辑，不能支持生产成功率的统计推断。\n\n调查时把相同task_id的新旧运行配对，锁定工具、数据、预算和模型以外的配置，比较第一处关键分歧。如果新版在schema参数里遗漏approval_id，而工具网关也没拦截，初始错误属于工具参数生成，未拦截原因属于执行授权，最终后果属于业务状态。只标“模型错了”会错过可独立修复的防线。若多个变量同时更换，先回滚或单因素替换，不用相关性冒充因果。\n\n接着重放真实Trace：脱敏输入与必要状态，把外部写工具替换为受控桩，固定时间和工具回执；模型仍可能有随机性，要多次运行，报告配对胜负和波动范围。回放里未复现的动态依赖单独标记，不能声称已经还原全部线上环境。将这次approval_id故障加入永久回归样本，断言“未提供有效审批时绝不产生退款”。\n\n## 线上指标与离线指标如何衔接\n离线便于控变量，线上能发现真实分布和长尾。线上观察用户确认的任务完成率、业务回执成功率、人工接管、重复副作用、安全事件、p95/p99延迟和每成功任务成本。点赞率可能受界面与措辞影响，工具HTTP 200也可能只是受理请求，都不能直接代替业务成功率。日志要能关联模型、提示、检索快照和工具版本，便于按版本与场景回溯。\n\nShadow让候选版本接收请求副本但不产生真实写入，用来比较计划和参数；数据进入新模型依然需满足权限与脱敏。Canary让小比例真实任务进入候选版，设置流量范围、观察窗口、停止条件和回滚开关。高风险工具可以先只读或需额外验证。离线门禁通过不是可以取消线上监控的理由，线上观察也不能替代发布前的确定性安全检查。\n\n## 把发布门禁写成可审查的规则\n门禁至少同时约束质量最低线、关键安全违规为零、恢复能力、尾延迟、成本/成功任务和样本完整性。缺失指标不能按零违规自动放行；关键桶样本不足应标为证据不足。任何阈值都应注明分母、计算口径、版本和允许误差。比较成功率时关注不确定性：小样本里高出一两例可能是随机性，不宜直接解释成稳定提升。\n\n面试表达按“业务契约→环境固定→三层判分→配对归因→发布/回滚”组织。可以承认没有真实线上实验，给出可执行实验设计，不能把练习结果写成生产事故经验。本课实验代码故意让候选版总成功率更高但出现安全违规，门禁必须拒绝；这比打印一个漂亮平均分更接近可靠性的核心。",
+  "diagram": {
+    "nodes": [
+      "固定四个基线任务",
+      "复制候选并植入write违规",
+      "核对ID并计算两组指标",
+      "按零违规条件阻止发布",
+      "归类authorization并打印"
+    ],
+    "caption": "数据与输出均来自本实验四条夹具；BLOCK是正确门禁结果，normal不表示候选本身无缺陷。",
+    "walkthrough": {
+      "scenario": "沿《总分上升却不能发布的Harness》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "原实验逐步执行",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "固定四个基线任务",
+              "input": "read/write/recovery/long",
+              "action": "建立baseline，前三个中的recovery失败，其余ok=True，全部safe=True。",
+              "output": "成功3/4；违规0",
+              "state": "baseline记录数=4",
+              "failure": false,
+              "section": "机制：Harness把任务、环境、运行和判分连起来",
+              "why": "明确分母和同一任务集合，才知道之后的提升比较了什么。",
+              "code_lines": [
+                3,
+                8
+              ]
+            },
+            {
+              "node": 1,
+              "title": "建立有违规的候选夹具",
+              "input": "相同四个任务ID",
+              "action": "复制记录并把ok全设True，再把write.safe置False。",
+              "output": "成功4/4；write不安全",
+              "state": "candidate记录数=4；baseline未被改动",
+              "failure": false,
+              "section": "已解例：新模型总分提高，仍然阻止发布",
+              "why": "目标完成与过程合规分别建字段，防止总分把违规掩盖。",
+              "code_lines": [
+                9,
+                10
+              ]
+            },
+            {
+              "node": 2,
+              "title": "校验配对并算指标",
+              "input": "两版任务顺序相同",
+              "action": "断言ID列表一致；metrics得到b与c。",
+              "output": "b={success:0.75,critical:0}；c={success:1.0,critical:1}",
+              "state": "指标计算完成",
+              "failure": false,
+              "section": "已解例：新模型总分提高，仍然阻止发布",
+              "why": "same id保证本例同任务比较，但尚未构成真实环境冻结或多次采样。",
+              "code_lines": [
+                18,
+                20
+              ]
+            },
+            {
+              "node": 3,
+              "title": "门禁拒绝候选",
+              "input": "c.success>=b.success，但c.critical=1",
+              "action": "gate用and连接质量条件和零违规条件，assert not gate通过。",
+              "output": "gate(b,c)=False",
+              "state": "release决策为BLOCK",
+              "failure": false,
+              "section": "把发布门禁写成可审查的规则",
+              "why": "两个独立必要条件必须同时满足，质量提升不能抵消关键授权违规。",
+              "code_lines": [
+                15,
+                21
+              ]
+            },
+            {
+              "node": 4,
+              "title": "归类违规并打印",
+              "input": "候选中仅write.safe=False",
+              "action": "Counter把该项记为authorization一次；断言计数后打印。",
+              "output": "baseline_success=0.75；candidate_success=1.00；critical_violations=1；release=BLOCK",
+              "state": "所有原assert通过",
+              "failure": false,
+              "section": "已解例：新模型总分提高，仍然阻止发布",
+              "why": "这里按已知夹具分类，不是从Trace自动推断根因；输出保留安全与成功两个口径。",
+              "code_lines": [
+                22,
+                27
+              ]
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "同一实验的失败变式",
+          "basis": "单因素变式仅删除gate中的critical==0条件，实际运行在原第21行抛AssertionError；未实施任何真实发布。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "固定四个基线任务",
+              "input": "read/write/recovery/long",
+              "action": "建立baseline，前三个中的recovery失败，其余ok=True，全部safe=True。",
+              "output": "成功3/4；违规0",
+              "state": "baseline记录数=4",
+              "failure": false,
+              "section": "机制：Harness把任务、环境、运行和判分连起来",
+              "why": "明确分母和同一任务集合，才知道之后的提升比较了什么。",
+              "code_lines": [
+                3,
+                8
+              ]
+            },
+            {
+              "node": 1,
+              "title": "建立有违规的候选夹具",
+              "input": "相同四个任务ID",
+              "action": "复制记录并把ok全设True，再把write.safe置False。",
+              "output": "成功4/4；write不安全",
+              "state": "candidate记录数=4；baseline未被改动",
+              "failure": false,
+              "section": "已解例：新模型总分提高，仍然阻止发布",
+              "why": "目标完成与过程合规分别建字段，防止总分把违规掩盖。",
+              "code_lines": [
+                9,
+                10
+              ]
+            },
+            {
+              "node": 2,
+              "title": "校验配对并算指标",
+              "input": "两版任务顺序相同",
+              "action": "断言ID列表一致；metrics得到b与c。",
+              "output": "b={success:0.75,critical:0}；c={success:1.0,critical:1}",
+              "state": "指标计算完成",
+              "failure": false,
+              "section": "已解例：新模型总分提高，仍然阻止发布",
+              "why": "same id保证本例同任务比较，但尚未构成真实环境冻结或多次采样。",
+              "code_lines": [
+                18,
+                20
+              ]
+            },
+            {
+              "node": 3,
+              "title": "变式：删除安全门槛",
+              "input": "b与c保持原值，critical仍为1",
+              "action": "【变式已运行】把gate返回值改成只比较success；错误函数返回True。",
+              "output": "gate(b,c)=True",
+              "state": "候选被错误允许；指标未变",
+              "failure": true,
+              "section": "把发布门禁写成可审查的规则",
+              "why": "删掉and critical==0只改变决策，不会修复那次授权违规。",
+              "code_lines": [
+                15,
+                16
+              ]
+            },
+            {
+              "node": 4,
+              "title": "原测试阻止错误门禁",
+              "input": "原第21行仍要求not gate(b,c)",
+              "action": "assert not gate失败，后续Counter和四行打印未执行。",
+              "output": "AssertionError；stdout为空",
+              "state": "测试失败，不能报告ALLOW已上线",
+              "failure": true,
+              "section": "把发布门禁写成可审查的规则",
+              "why": "断言是对门禁实现的回归约束，暴露“只看总分”导致的错误。",
+              "code_lines": [
+                20,
+                23
+              ]
+            }
+          ],
+          "code_overrides": {
+            "16": "    return new[\"success\"] >= base[\"success\"]  # 变式：遗漏安全门槛"
+          }
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "为什么同时评 outcome、trajectory 和 state？",
+      "a": "自然语言结果可正确但业务没执行；业务执行可成功但过程越权；中间动作合规也可能没有达到目标。三层交叉检查才识别假完成和不安全成功。对开放任务允许不同合法路径，避免把唯一参考轨迹当答案。",
+      "rubric": "给出三类反例，并区分合法路径和硬约束。"
+    },
+    {
+      "q": "换了更强模型成功率下降，怎么归因？",
+      "a": "固定任务、环境和预算，用task_id配对回放，查路由、schema、参数、工具顺序、上下文和终止的首个分歧。多次运行区分波动，再单因素替换提示或适配层。榜单能力不保证符合自有工具契约，不能直接归咎模型智力。",
+      "rubric": "控变量、Trace分层、配对重复与接口契约。"
+    },
+    {
+      "q": "能把线上Trace直接再执行一次吗？",
+      "a": "先脱敏与审查使用范围，固定必要状态和版本，将付费或写工具换成桩或隔离环境。否则重放可能重复退款或创建工单。动态依赖无法重现时明确标注，不能把记录完整等同真实环境完全可复现。",
+      "rubric": "包含隐私、隔离副作用、版本和重现边界。"
+    },
+    {
+      "q": "离线成功率从0.75升到1.00，可以上线吗？",
+      "a": "不能仅凭这两个数上线。本例是同四个任务的配对比较，但candidate中write.safe=False，关键违规为1，所以gate返回False并输出BLOCK。即使安全字段全部通过，也还要检查真实最终状态、恢复、成本和尾延迟，并考虑样本不确定性；四条手工夹具不支持生产成功率推断。满足离线门禁后仍应小流量灰度并具备回滚。",
+      "rubric": "拒绝只看总分，含不确定性、硬约束、灰度回滚。"
+    }
+  ],
+  "lab": {
+    "title": "总分上升却不能发布的Harness",
+    "task": "先计算两个版本的成功率，再判断候选能否发布。之后只修复安全字段，验证门禁结论是否改变。",
+    "code": "from collections import Counter\n\nbaseline = [\n    {\"id\": \"read\", \"ok\": True, \"safe\": True},\n    {\"id\": \"write\", \"ok\": True, \"safe\": True},\n    {\"id\": \"recovery\", \"ok\": False, \"safe\": True},\n    {\"id\": \"long\", \"ok\": True, \"safe\": True},\n]\ncandidate = [dict(row, ok=True) for row in baseline]\ncandidate[1][\"safe\"] = False  # 最终目标完成，但绕过了审批\n\ndef metrics(rows):\n    return {\"success\": sum(r[\"ok\"] for r in rows) / len(rows),\n            \"critical\": sum(not r[\"safe\"] for r in rows)}\ndef gate(base, new):\n    return new[\"success\"] >= base[\"success\"] and new[\"critical\"] == 0\n\nassert [r[\"id\"] for r in baseline] == [r[\"id\"] for r in candidate]\nb, c = metrics(baseline), metrics(candidate)\nassert b[\"success\"] == 0.75 and c[\"success\"] == 1.0\nassert not gate(b, c)\nfailures = Counter(\"authorization\" for r in candidate if not r[\"safe\"])\nassert failures[\"authorization\"] == 1\nprint(f\"baseline_success={b['success']:.2f}\")\nprint(f\"candidate_success={c['success']:.2f}\")\nprint(\"critical_violations=\" + str(c[\"critical\"]))\nprint(\"release=\" + (\"ALLOW\" if gate(b, c) else \"BLOCK\"))\n",
+    "expected": "baseline_success=0.75\ncandidate_success=1.00\ncritical_violations=1\nrelease=BLOCK\n",
+    "explanation": "相同ID形成配对比较，最终成功与安全分开计分。候选的100%只表示目标通过，不能抵销一次关键授权违规。此四样本仅说明门禁逻辑，不能用于统计推断生产成功率。",
+    "extensions": [
+      "加入一个缺失state检查结果的任务，门禁应拒绝而非默认为通过。",
+      "加入p95延迟门槛并说明教学阈值与生产SLA区别。"
+    ],
+    "extension_answers": [
+      "每个记录要求state_ok键存在且为布尔值；缺失则返回incomplete_evidence并BLOCK。不能用get(\"state_ok\",True)掩盖缺失。",
+      "固定计算分位的方法，比较candidate_p95<=baseline_p95*1.15或业务绝对上限；1.15只作示例，生产阈值需负载、样本量和用户体验要求支持。"
+    ]
+  },
+  "pitfalls": [
+    "让同一模型独自出题、答题和给分却不做人审校准",
+    "只看最终文本和平均成功率",
+    "把线上回放变成再次执行真实副作用"
+  ],
+  "checkpoint": "能写出三层验收断言，实际运行并解释门禁为何拒绝高分版本；能设计一次固定变量的失败归因实验。",
+  "alignment": {
+    "case_title": "总分上升却不能发布的Harness",
+    "insert_after": "已解例：新模型总分提高，仍然阻止发布",
+    "bridge": "正文的发布门禁现在只用下方同一组四个任务说明。baseline和candidate都是read、write、recovery、long，ok表示最终目标是否通过，safe表示关键过程约束是否通过。原程序把candidate的ok全改成True，却让write.safe=False，因此这里既有“看起来全部成功”，也有一条不能忽略的授权违规。\n\nmetrics不把两者混成一个分数：b.success是0.75，c.success是1.00，c.critical是1。gate用and要求成功率不退化且critical为0，所以最终release=BLOCK。Counter只把已知的这条不安全夹具计为authorization，它并没有分析真实轨迹。\n\n先在演示中跟随这几个字段，再运行实验核对四行输出；然后看失败变式如何仅删除安全条件，就被第21行原断言抓住。这样能把“硬门禁不可被平均分抵消”落实到一个布尔表达式。例子中的safe来自手写数据，状态检查、重复运行和线上灰度仍是正文扩展的生产要求，不能从这个小程序推断系统已经具备完整Harness。",
+    "coverage": "实现四条手工夹具、同ID比较、成功/安全计数和布尔发布门禁；没有实际Agent Runner、工具桩、最终业务状态检查、Trace归因、统计置信区间、模型Judge、真实环境冻结、Shadow/Canary或自动回滚。",
+    "question_sections": [
+      "问题：答案看起来正确，为什么上线仍然失败",
+      "已解例：新模型总分提高，仍然阻止发布",
+      "已解例：新模型总分提高，仍然阻止发布",
+      "把发布门禁写成可审查的规则"
+    ],
+    "coverage_summary": "固定结果模拟评测运行，重点观察质量提升为何不能抵消安全失败。"
+  }
+}

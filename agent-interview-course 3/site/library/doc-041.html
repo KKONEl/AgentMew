@@ -1,0 +1,394 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>蚂蚁集团 AI Agent/大模型岗位 - 真实面经网络实录 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-041.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">蚂蚁集团/真实面经-网络实录.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E8%9A%82%E8%9A%81%E9%9B%86%E5%9B%A2/%E7%9C%9F%E5%AE%9E%E9%9D%A2%E7%BB%8F-%E7%BD%91%E7%BB%9C%E5%AE%9E%E5%BD%95.md">GitHub 固定版本</a> · <a href="../../source/%E8%9A%82%E8%9A%81%E9%9B%86%E5%9B%A2/%E7%9C%9F%E5%AE%9E%E9%9D%A2%E7%BB%8F-%E7%BD%91%E7%BB%9C%E5%AE%9E%E5%BD%95.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E9%9D%A2%E7%BB%8F%E4%B8%80%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%AE%97%E6%B3%95%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%A4%BE%E6%8B%9B">面经一：大模型算法工程师（社招）</a><a href="#%E4%B8%80%E9%9D%A265%E5%88%86%E9%92%9F">一面（65分钟）</a><a href="#%E4%BA%8C%E9%9D%A255%E5%88%86%E9%92%9F">二面（55分钟）</a><a href="#%E4%B8%89%E9%9D%A240%E5%88%86%E9%92%9F%E6%80%BB%E7%9B%91%E9%9D%A2">三面（40分钟，总监面）</a><a href="#%E9%9D%A2%E7%BB%8F%E4%BA%8Cai-agent%E5%B9%B3%E5%8F%B0%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%A4%BE%E6%8B%9B">面经二：AI Agent平台工程师（社招）</a><a href="#%E4%B8%80%E9%9D%A260%E5%88%86%E9%92%9F">一面（60分钟）</a><a href="#%E4%BA%8C%E9%9D%A255%E5%88%86%E9%92%9F_1">二面（55分钟）</a><a href="#%E4%B8%89%E9%9D%A245%E5%88%86%E9%92%9Fvp%E9%9D%A2">三面（45分钟，VP面）</a><a href="#%E9%9D%A2%E7%BB%8F%E4%B8%89%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8E%A8%E7%90%86%E4%BC%98%E5%8C%96%E6%A0%A1%E6%8B%9B">面经三：大模型推理优化（校招）</a><a href="#%E4%B8%80%E9%9D%A250%E5%88%86%E9%92%9F">一面（50分钟）</a><a href="#%E4%BA%8C%E9%9D%A250%E5%88%86%E9%92%9F">二面（50分钟）</a><a href="#%E9%9D%A2%E7%BB%8F%E5%9B%9B%E5%8F%8D%E6%B4%97%E9%92%B1%E7%AE%97%E6%B3%95%E5%B7%A5%E7%A8%8B%E5%B8%88-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%A4%BE%E6%8B%9B">面经四：反洗钱算法工程师 + 大模型（社招）</a><a href="#%E4%B8%80%E9%9D%A255%E5%88%86%E9%92%9F">一面（55分钟）</a><a href="#%E9%9D%A2%E7%BB%8F%E4%BA%94%E6%99%BA%E8%83%BD%E4%BD%93%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A82026-%E6%96%B0%E5%A2%9E%E5%85%AC%E5%BC%80%E6%9D%A5%E6%BA%90">面经五：智能体与大模型应用（2026 新增公开来源）</a><a href="#2026-%E9%AB%98%E9%A2%91%E8%BF%BD%E9%97%AE">2026 高频追问</a><a href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E5%BB%BA%E8%AE%AE">总结与建议</a><a href="#%E8%9A%82%E8%9A%81%E9%9B%86%E5%9B%A2%E9%9D%A2%E8%AF%95%E7%89%B9%E7%82%B9">蚂蚁集团面试特点</a><a href="#%E5%87%86%E5%A4%87%E5%BB%BA%E8%AE%AE">准备建议</a></nav></details><article class="prose source-prose"><h1 id="蚂蚁集团-ai-agent大模型岗位-真实面经网络实录">蚂蚁集团 AI Agent/大模型岗位 - 真实面经网络实录</h1>
+<blockquote>
+<p>整理自牛客、脉脉、CSDN等平台的真实面试分享，2024-2025年</p>
+</blockquote>
+<hr>
+<h2 id="面经一大模型算法工程师社招">面经一：大模型算法工程师（社招）</h2>
+<p><strong>面试时间：</strong> 2024年11月<br>
+<strong>岗位：</strong> 大模型算法工程师 - 智能金融方向<br>
+<strong>结果：</strong> 已offer  </p>
+<h3 id="一面65分钟">一面（65分钟）</h3>
+<p><strong>Q1：自我介绍，然后详细讲讲你最熟悉的一个大模型项目</strong></p>
+<blockquote>
+<p>回答思路：介绍了在前公司做的金融领域RAG问答系统。从需求分析、数据处理、检索方案设计到模型微调的完整过程，重点讲了如何处理金融文档的表格解析和数字准确性问题。</p>
+</blockquote>
+<p><strong>Q2：RAG项目的亮点在哪里？如果召回不准怎么优化？</strong></p>
+<blockquote>
+<p>回答思路：
+- 亮点：设计了混合检索策略（BM25+Dense），引入了金融实体识别做query增强
+- 召回不准的优化：
+  1. Query Rewriting：让LLM重写用户查询
+  2. HyDE：先生成假答案再检索
+  3. 多路召回融合+Reranker重排
+  4. 增加元数据过滤（日期、文档类型）
+  5. 优化chunking策略：按段落语义切分</p>
+</blockquote>
+<p><strong>Q3：BM25算法原理讲一下</strong></p>
+<blockquote>
+<p>回答思路：
+- 基于TF-IDF的改进，考虑了词频饱和和文档长度归一化
+- 公式：BM25(D,Q) = Σ IDF(qi) × (f(qi,D) × (k1+1)) / (f(qi,D) + k1 × (1-b+b×|D|/avgdl))
+- k1控制词频饱和度（常设1.2-2.0），b控制文档长度惩罚（常设0.75）
+- 面试官追问了IDF的计算方式和为什么要做长度归一化</p>
+</blockquote>
+<p><strong>Q4：讲一下MHA、MQA、GQA的区别</strong></p>
+<blockquote>
+<p>回答思路：
+- MHA：每个头都有独立的Q/K/V投影矩阵
+- MQA：所有头共享同一组K/V，只有Q是独立的→KV Cache大幅减少
+- GQA：将头分成若干组，组内共享K/V→MHA和MQA的折中
+- LLaMA2用GQA，Qwen2也用GQA</p>
+</blockquote>
+<p><strong>Q5：Dense模型和MoE模型的区别？MoE的路由机制怎么做？</strong></p>
+<blockquote>
+<p>回答思路：
+- Dense：所有参数都参与每次推理，计算量固定
+- MoE：多个Expert，Router选择top-k个Expert激活→总参数大但激活参数少
+- 路由机制：Router是一个可学习的线性层，输出各Expert的概率分布
+- 常见路由：Top-K选择、Switch Transformer的Top-1路由
+- 负载均衡问题：加auxiliary loss惩罚不均匀分配</p>
+</blockquote>
+<p><strong>Q6：代码题 - 三数之和（LeetCode 15）</strong></p>
+<blockquote>
+<p>回答思路：排序+双指针，O(n²)。注意去重逻辑。</p>
+</blockquote>
+<h3 id="二面55分钟">二面（55分钟）</h3>
+<p><strong>Q1：LoRA微调的原理详细讲一下，A和B矩阵怎么初始化？</strong></p>
+<blockquote>
+<p>回答思路：
+- 原理：冻结预训练权重W，添加低秩分解 W' = W + BA
+- B矩阵用零初始化，A矩阵用正态/Kaiming初始化
+- 这样初始化保证训练开始时ΔW = BA = 0，不改变原模型行为
+- 秩r的选择：一般4-64，实际项目中设r=16效果就不错
+- alpha/r是scaling factor，控制LoRA更新的幅度</p>
+</blockquote>
+<p><strong>Q2：SFT和RL分别什么场景下用？</strong></p>
+<blockquote>
+<p>回答思路：
+- SFT：需要模型学会特定格式/风格/指令跟随时用，对数据质量要求高
+- RL（RLHF/DPO）：需要让模型输出更符合人类偏好、更安全时用
+- 先SFT再RL是标准流程（InstructGPT的做法）
+- 纯SFT也能做到不错的效果，如果数据质量够高的话</p>
+</blockquote>
+<p><strong>Q3：DPO、PPO、GRPO的原理和区别，写一下DPO的loss函数</strong></p>
+<blockquote>
+<p>回答思路：
+- PPO：需要Reward Model + Critic，用策略梯度优化，加KL约束防止偏离参考策略太远
+- DPO：直接从偏好对学习，loss = -E[log σ(β(log π(yw)/πref(yw) - log π(yl)/πref(yl)))]
+- GRPO：DeepSeek提出，不需要Critic Model，用组内相对奖励做优势估计
+- PPO最强但最复杂，DPO最简单但可能次优，GRPO是工程友好的折中</p>
+</blockquote>
+<p><strong>Q4：SFT的数据是越大越好吗？有Scaling Law吗？</strong></p>
+<blockquote>
+<p>回答思路：
+- 不是越大越好。SFT数据质量远比数量重要
+- LIMA论文证明1000条高质量数据就能达到很好效果
+- SFT的Scaling Law不像预训练那么明显
+- 数据多但质量差反而会引入噪声，导致能力退化
+- 关键是数据的多样性、难度分布、质量控制</p>
+</blockquote>
+<p><strong>Q5：微调出现灾难性遗忘怎么办？</strong></p>
+<blockquote>
+<p>回答思路：
+- 训练策略：降低学习率、减少训练epoch、使用LoRA等参数高效方法
+- 数据策略：混入一定比例的通用数据（replay buffer）
+- 正则化：EWC（弹性权重巩固）、L2正则
+- 架构策略：用LoRA/Adapter只更新少量参数，基座不动</p>
+</blockquote>
+<h3 id="三面40分钟总监面">三面（40分钟，总监面）</h3>
+<p><strong>Q1：你应聘这个岗位的优势和劣势是什么？</strong></p>
+<blockquote>
+<p>回答思路：优势是有完整的RAG系统从0到1的经验，劣势是在大模型预训练方面实践较少。</p>
+</blockquote>
+<p><strong>Q2：你觉得应该从哪些方面评判一个大模型的好坏？</strong></p>
+<blockquote>
+<p>回答思路：
+- 能力维度：语言理解、生成、推理、知识、多轮对话
+- 效率维度：推理速度、成本、部署难度
+- 安全维度：幻觉率、有害输出、隐私保护
+- 生态维度：社区活跃度、工具链完善度</p>
+</blockquote>
+<p><strong>Q3：最近5年的职业规划</strong></p>
+<blockquote>
+<p>回答思路：1-2年深耕LLM应用开发，3年开始在Agent方向做技术探索，5年目标是成为AI架构师。</p>
+</blockquote>
+<p><strong>面试体验：</strong>
+蚂蚁面试非常注重基础理论的深度。面试官会一直追问细节，直到你说不出来为止。特别是LoRA、DPO这些热门技术，一定要能讲清楚数学公式和工程实现。项目经验要准备得非常细致，每个技术选型都要能说出原因。</p>
+<hr>
+<h2 id="面经二ai-agent平台工程师社招">面经二：AI Agent平台工程师（社招）</h2>
+<p><strong>面试时间：</strong> 2025年2月<br>
+<strong>岗位：</strong> AI Agent平台工程师 - 支付宝智能助手方向<br>
+<strong>结果：</strong> 三面挂  </p>
+<h3 id="一面60分钟">一面（60分钟）</h3>
+<p><strong>Q1：讲讲你对AI Agent的理解，支付宝上的Agent应该具备什么能力？</strong></p>
+<blockquote>
+<p>回答思路：
+- Agent = LLM + 规划 + 工具调用 + 记忆 + 反思
+- 支付宝场景：理解用户金融意图、操作账户功能（转账/理财等）、信息查询、风控安全
+- 关键挑战：金融场景对准确性和安全性要求极高，容错率低</p>
+</blockquote>
+<p><strong>Q2：Function Calling是怎么实现的？</strong></p>
+<blockquote>
+<p>回答思路：
+- 在System Prompt中定义可用函数的schema（名称、参数、描述）
+- LLM根据用户输入判断是否需要调用函数，输出结构化的函数调用请求
+- 执行引擎解析调用请求，执行对应API
+- 将执行结果回传给LLM做最终回答生成
+- 训练层面：SFT数据中包含工具调用样本</p>
+</blockquote>
+<p><strong>Q3：多Agent协作你怎么设计？</strong></p>
+<blockquote>
+<p>回答思路：
+- 架构模式：中心化（Orchestrator Agent管理其他Agent）vs 去中心化（Agent间直接通信）
+- 通信协议：消息传递、共享记忆、黑板模式
+- 任务分配：Router Agent根据意图分发、基于能力描述匹配
+- 冲突解决：优先级机制、投票机制、仲裁Agent</p>
+</blockquote>
+<p><strong>Q4：vLLM中的PagedAttention你了解吗？</strong></p>
+<blockquote>
+<p>回答思路：
+- 灵感来自操作系统的虚拟内存分页
+- 将KV Cache按固定大小的block管理，不连续存储
+- 解决了KV Cache预分配导致的显存浪费问题
+- 支持动态分配/释放，提升显存利用率
+- Continuous Batching进一步提升吞吐</p>
+</blockquote>
+<p><strong>Q5：算法题 - 柱状图中的最大矩形（LeetCode 84）</strong></p>
+<blockquote>
+<p>回答思路：单调栈解法，O(n)。这题有点难度，写了大约20分钟。</p>
+</blockquote>
+<h3 id="二面55分钟_1">二面（55分钟）</h3>
+<p><strong>Q1：项目深挖 - 你的Agent系统中，记忆冲突怎么处理？</strong></p>
+<blockquote>
+<p>回答思路：
+- 时间优先：新记忆覆盖旧记忆
+- 来源可信度：不同来源的记忆赋予不同权重
+- 版本管理：保留记忆历史，支持回溯
+- 主动确认：当检测到矛盾时，向用户确认</p>
+</blockquote>
+<p><strong>Q2：RAG和Fine-tuning怎么选？什么时候用哪个？</strong></p>
+<blockquote>
+<p>回答思路：
+- RAG：知识实时性要求高、需要溯源、知识量大且频繁更新
+- Fine-tuning：需要特定行为模式、格式要求、推理时不想有检索延迟
+- 在金融场景下，通常两者结合：微调模型学会金融术语和格式，RAG提供最新的政策法规</p>
+</blockquote>
+<p><strong>Q3：检索器和Reranker的分数太相近，不可靠怎么解决？</strong></p>
+<blockquote>
+<p>回答思路：
+- 增加负样本的多样性和难度（hard negative mining）
+- 用更强的Reranker模型（Cross-Encoder &gt; Bi-Encoder）
+- 添加特征融合：结合BM25分数、向量相似度、元数据匹配等多路信号
+- 设置分数阈值，低于阈值的结果不返回
+- 引入LLM做最终判断（LLM-as-Judge）</p>
+</blockquote>
+<p><strong>Q4：蚂蚁的业务场景中，Agent的安全性怎么保障？</strong></p>
+<blockquote>
+<p>回答思路：
+- 输入安全：Prompt注入检测、内容审核
+- 输出安全：敏感信息过滤、金融合规检查
+- 操作安全：高风险操作需二次确认、权限控制
+- 系统安全：速率限制、审计日志、异常检测
+- 红队测试：定期做对抗测试</p>
+</blockquote>
+<p><strong>Q5：如何用修改损失函数来解决MoE的负载均衡问题？</strong></p>
+<blockquote>
+<p>回答思路：
+- 在原始loss基础上加auxiliary load balancing loss
+- L_aux = α × N × Σ(fi × Pi)，其中fi是expert被选中的频率，Pi是router分配的概率
+- 这个loss鼓励所有expert被均匀使用
+- Switch Transformer中的具体实现：α通常设0.01</p>
+</blockquote>
+<h3 id="三面45分钟vp面">三面（45分钟，VP面）</h3>
+<p><strong>Q1：你怎么看AI Agent在金融领域的未来发展？</strong></p>
+<blockquote>
+<p>回答思路：从自动化流程、智能投顾、风控、客服四个方向展开，强调了合规和安全是金融Agent的核心挑战。</p>
+</blockquote>
+<p><strong>Q2：如果让你从0开始搭建蚂蚁的Agent平台，你会怎么做？</strong></p>
+<blockquote>
+<p>回答思路：
+- 基础层：LLM推理服务、向量数据库、工具注册中心
+- 编排层：工作流引擎、多Agent调度、记忆管理
+- 应用层：对话管理、意图路由、输出安全审核
+- 运维层：监控、评估、A/B测试、灰度发布</p>
+</blockquote>
+<p><strong>Q3：你有什么想问我的？</strong></p>
+<blockquote>
+<p>回答思路：问了团队规模、技术栈选择、以及Agent平台的当前进展。</p>
+</blockquote>
+<p><strong>面试体验：</strong>
+蚂蚁的面试很有深度，三面VP面偏战略视野。挂在三面，反馈是"技术能力满足要求，但对金融业务理解不够深入"。建议如果面蚂蚁金融方向，一定要提前研究支付宝的AI功能和金融监管政策。</p>
+<hr>
+<h2 id="面经三大模型推理优化校招">面经三：大模型推理优化（校招）</h2>
+<p><strong>面试时间：</strong> 2024年8月<br>
+<strong>岗位：</strong> 大模型算法工程师 - 推理加速方向<br>
+<strong>结果：</strong> 已offer  </p>
+<h3 id="一面50分钟">一面（50分钟）</h3>
+<p><strong>Q1：KV Cache是什么？为什么需要KV Cache？</strong></p>
+<blockquote>
+<p>回答思路：
+- 自回归生成中，每一步都要重新计算所有token的attention
+- KV Cache缓存已计算过的K和V矩阵，避免重复计算
+- 显存占用 = 2 × num_layers × num_heads × head_dim × seq_len × batch_size × precision
+- 长序列时KV Cache会占用大量显存</p>
+</blockquote>
+<p><strong>Q2：KV Cache压缩有哪些方法？</strong></p>
+<blockquote>
+<p>回答思路：
+- GQA/MQA：减少KV头数
+- 量化：将KV Cache量化到INT8/INT4
+- 驱逐策略：丢弃不重要的KV（H2O、StreamingLLM）
+- 低秩压缩：MLA（Multi-head Latent Attention）
+- 窗口化：只保留最近N个token的KV</p>
+</blockquote>
+<p><strong>Q3：DeepSpeed你了解吗？ZeRO优化的三个阶段？</strong></p>
+<blockquote>
+<p>回答思路：
+- ZeRO-1：优化器状态分片
+- ZeRO-2：优化器状态+梯度分片
+- ZeRO-3：优化器状态+梯度+参数都分片
+- 每个阶段逐步减少单卡显存占用
+- DeepSpeed还有Offload功能，可以把数据放到CPU内存</p>
+</blockquote>
+<p><strong>Q4：Pre-norm和Post-norm的区别？为什么现在主流用Pre-norm？</strong></p>
+<blockquote>
+<p>回答思路：
+- Post-norm：残差连接后做LayerNorm（原始Transformer）
+- Pre-norm：残差连接前做LayerNorm（LLaMA等现代模型用）
+- Pre-norm训练更稳定，不需要warmup
+- 但Post-norm在最终性能上可能略优
+- 面试官纠正：其实现在大模型主流用的是Pre-norm（RMSNorm）</p>
+</blockquote>
+<p><strong>Q5：算法题 - 接雨水（LeetCode 42）</strong></p>
+<blockquote>
+<p>回答思路：双指针法，O(n)时间O(1)空间。</p>
+</blockquote>
+<h3 id="二面50分钟">二面（50分钟）</h3>
+<p><strong>Q1：FlashAttention的原理？</strong></p>
+<blockquote>
+<p>回答思路：
+- 核心思想：利用GPU内存层次结构（HBM vs SRAM）
+- 将Q/K/V分块（tiling），在SRAM中完成attention计算
+- 避免将完整的attention矩阵写入HBM
+- IO复杂度从O(N²)降低到O(N²/M)，M是SRAM大小
+- FlashAttention-2进一步优化了并行策略</p>
+</blockquote>
+<p><strong>Q2：投机解码（Speculative Decoding）了解吗？</strong></p>
+<blockquote>
+<p>回答思路：
+- 用一个小模型（draft model）快速生成多个候选token
+- 用大模型（target model）并行验证
+- 接受率高时能显著提速，因为验证是并行的
+- 关键：小模型和大模型的分布要足够接近</p>
+</blockquote>
+<p><strong>Q3：如果在多卡GPU上训练一个70B的模型，你怎么设计训练策略？</strong></p>
+<blockquote>
+<p>回答思路：
+- 3D并行：张量并行（TP within node）+ 流水线并行（PP across nodes）+ 数据并行（DP）
+- 具体配置示例：8×A100 80GB，TP=4, PP=2, DP=1
+- 混合精度：BF16训练，FP32 master weights
+- 梯度检查点（gradient checkpointing）减少显存
+- 通信优化：NCCL、overlap computation和communication</p>
+</blockquote>
+<p><strong>Q4：你在项目中遇到过什么推理优化的挑战？</strong></p>
+<blockquote>
+<p>回答思路：讲了一个具体案例 - 将7B模型的首token延迟从500ms优化到200ms。通过KV Cache量化+FlashAttention+Continuous Batching实现。</p>
+</blockquote>
+<p><strong>面试体验：</strong>
+蚂蚁推理优化方向面试偏底层，需要对GPU架构、内存层次、并行训练有深入了解。如果你做过实际的推理优化工作，一定要准备具体的性能数据（延迟、吞吐等），面试官很看重可量化的结果。</p>
+<hr>
+<h2 id="面经四反洗钱算法工程师-大模型社招">面经四：反洗钱算法工程师 + 大模型（社招）</h2>
+<p><strong>面试时间：</strong> 2025年1月<br>
+<strong>岗位：</strong> 反洗钱算法工程师（需结合大模型）<br>
+<strong>结果：</strong> 二面中  </p>
+<h3 id="一面55分钟">一面（55分钟）</h3>
+<p><strong>Q1：介绍一下GBDT算法原理</strong></p>
+<blockquote>
+<p>回答思路：
+- 梯度提升决策树，通过boosting方式串行训练多棵树
+- 每棵新树拟合前面所有树的残差（梯度）
+- 支持回归和分类任务
+- 与XGBoost的区别：XGBoost加了正则化项、支持并行、缺失值处理</p>
+</blockquote>
+<p><strong>Q2：如何将大模型应用到反洗钱场景？</strong></p>
+<blockquote>
+<p>回答思路：
+- 交易描述理解：用LLM分析交易备注、用户行为描述
+- 报告生成：自动生成可疑交易报告
+- 知识图谱增强：结合企业关系图谱做链路分析
+- Agent化：设计调查Agent，自动从多数据源收集线索</p>
+</blockquote>
+<p><strong>Q3：Transformer的self-attention和cross-attention区别？</strong></p>
+<blockquote>
+<p>回答思路：
+- self-attention：Q、K、V来自同一序列
+- cross-attention：Q来自decoder，K、V来自encoder（或外部信息）
+- 典型应用：Encoder-Decoder模型中decoder对encoder输出的attention</p>
+</blockquote>
+<p><strong>Q4：如何用Python实现简单的HMM？</strong></p>
+<blockquote>
+<p>回答思路：手写了前向算法的核心逻辑，讲了状态转移矩阵、发射矩阵、初始状态概率的含义。</p>
+</blockquote>
+<p><strong>Q5：代码题 - 最长递增子序列（LeetCode 300）</strong></p>
+<blockquote>
+<p>回答思路：先讲了O(n²)DP解法，面试官追问O(nlogn)的二分+贪心解法。</p>
+</blockquote>
+<p><strong>面试体验：</strong>
+蚂蚁反洗钱方向比较特殊，需要传统ML+大模型两手都硬。面试会考GNN、HMM这些传统算法，同时也要了解大模型在安全合规领域的应用。适合有安全/金融背景+大模型经验的人。</p>
+<hr>
+<h2 id="面经五智能体与大模型应用2026-新增公开来源">面经五：智能体与大模型应用（2026 新增公开来源）</h2>
+<blockquote>
+<p>来源：牛客公开页面；以下为摘要索引，完整内容请查看来源链接。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>标题</th>
+<th>核心考点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/888874988554448896" rel="noreferrer">5月20日，蚂蚁智能体与大模型应用 一面</a></td>
+<td>幻觉治理、fine-tuning、Skills、Spring AI、Claude Code、混合检索</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/800426409796624384" rel="noreferrer">蚂蚁秋招时间线+面经</a></td>
+<td>RAG vs Fine-tuning、rerank、NDCG、Agent 评测、Memory、MCP、A2A</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/feed/main/detail/376b964b0d154881bcfe3c46fe1a0e2a?sourceSSR=post" rel="noreferrer">蚂蚁 智能体与大模型应用实习 一面面经</a></td>
+<td>Agent 价值、AI 前沿技术、Skill 实践、项目深挖</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2026-高频追问">2026 高频追问</h3>
+<ol>
+<li>Agent 到底解决什么问题？为什么不能直接用大模型或普通 workflow？</li>
+<li>金融/支付场景中如何降低幻觉并保证可追溯？</li>
+<li>RAG 和微调如何取舍？何时使用 rerank、NDCG、RAGAS 等评估指标？</li>
+<li>MCP、A2A、Skill 在企业应用里分别负责什么边界？</li>
+<li>Spring AI / Claude Code / AI Coding 经验如何落到真实项目效率提升？</li>
+</ol>
+<hr>
+<h2 id="总结与建议">总结与建议</h2>
+<h3 id="蚂蚁集团面试特点">蚂蚁集团面试特点</h3>
+<ol>
+<li><strong>理论深度要求高</strong>：每个技术点都会追问到底层原理和数学推导</li>
+<li><strong>项目要有"亮点"</strong>：面试官明确会问"你的项目有什么新颖之处"</li>
+<li><strong>微调知识必考</strong>：LoRA、DPO、PPO的原理和实现是高频考点</li>
+<li><strong>金融场景理解</strong>：面金融方向需要了解合规、安全、风控等业务知识</li>
+<li><strong>算法题偏难</strong>：柱状图最大矩形、接雨水这种Hard级别也会出</li>
+</ol>
+<h3 id="准备建议">准备建议</h3>
+<ol>
+<li>能写出LoRA和DPO的数学公式，并解释每一项的含义</li>
+<li>项目经验要有量化结果（提升了多少、优化了多少延迟）</li>
+<li>了解蚂蚁的技术栈和产品线（支付宝、OceanBase、蚂蚁百灵等）</li>
+<li>如果面推理优化方向，要了解FlashAttention、PagedAttention的原理</li>
+<li>准备好Hard级别的算法题，蚂蚁出题难度偏高</li>
+</ol></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

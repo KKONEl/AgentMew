@@ -1,0 +1,298 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>12 周 AI Agent 工程师进阶路线 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-045.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/12周Agent工程师进阶路线.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/12%E5%91%A8Agent%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%BF%9B%E9%98%B6%E8%B7%AF%E7%BA%BF.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/12%E5%91%A8Agent%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%BF%9B%E9%98%B6%E8%B7%AF%E7%BA%BF.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E8%B7%AF%E7%BA%BF%E6%80%BB%E8%A7%88">路线总览</a><a href="#%E7%AC%AC-1-%E5%91%A8llm-%E4%B8%8E-prompt-%E5%9F%BA%E7%A1%80">第 1 周：LLM 与 Prompt 基础</a><a href="#%E7%AC%AC-2-%E5%91%A8tool-calling-%E4%B8%8E%E5%9F%BA%E7%A1%80-agent-loop">第 2 周：Tool Calling 与基础 Agent Loop</a><a href="#%E7%AC%AC-3-%E5%91%A8rag-%E6%9C%80%E5%B0%8F%E5%8F%AF%E7%94%A8%E7%B3%BB%E7%BB%9F">第 3 周：RAG 最小可用系统</a><a href="#%E7%AC%AC-4-%E5%91%A8rag-%E4%BC%98%E5%8C%96%E4%B8%8E%E8%AF%84%E4%BC%B0">第 4 周：RAG 优化与评估</a><a href="#%E7%AC%AC-5-%E5%91%A8langgraph-%E7%8A%B6%E6%80%81%E5%9B%BE">第 5 周：LangGraph 状态图</a><a href="#%E7%AC%AC-6-%E5%91%A8%E5%A4%9A-agent-%E5%8D%8F%E4%BD%9C">第 6 周：多 Agent 协作</a><a href="#%E7%AC%AC-7-%E5%91%A8mcp-%E4%B8%8E%E5%B7%A5%E5%85%B7%E7%94%9F%E6%80%81">第 7 周：MCP 与工具生态</a><a href="#%E7%AC%AC-8-%E5%91%A8agent-%E5%AE%89%E5%85%A8%E4%B8%8E%E6%9D%83%E9%99%90">第 8 周：Agent 安全与权限</a><a href="#%E7%AC%AC-9-%E5%91%A8%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E4%B8%8E%E8%AF%84%E4%BC%B0">第 9 周：可观测性与评估</a><a href="#%E7%AC%AC-10-%E5%91%A8%E9%83%A8%E7%BD%B2%E4%B8%8E%E6%88%90%E6%9C%AC%E4%BC%98%E5%8C%96">第 10 周：部署与成本优化</a><a href="#%E7%AC%AC-11-%E5%91%A8%E4%BD%9C%E5%93%81%E9%9B%86%E6%89%93%E7%A3%A8">第 11 周：作品集打磨</a><a href="#%E7%AC%AC-12-%E5%91%A8%E6%A8%A1%E6%8B%9F%E9%9D%A2%E8%AF%95%E4%B8%8E%E8%A1%A5%E7%9F%AD%E6%9D%BF">第 12 周：模拟面试与补短板</a><a href="#%E6%8E%A8%E8%8D%90%E6%AF%8F%E5%91%A8%E5%A4%8D%E7%9B%98%E6%A8%A1%E6%9D%BF">推荐每周复盘模板</a><a href="#%E6%9C%80%E7%BB%88%E4%BD%9C%E5%93%81%E9%9B%86%E6%B8%85%E5%8D%95">最终作品集清单</a></nav></details><article class="prose source-prose"><h1 id="12-周-ai-agent-工程师进阶路线">12 周 AI Agent 工程师进阶路线</h1>
+<blockquote>
+<p>面向已经会基础编程、想在 3 个月内补齐 AI Agent / 大模型应用工程能力的人。目标不是“看完资料”，而是每周交付一个可验证产物，最后形成可写进简历、可用于面试答辩的作品集。</p>
+</blockquote>
+<hr>
+<h2 id="路线总览">路线总览</h2>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>周期</th>
+<th>目标</th>
+<th>交付物</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>基础夯实</td>
+<td>第 1-2 周</td>
+<td>补齐 LLM、Prompt、Tool Calling、RAG 基础</td>
+<td>个人知识卡片 + 10 个核心概念答案</td>
+</tr>
+<tr>
+<td>RAG 工程化</td>
+<td>第 3-4 周</td>
+<td>做出可评估、可溯源的 RAG 系统</td>
+<td>文档问答 Demo + 评估报告</td>
+</tr>
+<tr>
+<td>Agent 编排</td>
+<td>第 5-6 周</td>
+<td>掌握 ReAct、Plan-and-Execute、LangGraph 状态图</td>
+<td>ReAct Agent + LangGraph 多步任务</td>
+</tr>
+<tr>
+<td>工具与协议</td>
+<td>第 7-8 周</td>
+<td>掌握 Function Calling、MCP、权限与沙箱</td>
+<td>自建 MCP Server + 安全工具调用</td>
+</tr>
+<tr>
+<td>生产化能力</td>
+<td>第 9-10 周</td>
+<td>补齐可观测性、评估、成本、部署、安全</td>
+<td>Agent 服务化 + trace + guardrails</td>
+</tr>
+<tr>
+<td>面试作品集</td>
+<td>第 11-12 周</td>
+<td>完成项目打磨、答辩材料和模拟面试</td>
+<td>项目 README + 架构图 + 10 分钟答辩稿</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="第-1-周llm-与-prompt-基础">第 1 周：LLM 与 Prompt 基础</h2>
+<p><strong>学习重点</strong></p>
+<ul>
+<li>Transformer、Token、Context Window、KV Cache 的基本概念</li>
+<li>System Prompt、Few-shot、结构化输出、JSON schema</li>
+<li>幻觉、temperature、top-p、模型路由的基本取舍</li>
+</ul>
+<p><strong>必做任务</strong></p>
+<ol>
+<li>用一页纸解释：LLM 为什么会幻觉？RAG 为什么能缓解？</li>
+<li>写 5 个结构化输出 prompt：JSON、表格、评分、拒答、引用格式。</li>
+<li>准备 10 个常见追问答案：Token、KV Cache、温度、上下文压缩、Prompt 注入。</li>
+</ol>
+<p><strong>验收标准</strong></p>
+<ul>
+<li>能不用背稿讲清楚“模型生成不是查库，而是条件概率采样”。</li>
+<li>能解释结构化输出失败时如何兜底：重试、schema 校验、parser repair、函数调用。</li>
+</ul>
+<hr>
+<h2 id="第-2-周tool-calling-与基础-agent-loop">第 2 周：Tool Calling 与基础 Agent Loop</h2>
+<p><strong>学习重点</strong></p>
+<ul>
+<li>Function Calling / Tool Use 的参数 schema、工具描述、错误处理</li>
+<li>ReAct：Thought → Action → Observation 循环</li>
+<li>工具权限、危险操作确认、工具结果压缩</li>
+</ul>
+<p><strong>必做任务</strong></p>
+<ol>
+<li>写一个最小 ReAct Agent：支持 <code>search</code>、<code>calculator</code>、<code>read_file</code> 三个工具。</li>
+<li>给工具加权限分级：只读、需确认、高危禁止。</li>
+<li>记录 5 个失败 case，并写出原因归因。</li>
+</ol>
+<p><strong>验收标准</strong></p>
+<ul>
+<li>能说明 Tool Description 为什么影响工具选择准确率。</li>
+<li>能讲清楚工具失败后的重试、降级和停止条件。</li>
+</ul>
+<hr>
+<h2 id="第-3-周rag-最小可用系统">第 3 周：RAG 最小可用系统</h2>
+<p><strong>学习重点</strong></p>
+<ul>
+<li>文档解析、chunking、embedding、向量库、检索、生成</li>
+<li>引用溯源、上下文拼接、TopK 选择</li>
+</ul>
+<p><strong>必做任务</strong></p>
+<ol>
+<li>用 20 篇 Markdown/PDF 做一个本地知识库问答。</li>
+<li>输出答案时带引用片段和来源文件。</li>
+<li>做 30 条问题的人工测试集。</li>
+</ol>
+<p><strong>验收标准</strong></p>
+<ul>
+<li>每个答案能追溯到原文片段。</li>
+<li>能解释 chunk size / overlap 对召回和幻觉的影响。</li>
+</ul>
+<hr>
+<h2 id="第-4-周rag-优化与评估">第 4 周：RAG 优化与评估</h2>
+<p><strong>学习重点</strong></p>
+<ul>
+<li>Hybrid Search：BM25 + Dense Retrieval</li>
+<li>RRF 融合、Rerank、Query Rewrite、HyDE</li>
+<li>RAGAS、Recall@K、MRR、NDCG、Faithfulness</li>
+</ul>
+<p><strong>必做任务</strong></p>
+<ol>
+<li>加 BM25 + Dense 双路召回。</li>
+<li>加 reranker，并对比 Top5 命中率。</li>
+<li>输出一份评估报告：召回、延迟、成本、失败样例。</li>
+</ol>
+<p><strong>验收标准</strong></p>
+<ul>
+<li>能说明“召回不到”和“生成不对”如何分层排查。</li>
+<li>能用指标证明优化是否有效，而不是只说“效果更好”。</li>
+</ul>
+<hr>
+<h2 id="第-5-周langgraph-状态图">第 5 周：LangGraph 状态图</h2>
+<p><strong>学习重点</strong></p>
+<ul>
+<li>State、Node、Edge、Conditional Edge、Checkpoint</li>
+<li>Graph vs Chain vs Agent Loop 的边界</li>
+</ul>
+<p><strong>必做任务</strong></p>
+<ol>
+<li>用 LangGraph 改写第 2 周 ReAct Agent。</li>
+<li>加 <code>max_iterations</code>、失败重试、人工确认节点。</li>
+<li>让任务中断后可以从 checkpoint 恢复。</li>
+</ol>
+<p><strong>验收标准</strong></p>
+<ul>
+<li>能画出 StateGraph 并解释每个节点的输入输出。</li>
+<li>能说明 checkpoint 恢复如何保证幂等。</li>
+</ul>
+<hr>
+<h2 id="第-6-周多-agent-协作">第 6 周：多 Agent 协作</h2>
+<p><strong>学习重点</strong></p>
+<ul>
+<li>Supervisor / Worker、角色分工、共享状态、A2A 通信</li>
+<li>多 Agent 的协调成本、循环风险、一致性问题</li>
+</ul>
+<p><strong>必做任务</strong></p>
+<ol>
+<li>做一个三角色协作系统：Researcher、Coder、Writer。</li>
+<li>Supervisor 根据状态决定下一步派谁。</li>
+<li>加成本上限、轮次上限和任务完成判断。</li>
+</ol>
+<p><strong>验收标准</strong></p>
+<ul>
+<li>能解释什么时候用多 Agent，什么时候单 Agent + 多工具更好。</li>
+<li>能定位多 Agent 循环、重复工作、上下文污染问题。</li>
+</ul>
+<hr>
+<h2 id="第-7-周mcp-与工具生态">第 7 周：MCP 与工具生态</h2>
+<p><strong>学习重点</strong></p>
+<ul>
+<li>MCP Host / Client / Server / Transport</li>
+<li>MCP 与 Function Calling、Plugin、A2A 的关系</li>
+</ul>
+<p><strong>必做任务</strong></p>
+<ol>
+<li>自建一个 MCP Server：暴露 <code>search_docs</code>、<code>get_doc</code>、<code>summarize</code> 三个工具。</li>
+<li>写工具 schema、错误返回格式和权限说明。</li>
+<li>用 Claude Desktop / 支持 MCP 的客户端连通。</li>
+</ol>
+<p><strong>验收标准</strong></p>
+<ul>
+<li>能解释 MCP 解决的是“工具接入标准化”问题。</li>
+<li>能说明 MCP Server 的安全边界和认证方式。</li>
+</ul>
+<hr>
+<h2 id="第-8-周agent-安全与权限">第 8 周：Agent 安全与权限</h2>
+<p><strong>学习重点</strong></p>
+<ul>
+<li>Prompt 注入、工具误调用、数据泄露、越权访问</li>
+<li>Sandbox、policy engine、audit log、human approval</li>
+</ul>
+<p><strong>必做任务</strong></p>
+<ol>
+<li>给工具调用加 policy check。</li>
+<li>为危险操作加“先生成计划、用户确认、再执行”的流程。</li>
+<li>设计 10 个红队 prompt 并记录拦截结果。</li>
+</ol>
+<p><strong>验收标准</strong></p>
+<ul>
+<li>能讲清楚“输入过滤、工具前置检查、输出校验”三道防线。</li>
+<li>能说明如何审计 Agent 的每次 tool call。</li>
+</ul>
+<hr>
+<h2 id="第-9-周可观测性与评估">第 9 周：可观测性与评估</h2>
+<p><strong>学习重点</strong></p>
+<ul>
+<li>Trace、Run replay、日志、指标、告警</li>
+<li>Task success rate、first-pass success、verified success、recovery success</li>
+<li>tool accuracy、路径震荡率、latency、cost、hallucination rate</li>
+</ul>
+<p><strong>必做任务</strong></p>
+<ol>
+<li>给 Agent 加 trace id 和每步状态快照。</li>
+<li>输出一次任务执行的 timeline。</li>
+<li>构建 50 条回归测试集，统计任务成功率和首次成功率。</li>
+<li>注入一次工具超时和进程重启，验证能否从 checkpoint 恢复且不重复执行副作用。</li>
+</ol>
+<p><strong>验收标准</strong></p>
+<ul>
+<li>能回答“线上 bad case 怎么定位到是哪一层的问题”。</li>
+<li>能展示 trace、日志、恢复证据和评估数据。</li>
+<li>能区分“模型自述完成”和“经过独立验证后完成”。</li>
+</ul>
+<hr>
+<h2 id="第-10-周部署与成本优化">第 10 周：部署与成本优化</h2>
+<p><strong>学习重点</strong></p>
+<ul>
+<li>FastAPI 服务化、Docker、队列、缓存、限流、降级</li>
+<li>模型路由、语义缓存、上下文压缩、batching</li>
+<li>Agent Runtime、任务状态机、租约、幂等键和补偿操作</li>
+<li>大规模工具注册表、权限过滤、候选检索和 Schema 版本化</li>
+</ul>
+<p><strong>必做任务</strong></p>
+<ol>
+<li>把 Agent 包装成 HTTP API。</li>
+<li>加 Redis 语义缓存和限流。</li>
+<li>输出延迟、token 成本、缓存命中率三项指标。</li>
+<li>将一个有副作用的工具改造成“幂等键 + 执行结果日志 + 安全重试”。</li>
+<li>不把全部工具放进 Prompt，先从工具注册表检索 Top-K 候选再交给模型选择。</li>
+</ol>
+<p><strong>验收标准</strong></p>
+<ul>
+<li>能说明如何把 demo 变成可运行服务。</li>
+<li>能解释哪些请求走大模型，哪些走小模型或缓存。</li>
+<li>能解释 Agent、Orchestrator、Harness 和 Runtime 的责任边界。</li>
+</ul>
+<hr>
+<h2 id="第-11-周作品集打磨">第 11 周：作品集打磨</h2>
+<p><strong>学习重点</strong></p>
+<ul>
+<li>README、架构图、部署说明、评估报告、失败案例复盘</li>
+</ul>
+<p><strong>必做任务</strong></p>
+<ol>
+<li>为项目写一份面试官友好的 README。</li>
+<li>准备 3 张图：系统架构图、数据流图、评估闭环图。</li>
+<li>写“项目亮点 / 难点 / trade-off / 下一步优化”四段。</li>
+</ol>
+<p><strong>验收标准</strong></p>
+<ul>
+<li>面试官不看代码，也能通过 README 明白你的贡献。</li>
+<li>项目亮点有指标，不只是“用了 LangChain / RAG / Agent”。</li>
+</ul>
+<hr>
+<h2 id="第-12-周模拟面试与补短板">第 12 周：模拟面试与补短板</h2>
+<p><strong>学习重点</strong></p>
+<ul>
+<li>项目答辩、系统设计、八股追问、代码题</li>
+</ul>
+<p><strong>必做任务</strong></p>
+<ol>
+<li>准备 10 分钟项目答辩稿。</li>
+<li>做 3 次模拟面试：项目深挖、系统设计、RAG/Agent 专项。</li>
+<li>根据失败题补一页“错题复盘”。</li>
+</ol>
+<p><strong>验收标准</strong></p>
+<ul>
+<li>能讲清楚你为什么这么设计，而不是只讲“我用了什么框架”。</li>
+<li>能回答：效果如何评估？失败怎么办？成本多少？如何上线？</li>
+</ul>
+<hr>
+<h2 id="推荐每周复盘模板">推荐每周复盘模板</h2>
+<pre><code class="language-text">本周主题：
+完成产物：
+最难的技术点：
+遇到的 bad case：
+指标结果：
+下周改进：
+可写进简历的一句话：
+</code></pre>
+<h2 id="最终作品集清单">最终作品集清单</h2>
+<ul>
+<li>一个 RAG 知识问答系统</li>
+<li>一个 LangGraph 多 Agent 协作系统</li>
+<li>一个带安全护栏和可观测性的生产级 Agent 服务</li>
+<li>一份项目 README</li>
+<li>一份评估报告</li>
+<li>一份 10 分钟项目答辩稿</li>
+</ul></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

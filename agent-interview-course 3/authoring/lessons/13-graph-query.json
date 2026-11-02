@@ -1,0 +1,279 @@
+{
+  "id": "13",
+  "slug": "13-graph-query",
+  "title": "GraphRAG 查询：Local、Global 与混合检索",
+  "stage": "04 Agentic RAG 与 GraphRAG",
+  "prerequisites": [
+    "12"
+  ],
+  "minutes": 75,
+  "goals": [
+    "按问题范围选择Local/Global",
+    "解释Map-Reduce与重复证据",
+    "设计图与向量对照实验"
+  ],
+  "sources": [
+    "通用知识/Agentic RAG与GraphRAG深度解析.md",
+    "通用知识/2026-10-RAG与检索面试题与参考答案.md"
+  ],
+  "body": "## 两种问题，需要不同覆盖范围\n“小李参加了哪些项目”围绕具体实体，适合从实体及其邻域收集证据；“这些研究项目的主要方向和争议是什么”需要跨整个语料综合。只用最近似的三个chunk做后者，很容易把局部热门话题误当全部主题。检索目标要先写清：寻找局部事实，还是形成有覆盖意识的综合结论。\n\nLocal Search通常将查询关联到实体，再组织相关实体、关系、文本和社区信息作为上下文。它不是任意固定N跳就保证完整，候选选择、预算、关联强度和原文覆盖都会影响结果。向量检索可参与实体定位，所以“GraphRAG完全不用向量”也是误解。\n\n## Global Search 的 Map-Reduce\nGlobal Search主要以社区报告为输入。Map阶段在报告批次上产生与问题相关的部分回答或要点，再由Reduce阶段汇总。这个方法使全局材料可分批处理，但摘要损失、Map遗漏、重复计数和Reduce偏见仍存在。报告是索引时生成的派生资料，应能回溯原始证据；不是让模型凭报告标题自由发挥。[官方Global Search](https://microsoft.github.io/graphrag/query/global_search/)\n\n粗层报告较少、覆盖广，细层报告更多、细节多。更细并不自动更准确：预算不足会漏覆盖，也更贵。需要在任务集对照层级、报告数量和最终事实覆盖。某些实现提供其他检索策略或动态选择，应固定版本再讨论API；学习时先掌握Local/Global的输入与聚合责任。\n\n## 已解例：为什么不能简单数关键词\n本例报告一给出项目A属于检索方向、项目B属于多Agent方向；报告二重复提到A，并补充项目C也属于检索方向。这正是下方程序的两份reports输入。如果直接累加关键词，“检索”出现两次并不代表两个独立项目。Map输出应携带claim_id、来源和实体范围，Reduce需去重、保留冲突，不把多条转述当多份独立证据。\n\n对“主要方向”可以总结检索与协作，对“最大问题”则缺少可比较的量化数据，不能仅按出现次数断言。回答应区分频繁提及、覆盖项目数与严重程度，并注明语料范围。全局摘要不是统计数据库，要求准确数量时要回结构化记录核算。\n\n## 多跳与全局综述也不同\n“导师的学生参加谁资助的项目”是关系链问题，路径长度可能长但范围局部；“整库主要风险”是覆盖问题，未必需要长路径。不要把Global Search解释成“比Local多走几跳”。它们不同在知识单元、候选选取和聚合方式，不只是跳数。\n\n混合系统可以先判断任务：精确ID→SQL或关键词；语义局部事实→向量/实体检索；关系链→图；语料综述→社区报告；证据不足→Agent控制器补查。这是职责组合，不需要把所有问题都送入最复杂路径。路由本身也要评估，错误路由可能比索引质量更影响答案。\n\n## 怎么验证图带来了增益\n固定同一语料和生成模型，比较向量基线、图邻域与混合方式。在局部、多跳、全局和无答案子集分别测量；记录构建成本、更新时延和查询开销。增加图后多跳题改善但简单题更慢，可以做路由而不是全量替换。若证据链解释更清晰，仍需核实边是否来自可靠原文，不把可视化当正确率指标。\n\n下面Map-Reduce实验把报告内容预先转成事实记录，演示去重与合并；真实系统的Map是有误差的模型生成，因此还需引用与支持校验。学习中用确定性数据可以先把聚合职责看清，之后再研究模型误差，不要一开始把两类问题混在一起。",
+  "diagram": {
+    "nodes": [
+      "读取两份相同示例报告",
+      "初始化聚合字典",
+      "处理第一份报告",
+      "处理第二份报告",
+      "校验聚合不变量",
+      "稳定打印主题与项目"
+    ],
+    "caption": "本图只展开《避免全局摘要重复计数》的代码机制；每一帧与下方程序、当前正文概念对应。",
+    "walkthrough": {
+      "scenario": "沿《避免全局摘要重复计数》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "正常：逐行对照参考程序",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "title": "读取两份相同示例报告",
+              "section": "已解例：为什么不能简单数关键词",
+              "code_lines": [
+                1,
+                5
+              ],
+              "input": "r1有A/检索、B/多Agent；r2有A/检索、C/检索",
+              "action": "把Map结果当已给定输入。",
+              "output": "4次提及，3个真实项目",
+              "state": "mentions=4; project_ids={A,B,C}",
+              "why": "出现次数和真实实体数从一开始就不同。",
+              "failure": false,
+              "node": 0
+            },
+            {
+              "title": "初始化聚合字典",
+              "section": "Global Search 的 Map-Reduce",
+              "code_lines": [
+                6,
+                6
+              ],
+              "input": "还没有处理任何项目主题对",
+              "action": "创建空merged。",
+              "output": "merged={}",
+              "state": "themes=[]",
+              "why": "Reduce必须保存实体身份，而非只累计文字频率。",
+              "failure": false,
+              "node": 1
+            },
+            {
+              "title": "处理第一份报告",
+              "section": "已解例：为什么不能简单数关键词",
+              "code_lines": [
+                7,
+                9
+              ],
+              "input": "(A,检索)、(B,多Agent)",
+              "action": "按theme建立集合并add(project)。",
+              "output": "merged={检索:{A},多Agent:{B}}",
+              "state": "processed_reports=1",
+              "why": "每个主题下保存稳定项目ID，为去重建立依据。",
+              "failure": false,
+              "node": 2
+            },
+            {
+              "title": "处理第二份报告",
+              "section": "已解例：为什么不能简单数关键词",
+              "code_lines": [
+                7,
+                9
+              ],
+              "input": "(A,检索)、(C,检索)",
+              "action": "再次加入A集合不变；加入C增加一个项目。",
+              "output": "merged={检索:{A,C},多Agent:{B}}",
+              "state": "processed_reports=2; retrieval_projects=2",
+              "why": "这一步才体现“重复转述不增加独立项目”的机制。",
+              "failure": false,
+              "node": 3
+            },
+            {
+              "title": "校验聚合不变量",
+              "section": "已解例：为什么不能简单数关键词",
+              "code_lines": [
+                10,
+                10
+              ],
+              "input": "检索主题集合已经形成",
+              "action": "检查结果恰为{A,C}。",
+              "output": "断言通过",
+              "state": "merged[检索]=={A,C}",
+              "why": "若用来源位置当身份，这个断言会及时抓到重复计数。",
+              "failure": false,
+              "node": 4
+            },
+            {
+              "title": "稳定打印主题与项目",
+              "section": "Global Search 的 Map-Reduce",
+              "code_lines": [
+                11,
+                12
+              ],
+              "input": "两个主题与对应集合",
+              "action": "主题排序；各集合内部也排序。",
+              "output": "多Agent B\n检索 A,C",
+              "state": "stdout与预期一致",
+              "why": "同一结果可回到两份reports中的原始项目，而不是新编实体。",
+              "failure": false,
+              "node": 5
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "边界变式：对照同一份程序",
+          "basis": "边界分支沿用同一实验。若列出替换行，代码片段展示替换后的变式；下方完整参考程序仍保留正常版本。",
+          "steps": [
+            {
+              "title": "读取两份相同示例报告",
+              "section": "已解例：为什么不能简单数关键词",
+              "code_lines": [
+                1,
+                5
+              ],
+              "input": "r1有A/检索、B/多Agent；r2有A/检索、C/检索",
+              "action": "把Map结果当已给定输入。",
+              "output": "4次提及，3个真实项目",
+              "state": "mentions=4; project_ids={A,B,C}",
+              "why": "出现次数和真实实体数从一开始就不同。",
+              "failure": false,
+              "node": 0
+            },
+            {
+              "title": "初始化聚合字典",
+              "section": "Global Search 的 Map-Reduce",
+              "code_lines": [
+                6,
+                6
+              ],
+              "input": "还没有处理任何项目主题对",
+              "action": "创建空merged。",
+              "output": "merged={}",
+              "state": "themes=[]",
+              "why": "Reduce必须保存实体身份，而非只累计文字频率。",
+              "failure": false,
+              "node": 1
+            },
+            {
+              "title": "处理第一份报告",
+              "section": "已解例：为什么不能简单数关键词",
+              "code_lines": [
+                7,
+                9
+              ],
+              "input": "(A,检索)、(B,多Agent)",
+              "action": "变式将项目ID附上报告编号，错误地把来源位置变成身份。",
+              "output": "merged={检索:{A-report1},多Agent:{B-report1}}",
+              "state": "identity=project_plus_report",
+              "why": "每个主题下保存稳定项目ID，为去重建立依据。",
+              "failure": false,
+              "node": 2
+            },
+            {
+              "title": "处理第二份报告",
+              "section": "已解例：为什么不能简单数关键词",
+              "code_lines": [
+                7,
+                9
+              ],
+              "input": "(A,检索)、(C,检索)",
+              "action": "同一A在第二份被写成A-report2，集合无法把两次转述合并。",
+              "output": "检索:{A-report1,A-report2,C-report2}",
+              "state": "retrieval_count=3 (错误，应为2)",
+              "why": "不同来源是同一实体的证据，不应改写实体ID。",
+              "failure": false,
+              "node": 3
+            },
+            {
+              "title": "校验聚合不变量",
+              "section": "已解例：为什么不能简单数关键词",
+              "code_lines": [
+                10,
+                10
+              ],
+              "input": "检索集合含带报告后缀的三项",
+              "action": "第10行仍期望稳定实体集合{A,C}，断言失败。",
+              "output": "AssertionError；不输出错误汇总",
+              "state": "entity_deduplication=fail",
+              "why": "这就是正文重复计数问题在同一份Reduce程序里的具体反例。",
+              "failure": true,
+              "node": 4
+            }
+          ],
+          "code_overrides": {
+            "9": "        merged.setdefault(theme, set()).add(project + \"-report\" + str(reports.index(report)+1))"
+          },
+          "verified_result": {
+            "returncode": 1,
+            "stdout": "",
+            "exception": "AssertionError"
+          }
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "Global是不是Local多走几跳？",
+      "a": "不是。Local围绕特定实体组织邻域证据；Global通常对社区报告进行批次分析与汇总，目标是语料范围综合。多跳关系链可仍是局部查询。",
+      "rubric": "区分范围、输入单元和聚合方式。"
+    },
+    {
+      "q": "多个社区报告都提到项目A，能当多个独立项目吗？",
+      "a": "不能。要用稳定实体/claim ID去重，并保留来源集合。重复转述不能当独立支持或数量，准确统计应回结构化底表验证。",
+      "rubric": "说明去重键与证据独立性。"
+    },
+    {
+      "q": "查某订单金额应该用Global Search吗？",
+      "a": "通常应查带授权和一致性保证的订单API/数据库。社区报告是有损摘要，既可能过期也可能遗漏精确数值，复杂图搜索在此没有天然收益。",
+      "rubric": "按需求选简单工具。"
+    },
+    {
+      "q": "细层社区一定优于粗层吗？",
+      "a": "不一定。细层更详细但报告多、延迟与预算压力大，可能覆盖不全；粗层更省但有摘要损失。按任务比较覆盖、正确性和成本。",
+      "rubric": "说明双向取舍与评测。"
+    }
+  ],
+  "lab": {
+    "title": "避免全局摘要重复计数",
+    "task": "运行程序，比较直接计数报告提及次数与去重项目数的差别。",
+    "code": "reports = [\n    [(\"A\",\"检索\"),(\"B\",\"多Agent\")],\n    [(\"A\",\"检索\"),(\"C\",\"检索\")],\n]\n# Map输出已人工给定；用实体ID模拟Reduce去重。\nmerged = {}\nfor report in reports:\n    for project, theme in report:\n        merged.setdefault(theme, set()).add(project)\nassert merged[\"检索\"] == {\"A\",\"C\"}\nfor theme in sorted(merged):\n    print(theme, \",\".join(sorted(merged[theme])))\n",
+    "expected": "多Agent B\n检索 A,C\n",
+    "explanation": "Map输入已人工结构化，Reduce按主题聚合项目ID，A出现两次只计一次；真实系统还需处理同ID不同说法和冲突。",
+    "extensions": [
+      "同一项目出现互相矛盾主题时如何处理？",
+      "为什么“频繁提及”不能推断“最严重”？"
+    ],
+    "extension_answers": [
+      "主题可多标签；如事实真正冲突则保留来源、时间和冲突状态，不能用dict覆盖最后一条。",
+      "频率是出现量，严重性需影响范围、损失或业务指标；选择偏差与重复报道都会扭曲频率。"
+    ]
+  },
+  "pitfalls": [
+    "把Global等同多跳",
+    "摘要提及次数当真实统计",
+    "对全部问题无条件使用图"
+  ],
+  "checkpoint": "为精确金额、关系链、整库主题各选路径，并解释预算和失败模式。",
+  "alignment": {
+    "case_title": "避免全局摘要重复计数",
+    "insert_after": "已解例：为什么不能简单数关键词",
+    "bridge": "这一节的“不能简单数关键词”会直接落到下面两份`reports`。第一份是`[(A,检索),(B,多Agent)]`，第二份是`[(A,检索),(C,检索)]`。A被两份报告重复提到，B只出现一次，C只出现一次；最终真实项目有A、B、C三个，其中检索方向的项目应是A、C两项，而不是把A的两次转述计成两个项目。\n\n本例把Map输出人工写好，程序只执行Reduce。第7—9行遍历每份报告和每个项目主题对，用主题作为字典键，用项目ID放进集合。第一份处理后，检索对应{A}、多Agent对应{B}；第二份再加入A时集合不变，加入C后才变成{A,C}。第10行明确检查这个不变量，最后排序输出，保证显示顺序稳定。\n\n演示会逐次展示同一个`merged`字典怎样改变；紧接的代码就是同样的两个输入列表。边界分支故意把项目身份改成“项目ID＋报告编号”，A在两份报告中就变成两个不同键，断言会暴露错误。这是Global聚合里的去重机制。完整LLM Map和社区检索尚未运行，请把这份程序的能力边界和正文全景分开。",
+    "coverage": "只执行人工Map结果的Reduce与稳定输出，不运行实体定位、Local Search、社区生成或真实LLM Map。",
+    "question_sections": [
+      "多跳与全局综述也不同",
+      "已解例：为什么不能简单数关键词",
+      "两种问题，需要不同覆盖范围",
+      "Global Search 的 Map-Reduce"
+    ],
+    "coverage_summary": "Map结果已人工给定，程序只执行Reduce去重，不运行真实LLM分析。"
+  }
+}

@@ -1,0 +1,247 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>MCP 与工具生态面试题 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-076.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/MCP与工具生态.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/18-security-governance.html">18 安全治理、注入防护与工具权限</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/MCP%E4%B8%8E%E5%B7%A5%E5%85%B7%E7%94%9F%E6%80%81.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/MCP%E4%B8%8E%E5%B7%A5%E5%85%B7%E7%94%9F%E6%80%81.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80mcp-%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5">一、MCP 核心概念</a><a href="#%E4%BB%80%E4%B9%88%E6%98%AF-mcpmodel-context-protocol">什么是 MCP（Model Context Protocol）？</a><a href="#mcp-%E8%A7%A3%E5%86%B3%E7%9A%84%E6%A0%B8%E5%BF%83%E7%97%9B%E7%82%B9">MCP 解决的核心痛点</a><a href="#%E4%BA%8Cmcp-%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3">二、MCP 架构详解</a><a href="#%E5%9B%9B%E5%A4%A7%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6">四大核心组件</a><a href="#mcp-%E4%B8%89%E5%A4%A7%E8%83%BD%E5%8A%9B%E5%8E%9F%E8%AF%AD">MCP 三大能力原语</a><a href="#%E4%B8%89mcp-vs-function-calling-vs-plugin">三、MCP vs Function Calling vs Plugin</a><a href="#%E4%B8%89%E8%80%85%E5%AF%B9%E6%AF%94">三者对比</a><a href="#%E5%9B%9Bmcp-server-%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98">四、MCP Server 开发实战</a><a href="#pythonfastmcp">Python（FastMCP）</a><a href="#typescriptmcp-sdk">TypeScript（MCP SDK）</a><a href="#%E5%BC%80%E5%8F%91%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5">开发最佳实践</a><a href="#%E4%BA%94mcp-%E5%9C%A8%E4%BC%81%E4%B8%9A%E7%BA%A7-agent-%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF">五、MCP 在企业级 Agent 中的应用场景</a><a href="#%E5%85%AD%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88">六、常见面试题与参考答案</a><a href="#q1mcp-%E6%98%AF%E4%BB%80%E4%B9%88%E5%AE%83%E8%A7%A3%E5%86%B3%E4%BA%86%E4%BB%80%E4%B9%88%E6%A0%B8%E5%BF%83%E9%97%AE%E9%A2%98">Q1：MCP 是什么？它解决了什么核心问题？</a><a href="#q2mcp-%E7%9A%84%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E5%88%86%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88%E5%90%84%E8%87%AA%E8%81%8C%E8%B4%A3%E6%98%AF%E4%BB%80%E4%B9%88">Q2：MCP 的四大组件分别是什么？各自职责是什么？</a><a href="#q3mcp-%E7%9A%84%E4%B8%89%E5%A4%A7%E8%83%BD%E5%8A%9B%E5%8E%9F%E8%AF%AD%E6%98%AF%E4%BB%80%E4%B9%88%E5%AE%83%E4%BB%AC%E7%9A%84%E6%8E%A7%E5%88%B6%E6%96%B9%E5%88%86%E5%88%AB%E6%98%AF%E8%B0%81">Q3：MCP 的三大能力原语是什么？它们的控制方分别是谁？</a><a href="#q4mcp-vs-function-calling-%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8C%BA%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88">Q4：MCP vs Function Calling 的核心区别是什么？</a><a href="#q5mcp-%E6%94%AF%E6%8C%81%E5%93%AA%E4%BA%9B-transport%E5%90%84%E9%80%82%E7%94%A8%E4%BB%80%E4%B9%88%E5%9C%BA%E6%99%AF">Q5：MCP 支持哪些 Transport？各适用什么场景？</a><a href="#q6%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%B8%AA%E9%AB%98%E8%B4%A8%E9%87%8F%E7%9A%84-mcp-tool-%E6%8F%8F%E8%BF%B0">Q6：如何设计一个高质量的 MCP Tool 描述？</a><a href="#q7mcp-%E7%9A%84%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9E%8B%E6%98%AF%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E7%9A%84">Q7：MCP 的安全模型是如何设计的？</a><a href="#q8%E5%A6%82%E6%9E%9C%E4%B8%80%E4%B8%AA-mcp-server-%E5%93%8D%E5%BA%94%E5%BE%88%E6%85%A2%E6%80%8E%E4%B9%88%E4%BC%98%E5%8C%96">Q8：如果一个 MCP Server 响应很慢，怎么优化？</a><a href="#q9mcp-%E4%B8%AD%E7%9A%84-resource-%E5%92%8C-tool-%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E7%94%A8-resource">Q9：MCP 中的 Resource 和 Tool 有什么区别？什么时候用 Resource？</a><a href="#q10%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-mcp-server-%E7%9A%84%E5%B7%A5%E5%85%B7%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6">Q10：如何实现 MCP Server 的工具权限控制？</a><a href="#q11mcp-%E7%9A%84-capability-negotiation-%E6%98%AF%E4%BB%80%E4%B9%88%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%AE%83">Q11：MCP 的 capability negotiation 是什么？为什么需要它？</a><a href="#q12%E5%9C%A8%E4%BC%81%E4%B8%9A%E7%BA%A7%E5%9C%BA%E6%99%AF%E4%B8%AD%E5%A6%82%E4%BD%95%E7%AE%A1%E7%90%86%E5%A4%A7%E9%87%8F-mcp-server">Q12：在企业级场景中，如何管理大量 MCP Server？</a><a href="#q13mcp-%E7%9A%84-sampling-%E6%9C%BA%E5%88%B6%E6%98%AF%E4%BB%80%E4%B9%88">Q13：MCP 的 Sampling 机制是什么？</a><a href="#q14%E5%A6%82%E4%BD%95%E6%B5%8B%E8%AF%95%E5%92%8C%E8%B0%83%E8%AF%95-mcp-server">Q14：如何测试和调试 MCP Server？</a><a href="#q15mcp-%E4%B8%8E-openapiswagger-%E6%9C%89%E4%BB%80%E4%B9%88%E5%85%B3%E7%B3%BB">Q15：MCP 与 OpenAPI/Swagger 有什么关系？</a><a href="#q16mcp-%E5%8D%8F%E8%AE%AE%E6%98%AF%E6%9C%89%E7%8A%B6%E6%80%81%E8%BF%98%E6%98%AF%E6%97%A0%E7%8A%B6%E6%80%81%E7%9A%84">Q16：MCP 协议是有状态还是无状态的？</a><a href="#q17mcp-%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E7%9A%84%E5%B9%B6%E5%8F%91%E5%92%8C%E9%A1%BA%E5%BA%8F%E9%97%AE%E9%A2%98">Q17：MCP 如何处理工具调用的并发和顺序问题？</a><a href="#q18mcp-%E7%94%9F%E6%80%81%E4%B8%AD%E6%9C%89%E5%93%AA%E4%BA%9B%E7%9F%A5%E5%90%8D%E7%9A%84-server-%E5%AE%9E%E7%8E%B0">Q18：MCP 生态中有哪些知名的 Server 实现？</a><a href="#q19%E5%A6%82%E6%9E%9C%E8%AE%A9%E4%BD%A0%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%B8%AA-mcp-server%E4%BD%A0%E4%BC%9A%E5%A6%82%E4%BD%95%E8%80%83%E8%99%91%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86">Q19：如果让你设计一个 MCP Server，你会如何考虑错误处理？</a><a href="#q20mcp-%E7%9A%84%E6%9C%AA%E6%9D%A5%E5%8F%91%E5%B1%95%E6%96%B9%E5%90%91%E6%98%AF%E4%BB%80%E4%B9%88">Q20：MCP 的未来发展方向是什么？</a></nav></details><article class="prose source-prose"><h1 id="mcp-与工具生态面试题">MCP 与工具生态面试题</h1>
+<h2 id="一mcp-核心概念">一、MCP 核心概念</h2>
+<h3 id="什么是-mcpmodel-context-protocol">什么是 MCP（Model Context Protocol）？</h3>
+<p>MCP（Model Context Protocol）是由 Anthropic 于 2024 年底开源的一套<strong>标准化协议</strong>，旨在解决 LLM 应用与外部工具/数据源之间的集成碎片化问题。它定义了一种通用的通信方式，让 AI 模型能够以统一接口发现、调用和管理外部工具与资源。</p>
+<p><strong>核心问题：为什么需要 MCP？</strong></p>
+<p>在 MCP 出现之前，每个 AI 应用都需要为每个外部服务编写定制化的集成代码，形成 M×N 的集成困境：</p>
+<p><img alt="MCP 集成复杂度对比" src="../../source/diagrams/mcp-integration-comparison.svg" loading="lazy" decoding="async"></p>
+<p>类比：MCP 之于 AI 工具调用，就像 USB 之于外设连接——一个标准接口解决所有设备的兼容问题。</p>
+<h3 id="mcp-解决的核心痛点">MCP 解决的核心痛点</h3>
+<ol>
+<li><strong>集成碎片化</strong>：不同模型厂商的 Function Calling 格式不统一，工具开发者要适配多套 API</li>
+<li><strong>工具发现困难</strong>：缺乏标准化的工具注册和发现机制，用户需手动配置</li>
+<li><strong>上下文管理复杂</strong>：工具返回的结果如何注入模型上下文，缺乏统一规范</li>
+<li><strong>安全边界模糊</strong>：工具的权限控制、用户授权没有标准化方案</li>
+<li><strong>生态孤岛</strong>：每个平台的插件/工具不可复用，开发者重复造轮子</li>
+</ol>
+<h2 id="二mcp-架构详解">二、MCP 架构详解</h2>
+<h3 id="四大核心组件">四大核心组件</h3>
+<p><img alt="MCP 四大核心组件：Host / Client / Server / Transport" src="../../source/diagrams/mcp-architecture.svg" loading="lazy" decoding="async"></p>
+<p><strong>1. Host（宿主）</strong>
+- 运行 LLM 的应用程序，如 Claude Desktop、Cursor、自定义 Agent 框架
+- 负责管理多个 MCP Client 实例的生命周期
+- 控制安全策略和权限边界
+- 示例：Claude Desktop 就是一个 Host，它可以同时连接多个 MCP Server</p>
+<p><strong>2. Client（客户端）</strong>
+- Host 内部的协议实例，每个 Client 维护与一个 Server 的 1:1 连接
+- 负责协议协商（capability negotiation）、消息路由
+- 管理请求/响应的生命周期</p>
+<p><strong>3. Server（服务端）</strong>
+- 对外暴露工具（Tools）、资源（Resources）和提示模板（Prompts）
+- 一个 Server 可以提供多个工具，如 GitHub Server 提供 create_issue、list_repos 等
+- 轻量化设计，专注于单一数据源或服务的封装</p>
+<p><strong>4. Transport（传输层）</strong>
+- <strong>stdio</strong>：通过标准输入/输出通信，适合本地进程间通信，最常用
+- <strong>HTTP + SSE（Server-Sent Events）</strong>：适合远程通信，Server 通过 SSE 推送消息
+- <strong>Streamable HTTP</strong>：2025 年新增的传输方式，替代 SSE，更灵活</p>
+<h3 id="mcp-三大能力原语">MCP 三大能力原语</h3>
+<table>
+<thead>
+<tr>
+<th>原语</th>
+<th>说明</th>
+<th>控制方</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tools</strong></td>
+<td>模型可调用的函数</td>
+<td>模型决定是否调用</td>
+<td><code>create_issue()</code>, <code>query_db()</code></td>
+</tr>
+<tr>
+<td><strong>Resources</strong></td>
+<td>模型可读取的数据源</td>
+<td>应用程序控制</td>
+<td>文件内容、数据库 schema、API 文档</td>
+</tr>
+<tr>
+<td><strong>Prompts</strong></td>
+<td>预定义的提示模板</td>
+<td>用户触发</td>
+<td>"总结这个 PR"、"分析这段代码"</td>
+</tr>
+</tbody>
+</table>
+<h2 id="三mcp-vs-function-calling-vs-plugin">三、MCP vs Function Calling vs Plugin</h2>
+<h3 id="三者对比">三者对比</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Function Calling</th>
+<th>Plugin（如 ChatGPT）</th>
+<th>MCP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>定义层</strong></td>
+<td>模型推理层</td>
+<td>应用平台层</td>
+<td>通信协议层</td>
+</tr>
+<tr>
+<td><strong>标准化</strong></td>
+<td>各厂商格式不同</td>
+<td>平台私有</td>
+<td>开放标准</td>
+</tr>
+<tr>
+<td><strong>工具发现</strong></td>
+<td>开发者手动注册</td>
+<td>平台商店</td>
+<td>协议内建 <code>tools/list</code></td>
+</tr>
+<tr>
+<td><strong>可移植性</strong></td>
+<td>绑定特定模型</td>
+<td>绑定特定平台</td>
+<td>跨模型、跨平台</td>
+</tr>
+<tr>
+<td><strong>传输方式</strong></td>
+<td>HTTP API 内嵌</td>
+<td>HTTP API</td>
+<td>stdio / HTTP / SSE</td>
+</tr>
+<tr>
+<td><strong>状态管理</strong></td>
+<td>无</td>
+<td>会话级</td>
+<td>连接级，支持有状态</td>
+</tr>
+<tr>
+<td><strong>安全模型</strong></td>
+<td>API Key</td>
+<td>OAuth</td>
+<td>协议内建权限协商</td>
+</tr>
+<tr>
+<td><strong>典型场景</strong></td>
+<td>单模型工具调用</td>
+<td>消费级产品</td>
+<td>企业级 Agent 集成</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键区别：</strong>
+- <strong>Function Calling</strong> 是"模型怎么调工具"——关注的是 LLM 输出结构化的工具调用指令
+- <strong>Plugin</strong> 是"平台怎么管工具"——关注的是工具在特定平台的注册、分发、计费
+- <strong>MCP</strong> 是"工具怎么接入"——关注的是工具与 AI 应用之间的通信标准</p>
+<p>三者不是竞争关系，而是互补：MCP Server 暴露工具 → Host 通过 Function Calling 让模型决定调用哪个工具 → 平台以 Plugin 形式分发。</p>
+<h2 id="四mcp-server-开发实战">四、MCP Server 开发实战</h2>
+<h3 id="pythonfastmcp">Python（FastMCP）</h3>
+<pre><code class="language-python">from mcp.server.fastmcp import FastMCP
+
+# 创建 MCP Server
+mcp = FastMCP(&quot;weather-server&quot;)
+
+@mcp.tool()
+def get_weather(city: str, unit: str = &quot;celsius&quot;) -&gt; str:
+    &quot;&quot;&quot;获取指定城市的当前天气信息。
+
+    Args:
+        city: 城市名称，如 &quot;北京&quot;、&quot;上海&quot;
+        unit: 温度单位，celsius 或 fahrenheit
+    &quot;&quot;&quot;
+    # 实际实现会调用天气 API
+    return f&quot;{city} 当前温度 25°C，晴天&quot;
+
+@mcp.resource(&quot;config://app-settings&quot;)
+def get_settings() -&gt; str:
+    &quot;&quot;&quot;返回应用配置信息&quot;&quot;&quot;
+    return '{&quot;theme&quot;: &quot;dark&quot;, &quot;language&quot;: &quot;zh-CN&quot;}'
+
+@mcp.prompt()
+def summarize_weather(city: str) -&gt; str:
+    &quot;&quot;&quot;生成天气摘要提示&quot;&quot;&quot;
+    return f&quot;请根据以下天气数据，为{city}生成一段简洁的天气摘要。&quot;
+
+# 运行
+if __name__ == &quot;__main__&quot;:
+    mcp.run(transport=&quot;stdio&quot;)
+</code></pre>
+<h3 id="typescriptmcp-sdk">TypeScript（MCP SDK）</h3>
+<pre><code class="language-typescript">import { McpServer } from &quot;@modelcontextprotocol/sdk/server/mcp.js&quot;;
+import { StdioServerTransport } from &quot;@modelcontextprotocol/sdk/server/stdio.js&quot;;
+import { z } from &quot;zod&quot;;
+
+const server = new McpServer({
+  name: &quot;weather-server&quot;,
+  version: &quot;1.0.0&quot;,
+});
+
+server.tool(
+  &quot;get_weather&quot;,
+  &quot;获取指定城市的当前天气&quot;,
+  { city: z.string(), unit: z.enum([&quot;celsius&quot;, &quot;fahrenheit&quot;]).default(&quot;celsius&quot;) },
+  async ({ city, unit }) =&gt; {
+    return {
+      content: [{ type: &quot;text&quot;, text: `${city} 当前温度 25°C，晴天` }],
+    };
+  }
+);
+
+const transport = new StdioServerTransport();
+await server.connect(transport);
+</code></pre>
+<h3 id="开发最佳实践">开发最佳实践</h3>
+<ol>
+<li><strong>工具描述要精确</strong>：LLM 通过描述决定何时调用，含糊的描述会导致错误调用</li>
+<li><strong>参数用 JSON Schema 严格约束</strong>：类型、枚举、默认值、必填项都要明确</li>
+<li><strong>错误处理要优雅</strong>：返回结构化错误信息，而非抛异常让连接断开</li>
+<li><strong>幂等设计</strong>：同一调用多次执行应产生相同结果，防止重复操作</li>
+<li><strong>超时控制</strong>：长时间运行的工具应支持 progress notification</li>
+</ol>
+<h2 id="五mcp-在企业级-agent-中的应用场景">五、MCP 在企业级 Agent 中的应用场景</h2>
+<ol>
+<li><strong>统一工具网关</strong>：企业内部多个 Agent 通过 MCP 接入统一的工具注册中心，避免重复集成</li>
+<li><strong>权限隔离</strong>：不同角色的 Agent 通过 MCP 的权限协商机制，访问不同级别的工具</li>
+<li><strong>审计追踪</strong>：所有工具调用通过 MCP 标准协议，天然支持日志审计</li>
+<li><strong>多模型切换</strong>：工具层与模型层解耦，切换底层 LLM 不需要修改工具集成代码</li>
+<li><strong>渐进式迁移</strong>：企业可以逐步将内部 API 封装为 MCP Server，无需一次性重构</li>
+</ol>
+<h2 id="六常见面试题与参考答案">六、常见面试题与参考答案</h2>
+<h3 id="q1mcp-是什么它解决了什么核心问题">Q1：MCP 是什么？它解决了什么核心问题？</h3>
+<p><strong>答</strong>：MCP 是 Anthropic 开源的标准化协议，定义了 AI 应用与外部工具/数据源之间的通信规范。核心解决 M×N 集成碎片化问题——让工具开发者写一次 MCP Server，就能被所有支持 MCP 的 Host 调用，将集成复杂度从 M×N 降为 M+N。</p>
+<h3 id="q2mcp-的四大组件分别是什么各自职责是什么">Q2：MCP 的四大组件分别是什么？各自职责是什么？</h3>
+<p><strong>答</strong>：Host（宿主应用，管理生命周期和安全策略）、Client（协议实例，维护与 Server 的 1:1 连接）、Server（暴露 Tools/Resources/Prompts）、Transport（传输层，支持 stdio/HTTP+SSE/Streamable HTTP）。</p>
+<h3 id="q3mcp-的三大能力原语是什么它们的控制方分别是谁">Q3：MCP 的三大能力原语是什么？它们的控制方分别是谁？</h3>
+<p><strong>答</strong>：Tools（模型控制，模型决定是否调用）、Resources（应用控制，如自动注入上下文）、Prompts（用户控制，用户选择使用的模板）。设计理念是不同的能力由最合适的角色控制。</p>
+<h3 id="q4mcp-vs-function-calling-的核心区别是什么">Q4：MCP vs Function Calling 的核心区别是什么？</h3>
+<p><strong>答</strong>：Function Calling 解决"模型如何输出结构化工具调用指令"，是推理层的能力；MCP 解决"工具如何接入 AI 应用"，是通信协议层的标准。两者互补——MCP Server 暴露工具，模型通过 Function Calling 决定调用哪个。</p>
+<h3 id="q5mcp-支持哪些-transport各适用什么场景">Q5：MCP 支持哪些 Transport？各适用什么场景？</h3>
+<p><strong>答</strong>：①stdio：通过标准输入输出通信，适合本地进程，启动快、零配置；②HTTP+SSE：适合远程部署，Server 通过 SSE 推送事件；③Streamable HTTP：2025 年新增，无状态 HTTP 请求可选升级为 SSE 流，兼顾简单性和实时性。</p>
+<h3 id="q6如何设计一个高质量的-mcp-tool-描述">Q6：如何设计一个高质量的 MCP Tool 描述？</h3>
+<p><strong>答</strong>：①名称用动词+名词（如 <code>create_issue</code>）；②description 精确说明功能、适用场景、限制条件；③参数用 JSON Schema 严格定义类型、枚举、默认值；④返回值结构化；⑤加入使用示例。差的描述会导致 LLM 误调用或不调用。</p>
+<h3 id="q7mcp-的安全模型是如何设计的">Q7：MCP 的安全模型是如何设计的？</h3>
+<p><strong>答</strong>：多层安全机制：①协议层的 capability negotiation，Client 和 Server 在连接时协商各自支持的能力；②Host 层的权限控制，Host 决定哪些 Server 可连接、哪些工具可暴露给模型；③Transport 层可叠加 TLS、认证；④用户确认机制（human-in-the-loop），敏感操作需用户授权。</p>
+<h3 id="q8如果一个-mcp-server-响应很慢怎么优化">Q8：如果一个 MCP Server 响应很慢，怎么优化？</h3>
+<p><strong>答</strong>：①使用 progress notification 机制，向 Client 报告进度，避免超时；②工具拆分——将耗时操作拆为"提交任务"和"查询结果"两个工具；③缓存常用数据；④Server 端异步处理；⑤Transport 层考虑用 Streamable HTTP 替代 stdio 以支持并发。</p>
+<h3 id="q9mcp-中的-resource-和-tool-有什么区别什么时候用-resource">Q9：MCP 中的 Resource 和 Tool 有什么区别？什么时候用 Resource？</h3>
+<p><strong>答</strong>：Tool 是模型主动调用的函数，有副作用（如创建 issue）；Resource 是被动提供的数据源（如文件内容、数据库 schema），由应用程序控制注入时机。当数据是"背景信息"而非"操作"时用 Resource，如把项目的 README 作为 Resource 注入上下文。</p>
+<h3 id="q10如何实现-mcp-server-的工具权限控制">Q10：如何实现 MCP Server 的工具权限控制？</h3>
+<p><strong>答</strong>：①Server 端：在工具注解中声明所需权限，如 <code>annotations: {"readOnly": true}</code>；②Host 端：维护白名单，只暴露授权的工具给模型；③Runtime：敏感工具标记 <code>destructive</code>，Host 在调用前要求用户确认；④多租户场景通过 Transport 层携带用户身份，Server 端做鉴权。</p>
+<h3 id="q11mcp-的-capability-negotiation-是什么为什么需要它">Q11：MCP 的 capability negotiation 是什么？为什么需要它？</h3>
+<p><strong>答</strong>：Client 和 Server 在建立连接时互相声明自己支持的功能（如 Server 声明支持 tools、resources；Client 声明支持 sampling）。这样双方只使用共同支持的功能，保证向前兼容——旧 Client 遇到新 Server 不会因为不认识新特性而崩溃。</p>
+<h3 id="q12在企业级场景中如何管理大量-mcp-server">Q12：在企业级场景中，如何管理大量 MCP Server？</h3>
+<p><strong>答</strong>：①建立统一的 Server 注册中心（类似服务发现）；②用配置文件统一管理 Server 连接信息；③实现健康检查和自动重连；④日志集中收集和审计；⑤版本管理，支持灰度升级；⑥基于角色的访问控制（RBAC），不同 Agent 看到不同的工具集。</p>
+<h3 id="q13mcp-的-sampling-机制是什么">Q13：MCP 的 Sampling 机制是什么？</h3>
+<p><strong>答</strong>：Sampling 允许 Server 反过来请求 Host 的 LLM 进行推理。使用场景：Server 在处理复杂任务时需要 LLM 辅助决策（如分析查询结果、生成摘要）。这形成了"LLM ↔ Server"的双向通信，但始终由 Host 控制 LLM 的调用权限，保证安全。</p>
+<h3 id="q14如何测试和调试-mcp-server">Q14：如何测试和调试 MCP Server？</h3>
+<p><strong>答</strong>：①使用 MCP Inspector（官方调试工具），可视化查看 Server 暴露的工具和资源；②单元测试：直接调用工具函数；③集成测试：用 MCP Client SDK 模拟连接；④日志：Server 通过 <code>logging</code> 能力发送日志给 Host；⑤错误注入：测试网络断开、超时等异常情况。</p>
+<h3 id="q15mcp-与-openapiswagger-有什么关系">Q15：MCP 与 OpenAPI/Swagger 有什么关系？</h3>
+<p><strong>答</strong>：OpenAPI 定义 REST API 的接口规范，MCP 定义 AI 工具的通信协议。MCP Server 可以包装 OpenAPI 定义的 API——用 OpenAPI 描述 HTTP 接口，用 MCP 让 AI 模型能发现和调用这些接口。社区有工具可以自动将 OpenAPI spec 转为 MCP Server。</p>
+<h3 id="q16mcp-协议是有状态还是无状态的">Q16：MCP 协议是有状态还是无状态的？</h3>
+<p><strong>答</strong>：MCP 连接是有状态的。Client 和 Server 建立连接后，维护会话状态（如协商的 capabilities、订阅的资源变更通知）。但 Streamable HTTP Transport 支持无状态模式——简单的请求-响应可以不维护长连接，需要时再升级为有状态的 SSE 流。</p>
+<h3 id="q17mcp-如何处理工具调用的并发和顺序问题">Q17：MCP 如何处理工具调用的并发和顺序问题？</h3>
+<p><strong>答</strong>：MCP 基于 JSON-RPC 2.0，每个请求有唯一 ID，支持并发发送多个请求。Client 可以同时发起多个工具调用，Server 异步处理并按 ID 返回。顺序依赖由 Host/Agent 框架在上层控制——MCP 协议本身不强制顺序。</p>
+<h3 id="q18mcp-生态中有哪些知名的-server-实现">Q18：MCP 生态中有哪些知名的 Server 实现？</h3>
+<p><strong>答</strong>：官方和社区提供了大量 Server：GitHub（代码管理）、Filesystem（文件操作）、PostgreSQL/SQLite（数据库）、Brave Search（搜索）、Slack（消息）、Google Drive（文档）等。这些 Server 可以直接在 Claude Desktop、Cursor 等 Host 中使用，体现了 MCP 的即插即用优势。</p>
+<h3 id="q19如果让你设计一个-mcp-server你会如何考虑错误处理">Q19：如果让你设计一个 MCP Server，你会如何考虑错误处理？</h3>
+<p><strong>答</strong>：①区分可恢复和不可恢复错误——可恢复的返回错误信息让模型重试，不可恢复的返回明确失败原因；②使用 MCP 标准错误码（基于 JSON-RPC 错误码）；③工具返回的 <code>isError: true</code> 标记，让 Host 知道这是工具执行失败而非协议错误；④敏感信息脱敏——错误信息不应泄露内部实现细节；⑤超时处理——长任务用 progress notification，避免 Client 超时断连。</p>
+<h3 id="q20mcp-的未来发展方向是什么">Q20：MCP 的未来发展方向是什么？</h3>
+<p><strong>答</strong>：①远程 MCP Server 的标准化（目前以本地 stdio 为主，远程部署正在演进）；②认证授权标准化（OAuth 2.1 集成）；③工具市场/注册中心（类似 npm，方便发现和安装 MCP Server）；④多模态支持（图片、音视频等非文本内容的传输）；⑤与 Agent 框架的深度集成（LangChain、CrewAI 等已开始原生支持 MCP）。</p></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

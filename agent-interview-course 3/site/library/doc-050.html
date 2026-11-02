@@ -1,0 +1,201 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>2026-10 上下文与记忆面试题与参考答案 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-050.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/2026-10-上下文与记忆面试题与参考答案.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/05-context-engineering.html">05 Prompt 与上下文工程：选择、预算、压缩与回放</a> · <a href="../lessons/06-memory.html">06 记忆系统：存储、检索、写回与租户隔离</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B8%8E%E8%AE%B0%E5%BF%86%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B8%8E%E8%AE%B0%E5%BF%86%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F">使用方式</a><a href="#37-%E6%9E%84%E9%80%A0%E4%B8%80%E6%AC%A1%E6%A8%A1%E5%9E%8B%E8%BE%93%E5%85%A5%E6%97%B6%E7%B3%BB%E7%BB%9F%E7%BA%A6%E6%9D%9F%E7%94%A8%E6%88%B7%E6%B6%88%E6%81%AF%E7%8A%B6%E6%80%81%E5%92%8C%E5%B7%A5%E5%85%B7%E7%BB%93%E6%9E%9C%E5%A6%82%E4%BD%95%E5%88%86%E5%B1%82">37. 构造一次模型输入时，系统约束、用户消息、状态和工具结果如何分层？</a><a href="#38-%E5%B7%A5%E5%85%B7%E4%B8%80%E6%AC%A1%E8%BF%94%E5%9B%9E%E5%87%A0%E5%8D%81%E5%85%86%E6%95%B0%E6%8D%AE%E6%97%B6%E5%A6%82%E4%BD%95%E5%9C%A8%E8%BF%9B%E5%85%A5%E6%A8%A1%E5%9E%8B%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B9%8B%E5%89%8D%E5%AE%8C%E6%88%90%E5%A4%84%E7%90%86">38. 工具一次返回几十兆数据时，如何在进入模型上下文之前完成处理？</a><a href="#39-%E5%AF%B9%E8%AF%9D%E8%BD%AE%E6%95%B0%E4%B8%8D%E6%96%AD%E5%A2%9E%E9%95%BF%E6%97%B6%E5%A6%82%E4%BD%95%E6%8E%A7%E5%88%B6%E4%B8%8A%E4%B8%8B%E6%96%87%E9%A2%84%E7%AE%97%E8%80%8C%E4%B8%8D%E7%A0%B4%E5%9D%8F%E4%BB%BB%E5%8A%A1%E8%BF%9E%E7%BB%AD%E6%80%A7">39. 对话轮数不断增长时，如何控制上下文预算而不破坏任务连续性？</a><a href="#40-%E5%A6%82%E4%BD%95%E9%AA%8C%E8%AF%81%E5%8E%8B%E7%BC%A9%E5%90%8E%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87%E4%BB%8D%E4%BF%9D%E7%95%99%E5%86%B3%E5%AE%9A%E4%B8%8B%E4%B8%80%E6%AD%A5%E8%A1%8C%E5%8A%A8%E7%9A%84%E5%85%B3%E9%94%AE%E4%BF%A1%E6%81%AF">40. 如何验证压缩后的上下文仍保留决定下一步行动的关键信息？</a><a href="#41-%E5%BD%93%E5%89%8D%E4%BB%BB%E5%8A%A1%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B8%8E%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%E7%9A%84%E8%BE%B9%E7%95%8C%E6%98%AF%E4%BB%80%E4%B9%88%E5%93%AA%E4%BA%9B%E5%86%85%E5%AE%B9%E4%B8%8D%E5%80%BC%E5%BE%97%E9%95%BF%E6%9C%9F%E4%BF%9D%E5%AD%98">41. 当前任务上下文与长期记忆的边界是什么，哪些内容不值得长期保存？</a><a href="#42-%E5%B7%A5%E4%BD%9C%E8%AE%B0%E5%BF%86%E7%9F%AD%E6%9C%9F%E8%AE%B0%E5%BF%86%E5%92%8C%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%E5%88%86%E5%88%AB%E5%BA%94%E4%BF%9D%E5%AD%98%E4%BB%80%E4%B9%88%E4%BF%A1%E6%81%AF">42. 工作记忆、短期记忆和长期记忆分别应保存什么信息？</a><a href="#43-%E5%90%8C%E4%B8%80%E7%94%A8%E6%88%B7%E5%87%BA%E7%8E%B0%E4%BA%92%E7%9B%B8%E7%9F%9B%E7%9B%BE%E7%9A%84%E5%81%8F%E5%A5%BD%E6%88%96%E8%BA%AB%E4%BB%BD%E4%BF%A1%E6%81%AF%E6%97%B6%E5%A6%82%E4%BD%95%E6%9B%B4%E6%96%B0%E8%AE%B0%E5%BF%86">43. 同一用户出现互相矛盾的偏好或身份信息时，如何更新记忆？</a><a href="#44-%E9%94%99%E8%AF%AF%E7%9A%84%E7%94%A8%E6%88%B7%E5%A7%93%E5%90%8D%E8%BF%9B%E5%85%A5%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%E5%90%8E%E6%80%8E%E6%A0%B7%E8%AF%86%E5%88%AB%E6%B1%A1%E6%9F%93%E5%B9%B6%E4%BF%AE%E5%A4%8D%E5%8E%86%E5%8F%B2%E5%BD%B1%E5%93%8D">44. 错误的用户姓名进入长期记忆后，怎样识别污染并修复历史影响？</a><a href="#45-%E4%B8%BB-agent-%E4%B8%8E%E5%AD%90-agent-%E4%B9%8B%E9%97%B4%E5%A6%82%E4%BD%95%E4%BC%A0%E9%80%92%E5%BF%85%E8%A6%81%E4%BF%A1%E6%81%AF%E5%8F%88%E9%81%BF%E5%85%8D%E4%B8%8A%E4%B8%8B%E6%96%87%E7%9B%B8%E4%BA%92%E6%B1%A1%E6%9F%93">45. 主 Agent 与子 Agent 之间如何传递必要信息，又避免上下文相互污染？</a><a href="#46-%E7%94%A8%E6%88%B7%E5%81%8F%E5%A5%BD%E5%BC%82%E6%AD%A5%E5%86%99%E5%85%A5%E8%AE%B0%E5%BF%86%E6%97%B6%E5%A6%82%E4%BD%95%E8%A7%A3%E9%87%8A%E5%B9%B6%E6%8E%A7%E5%88%B6%E8%AF%BB%E5%8F%96%E5%88%B0%E6%97%A7%E4%BF%A1%E6%81%AF%E7%9A%84%E9%97%AE%E9%A2%98">46. 用户偏好异步写入记忆时，如何解释并控制读取到旧信息的问题？</a><a href="#47-%E4%B8%8A%E4%B8%8B%E6%96%87%E5%8E%8B%E7%BC%A9%E6%97%B6%E5%93%AA%E4%BA%9B%E7%B1%BB%E5%9E%8B%E7%9A%84%E4%BF%A1%E6%81%AF%E5%BA%94%E4%BC%98%E5%85%88%E4%BF%9D%E5%85%A8%E6%80%8E%E6%A0%B7%E8%AE%BE%E8%AE%A1%E9%AA%8C%E8%AF%81%E7%94%A8%E4%BE%8B">47. 上下文压缩时，哪些类型的信息应优先保全，怎样设计验证用例？</a><a href="#48-%E7%88%B6%E5%AD%90-agent-%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87%E5%B7%B2%E5%BE%88%E9%95%BF%E6%97%B6%E5%A6%82%E4%BD%95%E5%87%8F%E5%B0%91%E4%BC%A0%E9%80%92%E5%BC%80%E9%94%80%E5%B9%B6%E8%AF%B4%E6%98%8E%E4%BF%A1%E6%81%AF%E6%8D%9F%E5%A4%B1%E8%BE%B9%E7%95%8C">48. 父子 Agent 的上下文已很长时，如何减少传递开销并说明信息损失边界？</a></nav></details><article class="prose source-prose"><h1 id="2026-10-上下文与记忆面试题与参考答案">2026-10 上下文与记忆面试题与参考答案</h1>
+<blockquote>
+<p>来源快照：2026-10-22；答案整理：2026-10-23。此次迁入不代表重新抓取。
+本批题目按公开面经报道主题改写，是练习题，不是公司官方真题；答案为编辑综合参考，未经独立专家逐题复核，不是公司标准答案。</p>
+</blockquote>
+<p><a href="doc-048.html">返回本批索引</a> · <a href="doc-047.html">来源分级与资料</a></p>
+<h2 id="使用方式">使用方式</h2>
+<p>先独立回答，再对照得分点、追问和易错点。难度为编辑估计，非公司定级。
+公司标签只表示来源报道过相关主题，不证明逐字问过本题。B 仅代表曾找到原帖，不保证全文可读、作者亲历或题目真实；C 为待核验聚合线索。</p>
+<p><a id="Q-2078f8263d29"></a></p>
+<h2 id="37-构造一次模型输入时系统约束用户消息状态和工具结果如何分层">37. 构造一次模型输入时，系统约束、用户消息、状态和工具结果如何分层？</h2>
+<p><strong>题目 ID</strong>：<code>Q-2078f8263d29</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动、海康威视</p>
+<p><strong>参考答案</strong></p>
+<p>将受信系统规则、当前用户请求、结构化任务状态、必要历史和工具观察分层；外部材料明确标成不受信数据。保证工具调用与结果按 ID 关联，并按依赖顺序组织。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>预留生成预算</li>
+<li>权限与用户身份来自运行时</li>
+</ul>
+<p><strong>追问</strong>：工具结果中出现“忽略前文”如何处理？</p>
+<p><strong>易错点</strong>：不能把检索内容拼成系统指令来提升“权威性”。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939623386806751232?sourceSSR=post" rel="noreferrer">INT-2bfa666e65</a>（B：曾定位公开原帖）；<a href="https://www.nowcoder.com/discuss/940356350117228544?sourceSSR=post" rel="noreferrer">INT-e363eb73e2</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/" rel="noreferrer">INJECTION：OWASP LLM01: Prompt Injection</a>；<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a></p>
+<hr>
+<p><a id="Q-f72ae32dc22e"></a></p>
+<h2 id="38-工具一次返回几十兆数据时如何在进入模型上下文之前完成处理">38. 工具一次返回几十兆数据时，如何在进入模型上下文之前完成处理？</h2>
+<p><strong>题目 ID</strong>：<code>Q-f72ae32dc22e</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>在工具边界限流、限体积，把原始内容存为有权限和生命周期的产物；返回大小、schema、统计摘要与引用。按需过滤、分页、采样或通过受控计算工具提取相关字段。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>输入模型前做字节和 token 预算</li>
+<li>摘要可回链到原数据</li>
+</ul>
+<p><strong>追问</strong>：用户后来需要摘要里没保留的细节怎么办？</p>
+<p><strong>易错点</strong>：先把几十兆拼进提示词，再要求模型摘要，已经太晚。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939623386806751232?sourceSSR=post" rel="noreferrer">INT-2bfa666e65</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr>
+<p><a id="Q-28a3c147731d"></a></p>
+<h2 id="39-对话轮数不断增长时如何控制上下文预算而不破坏任务连续性">39. 对话轮数不断增长时，如何控制上下文预算而不破坏任务连续性？</h2>
+<p><strong>题目 ID</strong>：<code>Q-28a3c147731d</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>固定保留目标、约束与当前状态，近期对话用滑窗，旧历史用可追溯摘要，长期事实按需检索；在输入前按 token 计费口径估算并留出输出空间。记录压缩版本及回放表现。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>不要丢失工具调用配对</li>
+<li>为高价值原文保留可恢复引用</li>
+</ul>
+<p><strong>追问</strong>：摘要累积误差怎么发现？</p>
+<p><strong>易错点</strong>：只按消息条数截断会忽略单条超大消息。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939623386806751232?sourceSSR=post" rel="noreferrer">INT-2bfa666e65</a>（B：曾定位公开原帖）；<a href="https://www.nowcoder.com/discuss/938913714646929408?sourceSSR=post" rel="noreferrer">INT-c233db2a53</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr>
+<p><a id="Q-53d7a3257c5f"></a></p>
+<h2 id="40-如何验证压缩后的上下文仍保留决定下一步行动的关键信息">40. 如何验证压缩后的上下文仍保留决定下一步行动的关键信息？</h2>
+<p><strong>题目 ID</strong>：<code>Q-53d7a3257c5f</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>先定义必须保留的字段与事实，例如资源 ID、承诺、否定约束、未完成动作和审批范围；比较压缩前后在同一任务上的下一步决策及最终验收，必要时检索原文补回。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>字段检查加任务级回放</li>
+<li>加入长对话和冲突信息</li>
+</ul>
+<p><strong>追问</strong>：两份摘要文字不同但行动相同，如何评分？</p>
+<p><strong>易错点</strong>：不能只让同一个模型说“压缩得很好”就算验证。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/931893943342465024?sourceSSR=post" rel="noreferrer">INT-52d6d4862a</a>（B：曾定位公开原帖）；<a href="https://www.nowcoder.com/discuss/941992971027636224?sourceSSR=post" rel="noreferrer">INT-332a893cbf</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr>
+<p><a id="Q-7b3cf0a75a45"></a></p>
+<h2 id="41-当前任务上下文与长期记忆的边界是什么哪些内容不值得长期保存">41. 当前任务上下文与长期记忆的边界是什么，哪些内容不值得长期保存？</h2>
+<p><strong>题目 ID</strong>：<code>Q-7b3cf0a75a45</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动、网易</p>
+<p><strong>参考答案</strong></p>
+<p>上下文是当前决策可用的临时工作集；长期记忆保存跨任务仍有价值且有来源、权限和时效的事实。瞬时错误、未经证实推断、秘密以及无保留依据的信息不宜直接永久保存。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>记忆与知识库用途分离</li>
+<li>支持更新、过期与删除</li>
+</ul>
+<p><strong>追问</strong>：怎样决定一条信息是否有跨任务价值？</p>
+<p><strong>易错点</strong>：长期记忆不是聊天日志无限复制。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938913714646929408?sourceSSR=post" rel="noreferrer">INT-c233db2a53</a>（B：曾定位公开原帖）；<a href="https://mj.mianlingai.com/interview/netease-agent-development-first-round-2927708/" rel="noreferrer">INT-6784717d92</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr>
+<p><a id="Q-3389876d4408"></a></p>
+<h2 id="42-工作记忆短期记忆和长期记忆分别应保存什么信息">42. 工作记忆、短期记忆和长期记忆分别应保存什么信息？</h2>
+<p><strong>题目 ID</strong>：<code>Q-3389876d4408</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：网易</p>
+<p><strong>参考答案</strong></p>
+<p>工作记忆保存当前计划、变量和中间结果；短期记忆保存一次会话或任务的近期交互；长期记忆保存经确认的稳定偏好与跨任务经验。三层是设计概念，不是必须采用三套数据库。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>分别定义生命周期和读取范围</li>
+<li>给每条事实附来源</li>
+</ul>
+<p><strong>追问</strong>：一次性行程地址是否适合长期保存？</p>
+<p><strong>易错点</strong>：不要把模型猜测当稳定用户事实。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/netease-agent-development-first-round-2927708/" rel="noreferrer">INT-6784717d92</a>（C：仅聚合线索）；<a href="https://www.nowcoder.com/discuss/938914958287306752?sourceSSR=post" rel="noreferrer">INT-02e3d8f7b6</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr>
+<p><a id="Q-1b174081d135"></a></p>
+<h2 id="43-同一用户出现互相矛盾的偏好或身份信息时如何更新记忆">43. 同一用户出现互相矛盾的偏好或身份信息时，如何更新记忆？</h2>
+<p><strong>题目 ID</strong>：<code>Q-1b174081d135</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：网易、迅雷</p>
+<p><strong>参考答案</strong></p>
+<p>把记忆作为有来源、时间、适用范围和置信度的断言，而不是一个盲目覆盖的字符串。区分偏好改变、事实冲突与身份风险；高风险冲突需确认，旧记录保留版本或失效标记。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>权威来源优先但不能只看最新</li>
+<li>更新相关派生记忆</li>
+</ul>
+<p><strong>追问</strong>：同名用户是否被错误合并？</p>
+<p><strong>易错点</strong>：不能按最后一次模型输出就覆盖身份信息。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932392798559432704?sourceSSR=post" rel="noreferrer">INT-e123cde6cf</a>（B：曾定位公开原帖）；<a href="https://www.nowcoder.com/discuss/938914958287306752?sourceSSR=post" rel="noreferrer">INT-02e3d8f7b6</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr>
+<p><a id="Q-c73e0eb5e080"></a></p>
+<h2 id="44-错误的用户姓名进入长期记忆后怎样识别污染并修复历史影响">44. 错误的用户姓名进入长期记忆后，怎样识别污染并修复历史影响？</h2>
+<p><strong>题目 ID</strong>：<code>Q-c73e0eb5e080</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：网易</p>
+<p><strong>参考答案</strong></p>
+<p>从错误回答追溯具体记忆及其来源，暂停该条参与检索，核验后更正或撤销，同时清理派生摘要、向量和缓存。按关联用户和任务检查影响范围，避免只修一处显示值。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>保留纠错审计和删除传播</li>
+<li>加身份隔离与写入验证</li>
+</ul>
+<p><strong>追问</strong>：原始聊天里仍有错误姓名，如何防止再次提取？</p>
+<p><strong>易错点</strong>：只改数据库中的姓名字段可能会被旧摘要重新污染。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938914958287306752?sourceSSR=post" rel="noreferrer">INT-02e3d8f7b6</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr>
+<p><a id="Q-34148136c0aa"></a></p>
+<h2 id="45-主-agent-与子-agent-之间如何传递必要信息又避免上下文相互污染">45. 主 Agent 与子 Agent 之间如何传递必要信息，又避免上下文相互污染？</h2>
+<p><strong>题目 ID</strong>：<code>Q-34148136c0aa</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动、小米</p>
+<p><strong>参考答案</strong></p>
+<p>传递目标、约束、必需资料引用和明确输入输出契约，而不是复制整段父上下文。子 Agent 有独立状态与权限作用域，输出携带证据；共享信息经显式合并才能进入父状态。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>隔离租户和敏感字段</li>
+<li>子结论不自动升级为权威事实</li>
+</ul>
+<p><strong>追问</strong>：子 Agent 需要更多上下文时怎么办？</p>
+<p><strong>易错点</strong>：逻辑上的角色不同，不代表存储和工具权限已经隔离。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932407145864130560?sourceSSR=post" rel="noreferrer">INT-bfd0fa0cf9</a>（B：曾定位公开原帖）；<a href="https://www.nowcoder.com/discuss/931897509520109568?sourceSSR=post" rel="noreferrer">INT-17e29773f1</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr>
+<p><a id="Q-ac00c1a24bcd"></a></p>
+<h2 id="46-用户偏好异步写入记忆时如何解释并控制读取到旧信息的问题">46. 用户偏好异步写入记忆时，如何解释并控制读取到旧信息的问题？</h2>
+<p><strong>题目 ID</strong>：<code>Q-ac00c1a24bcd</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>在当前请求内可直接覆盖使用已确认的新偏好，异步持久化则携带版本和顺序号；后续读取比较版本，必要时等待写入或返回一致性提示。过时写任务不能覆盖更新值。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>区分会话一致性与全局最终一致性</li>
+<li>写入幂等且可追踪</li>
+</ul>
+<p><strong>追问</strong>：异步队列乱序或重放怎样处理？</p>
+<p><strong>易错点</strong>：不能用“最终一致”掩盖永远不收敛的旧值覆盖。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939623386806751232?sourceSSR=post" rel="noreferrer">INT-2bfa666e65</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr>
+<p><a id="Q-0c03e1cb116f"></a></p>
+<h2 id="47-上下文压缩时哪些类型的信息应优先保全怎样设计验证用例">47. 上下文压缩时，哪些类型的信息应优先保全，怎样设计验证用例？</h2>
+<p><strong>题目 ID</strong>：<code>Q-0c03e1cb116f</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动、百度</p>
+<p><strong>参考答案</strong></p>
+<p>优先保全目标、权限限制、用户承诺、关键实体/数值、当前步骤、失败原因和未完成外部动作。把它们结构化并附来源，测否定指令、相似实体、跨轮改口及恢复场景。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>保留原文引用供按需回读</li>
+<li>业务状态不只存在摘要中</li>
+</ul>
+<p><strong>追问</strong>：压缩时如何处理过期审批？</p>
+<p><strong>易错点</strong>：压缩只能降低信息成本，不能保证无损。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938913714646929408?sourceSSR=post" rel="noreferrer">INT-c233db2a53</a>（B：曾定位公开原帖）；<a href="https://www.nowcoder.com/discuss/938540748394217472?sourceSSR=post" rel="noreferrer">INT-15d1d6b299</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr>
+<p><a id="Q-d609dc25c7c3"></a></p>
+<h2 id="48-父子-agent-的上下文已很长时如何减少传递开销并说明信息损失边界">48. 父子 Agent 的上下文已很长时，如何减少传递开销并说明信息损失边界？</h2>
+<p><strong>题目 ID</strong>：<code>Q-d609dc25c7c3</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>先让父层提供有界任务包和内容寻址引用，子层按需要检索；子层回传结论、证据和未解问题，原始轨迹留在产物中。评测遗漏重要条件的概率与最终完成率。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>约束和资源 ID 不做模糊摘要</li>
+<li>只展开真正相关的材料</li>
+</ul>
+<p><strong>追问</strong>：引用不可访问或版本变化时如何处理？</p>
+<p><strong>易错点</strong>：“把所有东西总结一下”无法解释损失边界。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932407145864130560?sourceSSR=post" rel="noreferrer">INT-bfd0fa0cf9</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

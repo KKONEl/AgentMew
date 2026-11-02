@@ -1,0 +1,105 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>2026-10 模型与算法面试题与参考答案 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-056.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/2026-10-模型与算法面试题与参考答案.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/21-model-training.html">21 模型训练：从 SFT、LoRA 到偏好优化与显存预算</a> · <a href="../lessons/22-algorithms.html">22 算法与手写：检索、LRU缓存、堆与有界调度</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%AE%97%E6%B3%95%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%AE%97%E6%B3%95%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F">使用方式</a><a href="#151-%E5%A4%9A%E5%A4%B4%E6%B3%A8%E6%84%8F%E5%8A%9B%E7%9B%B8%E6%AF%94%E5%8D%95%E5%A4%B4%E6%B3%A8%E6%84%8F%E5%8A%9B%E5%A2%9E%E5%8A%A0%E4%BA%86%E5%93%AA%E4%BA%9B%E8%A1%A8%E8%BE%BE%E8%83%BD%E5%8A%9B%E4%BD%A0%E6%80%8E%E6%A0%B7%E8%A7%A3%E9%87%8A%E5%AE%9E%E9%99%85%E4%BD%9C%E7%94%A8">151. 多头注意力相比单头注意力增加了哪些表达能力，你怎样解释实际作用？</a><a href="#152-%E8%AF%B7%E4%BB%8E%E6%A8%A1%E5%9D%97%E5%92%8C%E8%AE%AD%E7%BB%83%E6%96%B9%E5%BC%8F%E8%AF%B4%E6%98%8E-blip2-%E7%9A%84%E7%BB%93%E6%9E%84%E5%B9%B6%E6%AF%94%E8%BE%83%E4%BD%A0%E4%BA%86%E8%A7%A3%E7%9A%84%E5%85%B6%E4%BB%96%E5%A4%9A%E6%A8%A1%E6%80%81%E6%96%B9%E6%A1%88">152. 请从模块和训练方式说明 BLIP2 的结构，并比较你了解的其他多模态方案。</a><a href="#153-%E6%AF%94%E8%BE%83-grpo-%E4%B8%8E-ppo-%E7%9A%84%E5%A5%96%E5%8A%B1%E5%A4%84%E7%90%86%E5%92%8C%E4%BC%98%E5%8C%96%E6%80%9D%E8%B7%AF%E5%B9%B6%E8%81%94%E7%B3%BB-agent-%E4%BB%BB%E5%8A%A1%E8%AF%B4%E6%98%8E%E9%80%82%E7%94%A8%E8%BE%B9%E7%95%8C">153. 比较 GRPO 与 PPO 的奖励处理和优化思路，并联系 Agent 任务说明适用边界。</a><a href="#154-%E6%B6%89%E5%8F%8A-lora-%E5%BE%AE%E8%B0%83%E7%9A%84%E9%A1%B9%E7%9B%AE%E5%A6%82%E4%BD%95%E8%AF%B4%E6%98%8E%E9%80%89%E6%8B%A9%E7%90%86%E7%94%B1%E8%AE%AD%E7%BB%83%E6%96%B9%E6%A1%88%E4%B8%8E%E9%AA%8C%E8%AF%81%E6%96%B9%E5%BC%8F">154. 涉及 LoRA 微调的项目，如何说明选择理由、训练方案与验证方式？</a><a href="#155-%E9%80%89%E6%8B%A9%E6%88%96%E6%9B%BF%E6%8D%A2-embedding-%E6%A8%A1%E5%9E%8B%E6%97%B6%E6%80%8E%E6%A0%B7%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E9%99%85%E6%A3%80%E7%B4%A2%E4%BB%BB%E5%8A%A1%E5%8C%B9%E9%85%8D%E7%9A%84%E8%AF%84%E6%B5%8B">155. 选择或替换 embedding 模型时，怎样设计与实际检索任务匹配的评测？</a><a href="#156-%E6%8F%8F%E8%BF%B0%E5%88%B0%E6%A0%87%E7%AD%BE%E7%9A%84%E6%98%A0%E5%B0%84%E5%8F%91%E7%94%9F%E8%AF%AD%E4%B9%89%E6%B7%B7%E6%B7%86%E6%97%B6%E5%A6%82%E4%BD%95%E5%8C%BA%E5%88%86%E8%A1%A8%E7%A4%BA%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83%E6%95%B0%E6%8D%AE%E4%B8%8E%E6%8E%92%E5%BA%8F%E7%8E%AF%E8%8A%82%E7%9A%84%E9%97%AE%E9%A2%98">156. 描述到标签的映射发生语义混淆时，如何区分表示模型、训练数据与排序环节的问题？</a></nav></details><article class="prose source-prose"><h1 id="2026-10-模型与算法面试题与参考答案">2026-10 模型与算法面试题与参考答案</h1>
+<blockquote>
+<p>来源快照：2026-10-22；答案整理：2026-10-23。此次迁入不代表重新抓取。
+本批题目按公开面经报道主题改写，是练习题，不是公司官方真题；答案为编辑综合参考，未经独立专家逐题复核，不是公司标准答案。</p>
+</blockquote>
+<p><a href="doc-048.html">返回本批索引</a> · <a href="doc-047.html">来源分级与资料</a></p>
+<h2 id="使用方式">使用方式</h2>
+<p>先独立回答，再对照得分点、追问和易错点。难度为编辑估计，非公司定级。
+公司标签只表示来源报道过相关主题，不证明逐字问过本题。B 仅代表曾找到原帖，不保证全文可读、作者亲历或题目真实；C 为待核验聚合线索。</p>
+<p><a id="Q-142ab15960ee"></a></p>
+<h2 id="151-多头注意力相比单头注意力增加了哪些表达能力你怎样解释实际作用">151. 多头注意力相比单头注意力增加了哪些表达能力，你怎样解释实际作用？</h2>
+<p><strong>题目 ID</strong>：<code>Q-142ab15960ee</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：SHEIN</p>
+<p><strong>参考答案</strong></p>
+<p>多头对Q/K/V作不同投影，在多个表示子空间并行注意，再拼接投影输出；在常见设计中总维度固定，多个头不等于等比例增加参数。作用需靠任务效果而非“头越多越好”解释。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>给出Attention(Q,K,V)=softmax(QKᵀ/√d_k)V</li>
+<li>区分头数与维度</li>
+</ul>
+<p><strong>追问</strong>：不同头一定会学到不同语义吗？</p>
+<p><strong>易错点</strong>：不能把多头简单解释成多个独立完整Transformer。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/shein-agent-qiuzhao-2913432/" rel="noreferrer">INT-024a0e7447</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://arxiv.org/abs/1706.03762" rel="noreferrer">ATTENTION：Attention Is All You Need</a></p>
+<hr>
+<p><a id="Q-efa901862210"></a></p>
+<h2 id="152-请从模块和训练方式说明-blip2-的结构并比较你了解的其他多模态方案">152. 请从模块和训练方式说明 BLIP2 的结构，并比较你了解的其他多模态方案。</h2>
+<p><strong>题目 ID</strong>：<code>Q-efa901862210</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：SHEIN</p>
+<p><strong>参考答案</strong></p>
+<p>BLIP-2 以冻结图像编码器和冻结语言模型为基础，训练含可学习查询的Q-Former作桥接，分阶段做视觉语言表示对齐与面向语言生成的连接。比较方案时说明桥接结构、训练模块与任务差异。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>区分表示学习和生成对齐阶段</li>
+<li>解释查询数量对信息压缩的作用</li>
+</ul>
+<p><strong>追问</strong>：冻结大模型后新能力从哪里来？</p>
+<p><strong>易错点</strong>：BLIP-2不是把图像直接当文本token，也不能与所有后续多模态版本混讲。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/shein-agent-qiuzhao-2913432/" rel="noreferrer">INT-024a0e7447</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://arxiv.org/abs/2301.12597" rel="noreferrer">BLIP2：BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models</a></p>
+<hr>
+<p><a id="Q-9921e7961203"></a></p>
+<h2 id="153-比较-grpo-与-ppo-的奖励处理和优化思路并联系-agent-任务说明适用边界">153. 比较 GRPO 与 PPO 的奖励处理和优化思路，并联系 Agent 任务说明适用边界。</h2>
+<p><strong>题目 ID</strong>：<code>Q-9921e7961203</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>常见PPO用价值估计构造优势并限制策略更新；原始GRPO对同一问题采样一组回答，用组内奖励统计构造相对优势，省去独立价值模型，但增加组采样需求。长Agent任务仍有奖励设计与信用分配问题。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>比较clip/KL、采样与内存成本</li>
+<li>组内奖励相同需稳定处理</li>
+</ul>
+<p><strong>追问</strong>：只有最终成功奖励，怎样判断是哪次工具动作带来收益？</p>
+<p><strong>易错点</strong>：GRPO不保证对所有任务更优，也不自动解决稀疏奖励。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932407145864130560?sourceSSR=post" rel="noreferrer">INT-bfd0fa0cf9</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://arxiv.org/abs/1707.06347" rel="noreferrer">PPO：Proximal Policy Optimization Algorithms</a>；<a href="https://arxiv.org/html/2402.03300v1" rel="noreferrer">GRPO：DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models</a></p>
+<hr>
+<p><a id="Q-c9c9cf44da07"></a></p>
+<h2 id="154-涉及-lora-微调的项目如何说明选择理由训练方案与验证方式">154. 涉及 LoRA 微调的项目，如何说明选择理由、训练方案与验证方式？</h2>
+<p><strong>题目 ID</strong>：<code>Q-c9c9cf44da07</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：小红书</p>
+<p><strong>参考答案</strong></p>
+<p>LoRA冻结基础权重，用低秩增量BA近似需要训练的更新；说明目标层、rank、缩放、数据、优化与验证。固定独立测试集比较基线和微调后质量、遗忘与成本，保留失败样本。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>超参和数据来源按真实实验填写</li>
+<li>推理部署说明合并/适配器策略</li>
+</ul>
+<p><strong>追问</strong>：rank增加后效果为什么可能不再提高？</p>
+<p><strong>易错点</strong>：不能把少参数训练理解为无需高质量数据或不会过拟合。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/934237893025890304?sourceSSR=post" rel="noreferrer">INT-55b114dad5</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://arxiv.org/abs/2106.09685" rel="noreferrer">LORA：LoRA: Low-Rank Adaptation of Large Language Models</a></p>
+<hr>
+<p><a id="Q-ec8d5babe507"></a></p>
+<h2 id="155-选择或替换-embedding-模型时怎样设计与实际检索任务匹配的评测">155. 选择或替换 embedding 模型时，怎样设计与实际检索任务匹配的评测？</h2>
+<p><strong>题目 ID</strong>：<code>Q-ec8d5babe507</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>建立带真实查询、相关证据和难负例的固定评测集，按语言、长短query、实体与领域分桶；比较Recall@K、排序、最终答案及延迟/资源，并遵循各模型的编码规范。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>更换模型需索引版本迁移</li>
+<li>先排数据泄漏和维度不兼容</li>
+</ul>
+<p><strong>追问</strong>：离线召回更好，线上答案为什么仍变差？</p>
+<p><strong>易错点</strong>：不同模型原始相似度通常不可直接横向比较。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/bytedance-agent-2928966/" rel="noreferrer">INT-340e4aa1be</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-4533fdf7415e"></a></p>
+<h2 id="156-描述到标签的映射发生语义混淆时如何区分表示模型训练数据与排序环节的问题">156. 描述到标签的映射发生语义混淆时，如何区分表示模型、训练数据与排序环节的问题？</h2>
+<p><strong>题目 ID</strong>：<code>Q-4533fdf7415e</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：腾讯</p>
+<p><strong>参考答案</strong></p>
+<p>先核对标签定义和标注一致性，按混淆对检查输入是否可判别；再分离表示召回、训练样本与难负例、候选排序和阈值问题。用oracle候选和逐模块替换定位瓶颈。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>合并同义标签或澄清本质歧义</li>
+<li>指标分桶而非只报总体准确率</li>
+</ul>
+<p><strong>追问</strong>：两标签在现有输入下本来就不可区分怎么办？</p>
+<p><strong>易错点</strong>：只换更大embedding模型可能修不好标签体系本身。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/940391665104064512?sourceSSR=post" rel="noreferrer">INT-7ab7609951</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

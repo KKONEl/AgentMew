@@ -1,0 +1,201 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>2026-10 评测与归因面试题与参考答案 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-058.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/2026-10-评测与归因面试题与参考答案.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/17-evaluation-harness.html">17 评测、失败归因与发布门禁</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-%E8%AF%84%E6%B5%8B%E4%B8%8E%E5%BD%92%E5%9B%A0%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-%E8%AF%84%E6%B5%8B%E4%B8%8E%E5%BD%92%E5%9B%A0%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F">使用方式</a><a href="#67-%E6%80%8E%E6%A0%B7%E6%9E%84%E5%BB%BA%E8%A6%86%E7%9B%96%E5%B7%A5%E5%85%B7%E5%A4%B1%E8%B4%A5%E9%95%BF%E4%BB%BB%E5%8A%A1%E5%92%8C%E5%BC%82%E5%B8%B8%E8%BE%93%E5%85%A5%E7%9A%84-agent-%E7%AB%AF%E5%88%B0%E7%AB%AF%E8%AF%84%E6%B5%8B%E9%9B%86">67. 怎样构建覆盖工具失败、长任务和异常输入的 Agent 端到端评测集？</a><a href="#68-%E7%94%A8%E6%A8%A1%E5%9E%8B%E5%90%88%E6%88%90%E6%B5%8B%E8%AF%95%E9%97%AE%E9%A2%98%E6%97%B6%E5%A6%82%E4%BD%95%E6%A3%80%E6%9F%A5%E4%BA%8B%E5%AE%9E%E4%BE%9D%E6%8D%AE%E8%B4%A8%E9%87%8F%E4%B8%8E%E5%9C%BA%E6%99%AF%E8%A6%86%E7%9B%96">68. 用模型合成测试问题时，如何检查事实依据、质量与场景覆盖？</a><a href="#69-%E6%9B%B4%E6%8D%A2%E8%83%BD%E5%8A%9B%E6%9B%B4%E5%BC%BA%E7%9A%84%E6%A8%A1%E5%9E%8B%E5%90%8E%E4%BB%BB%E5%8A%A1%E6%88%90%E5%8A%9F%E7%8E%87%E4%B8%8B%E9%99%8D%E4%BD%A0%E4%BC%9A%E6%80%8E%E6%A0%B7%E5%88%86%E5%B1%82%E5%BD%92%E5%9B%A0">69. 更换能力更强的模型后任务成功率下降，你会怎样分层归因？</a><a href="#70-%E5%A6%82%E4%BD%95%E5%B0%86%E7%BA%BF%E4%B8%8A%E5%AF%B9%E8%AF%9D-trace-%E8%BD%AC%E6%88%90%E5%8F%AF%E9%87%8D%E5%A4%8D%E6%89%A7%E8%A1%8C%E5%8F%AF%E4%BA%BA%E5%B7%A5%E5%A4%8D%E6%A0%B8%E7%9A%84%E5%9B%9E%E5%BD%92%E6%A0%B7%E6%9C%AC">70. 如何将线上对话 Trace 转成可重复执行、可人工复核的回归样本？</a><a href="#71-%E8%A7%84%E5%88%99%E8%AF%84%E5%88%86%E6%A8%A1%E5%9E%8B%E8%AF%84%E5%AE%A1%E4%B8%8E%E4%BA%BA%E5%B7%A5-review-%E5%A6%82%E4%BD%95%E7%BB%84%E5%90%88%E9%81%BF%E5%85%8D%E8%AF%84%E5%88%86%E4%BA%92%E7%9B%B8%E7%9F%9B%E7%9B%BE">71. 规则评分、模型评审与人工 Review 如何组合，避免评分互相矛盾？</a><a href="#72-rag-%E8%AF%84%E6%B5%8B%E6%8C%87%E6%A0%87%E5%87%BA%E7%8E%B0-nan-%E6%97%B6%E4%BD%A0%E4%BC%9A%E6%A3%80%E6%9F%A5%E5%93%AA%E4%BA%9B%E8%BE%93%E5%85%A5%E5%92%8C%E8%AE%A1%E7%AE%97%E7%8E%AF%E8%8A%82">72. RAG 评测指标出现 NaN 时，你会检查哪些输入和计算环节？</a><a href="#73-%E9%99%A4%E4%BA%86%E4%B8%9A%E5%8A%A1%E5%87%86%E7%A1%AE%E7%8E%87agent-%E4%B8%8A%E7%BA%BF%E5%90%8E%E8%BF%98%E9%9C%80%E8%A6%81%E8%A7%82%E5%AF%9F%E5%93%AA%E4%BA%9B%E8%B4%A8%E9%87%8F%E5%92%8C%E8%BF%90%E8%A1%8C%E6%8C%87%E6%A0%87">73. 除了业务准确率，Agent 上线后还需要观察哪些质量和运行指标？</a><a href="#74-%E5%A6%82%E4%BD%95%E6%8E%92%E9%99%A4%E6%A8%A1%E5%9E%8B%E5%8D%87%E7%BA%A7%E4%B8%8E%E6%B5%8B%E8%AF%95%E9%9B%86%E6%B3%84%E6%BC%8F%E9%AA%8C%E8%AF%81%E6%94%B6%E7%9B%8A%E7%A1%AE%E5%AE%9E%E6%9D%A5%E8%87%AA%E8%BF%90%E8%A1%8C%E6%97%B6%E8%AE%BE%E8%AE%A1">74. 如何排除模型升级与测试集泄漏，验证收益确实来自运行时设计？</a><a href="#75-%E7%AE%80%E5%8E%86%E5%86%99%E5%87%86%E7%A1%AE%E7%8E%87%E7%94%B1%E4%B8%83%E6%88%90%E5%8D%87%E8%87%B3%E6%8E%A5%E8%BF%91%E4%B9%9D%E6%88%90%E5%A6%82%E4%BD%95%E4%BA%A4%E4%BB%A3%E5%88%86%E6%AF%8D%E6%A0%B7%E6%9C%AC%E5%92%8C%E8%AF%84%E6%B5%8B%E6%B5%81%E7%A8%8B">75. 简历写“准确率由七成升至接近九成”，如何交代分母、样本和评测流程？</a><a href="#76-%E8%AF%84%E6%B5%8B%E9%9B%86%E6%B2%A1%E6%9C%89%E8%A6%86%E7%9B%96%E6%9F%90%E4%BA%9B%E7%9C%9F%E5%AE%9E%E5%9C%BA%E6%99%AF%E6%97%B6%E5%A6%82%E4%BD%95%E5%8F%91%E7%8E%B0%E7%BC%BA%E5%8F%A3%E5%B9%B6%E5%AE%89%E6%8E%92%E5%90%8E%E7%BB%AD%E8%A1%A5%E9%BD%90">76. 评测集没有覆盖某些真实场景时，如何发现缺口并安排后续补齐？</a><a href="#77-%E5%A6%82%E4%BD%95%E5%9C%A8%E8%AF%84%E6%B5%8B%E6%88%90%E6%9C%AC%E6%9C%89%E9%99%90%E6%97%B6%E6%89%B9%E9%87%8F%E6%A3%80%E6%9F%A5-skill-%E6%98%AF%E5%90%A6%E6%8C%89%E9%A2%84%E6%9C%9F%E5%AE%8C%E6%88%90%E4%BB%BB%E5%8A%A1">77. 如何在评测成本有限时批量检查 Skill 是否按预期完成任务？</a><a href="#78-%E5%A6%82%E6%9E%9C%E8%AE%A9%E4%BD%A0%E6%9E%84%E5%BB%BA%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B%E7%9A%84-agent%E4%BC%9A%E6%80%8E%E6%A0%B7%E5%AE%9A%E4%B9%89%E9%AA%8C%E6%94%B6%E5%92%8C%E8%B4%A8%E9%87%8F%E9%97%A8%E6%A7%9B">78. 如果让你构建自动生成测试用例的 Agent，会怎样定义验收和质量门槛？</a></nav></details><article class="prose source-prose"><h1 id="2026-10-评测与归因面试题与参考答案">2026-10 评测与归因面试题与参考答案</h1>
+<blockquote>
+<p>来源快照：2026-10-22；答案整理：2026-10-23。此次迁入不代表重新抓取。
+本批题目按公开面经报道主题改写，是练习题，不是公司官方真题；答案为编辑综合参考，未经独立专家逐题复核，不是公司标准答案。</p>
+</blockquote>
+<p><a href="doc-048.html">返回本批索引</a> · <a href="doc-047.html">来源分级与资料</a></p>
+<h2 id="使用方式">使用方式</h2>
+<p>先独立回答，再对照得分点、追问和易错点。难度为编辑估计，非公司定级。
+公司标签只表示来源报道过相关主题，不证明逐字问过本题。B 仅代表曾找到原帖，不保证全文可读、作者亲历或题目真实；C 为待核验聚合线索。</p>
+<p><a id="Q-5ea0a6e35c08"></a></p>
+<h2 id="67-怎样构建覆盖工具失败长任务和异常输入的-agent-端到端评测集">67. 怎样构建覆盖工具失败、长任务和异常输入的 Agent 端到端评测集？</h2>
+<p><strong>题目 ID</strong>：<code>Q-5ea0a6e35c08</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>从任务契约拆目标、工具、权限、轮数及依赖，再分层采样真实任务与故障注入。冻结输入、来源和环境，分别标最终验收、过程约束及可接受部分成功。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>覆盖超时、未知副作用、取消、恢复与恶意输入</li>
+<li>报告分桶指标</li>
+</ul>
+<p><strong>追问</strong>：怎样防止测试环境比线上过于简单？</p>
+<p><strong>易错点</strong>：只有正常 happy path 的高分不能证明可靠性。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939623386806751232?sourceSSR=post" rel="noreferrer">INT-2bfa666e65</a>（B：曾定位公开原帖）；<a href="https://mj.mianlingai.com/interview/bytedance-agent-2928966/" rel="noreferrer">INT-340e4aa1be</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a>；<a href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/" rel="noreferrer">INJECTION：OWASP LLM01: Prompt Injection</a></p>
+<hr>
+<p><a id="Q-372a9f181da7"></a></p>
+<h2 id="68-用模型合成测试问题时如何检查事实依据质量与场景覆盖">68. 用模型合成测试问题时，如何检查事实依据、质量与场景覆盖？</h2>
+<p><strong>题目 ID</strong>：<code>Q-372a9f181da7</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>先给生成器可核验材料和明确场景约束，再检查问题能否从证据回答、答案引用是否成立；做去重、难度与覆盖检查，抽样人工复核，训练和测试按来源分离。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>加入无答案与冲突样本</li>
+<li>别让同一模型独自出题、作答又给分</li>
+</ul>
+<p><strong>追问</strong>：合成数据风格太单一如何发现？</p>
+<p><strong>易错点</strong>：合成数量多不等于覆盖真实用户分布。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932295617999622144?sourceSSR=post" rel="noreferrer">INT-1c8ef39841</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-5e9f7cd9b585"></a></p>
+<h2 id="69-更换能力更强的模型后任务成功率下降你会怎样分层归因">69. 更换能力更强的模型后任务成功率下降，你会怎样分层归因？</h2>
+<p><strong>题目 ID</strong>：<code>Q-5e9f7cd9b585</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：vivo</p>
+<p><strong>参考答案</strong></p>
+<p>固定任务、工具和其他配置，逐层比较路由、参数结构、动作顺序、上下文处理、工具结果与终止条件。检查新模型的提示适配和能力接口，采用配对回放与单因素替换。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>把回归定位到具体失败类型</li>
+<li>核对 token/预算限制</li>
+</ul>
+<p><strong>追问</strong>：如何区分模型随机性与稳定退化？</p>
+<p><strong>易错点</strong>：基准榜更强不保证在你的运行时契约下更强。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932565368587976704?sourceSSR=post" rel="noreferrer">INT-4aea8e37ae</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" rel="noreferrer">GRAPH：LangGraph: Workflows and agents</a>；<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a></p>
+<hr>
+<p><a id="Q-497eab9e63c7"></a></p>
+<h2 id="70-如何将线上对话-trace-转成可重复执行可人工复核的回归样本">70. 如何将线上对话 Trace 转成可重复执行、可人工复核的回归样本？</h2>
+<p><strong>题目 ID</strong>：<code>Q-497eab9e63c7</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：作业帮</p>
+<p><strong>参考答案</strong></p>
+<p>先脱敏并取得适当使用依据，保存输入、版本、必要状态及工具回执。回归时用可控桩或隔离环境重放，单独标识未重现的动态外部依赖；将失败和人工修复转成断言。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>冻结时间和随机性</li>
+<li>防止重放触发真实付费或写操作</li>
+</ul>
+<p><strong>追问</strong>：真实工具结果包含个人信息怎么办？</p>
+<p><strong>易错点</strong>：“重放线上 trace”不应等于再次执行线上副作用。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/zuoyebang-agent-dev-first-round-2916240/" rel="noreferrer">INT-aa5fb6e122</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/graph-api" rel="noreferrer">REPLAY：LangGraph Graph API: re-execution and idempotency</a></p>
+<hr>
+<p><a id="Q-129cf8ceef60"></a></p>
+<h2 id="71-规则评分模型评审与人工-review-如何组合避免评分互相矛盾">71. 规则评分、模型评审与人工 Review 如何组合，避免评分互相矛盾？</h2>
+<p><strong>题目 ID</strong>：<code>Q-129cf8ceef60</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：作业帮</p>
+<p><strong>参考答案</strong></p>
+<p>确定性规则负责格式、权限和数值约束，模型评审负责开放语义，人工复核高风险与争议项。用有标签样本校准评分一致性，保留原始结果、评审版本和分歧，而非简单平均。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>模型评审先测偏差与稳定性</li>
+<li>必要时盲评和多次采样</li>
+</ul>
+<p><strong>追问</strong>：评审模型偏爱自己的回答怎么办？</p>
+<p><strong>易错点</strong>：模型评分高不等于业务事实正确。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/zuoyebang-agent-dev-first-round-2916240/" rel="noreferrer">INT-aa5fb6e122</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.ragas.io/en/stable/references/evaluate" rel="noreferrer">RAGAS：Ragas evaluation error handling and NaN results</a></p>
+<hr>
+<p><a id="Q-8f71e2fe577e"></a></p>
+<h2 id="72-rag-评测指标出现-nan-时你会检查哪些输入和计算环节">72. RAG 评测指标出现 NaN 时，你会检查哪些输入和计算环节？</h2>
+<p><strong>题目 ID</strong>：<code>Q-8f71e2fe577e</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：</p>
+<p><strong>参考答案</strong></p>
+<p>区分数据校验错误与指标执行失败：检查指标所需列、类型、空上下文、参考答案和 judge 输出，再看超时、限流及解析异常。evaluate 的失败行可返回 NaN；缺少必需列也可能直接抛错。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>报告有效/无效样本分母</li>
+<li>诊断时显式暴露异常并记录版本</li>
+</ul>
+<p><strong>追问</strong>：把 NaN 当 0 或直接丢弃会带来什么偏差？</p>
+<p><strong>易错点</strong>：不能断言所有 NaN 都来自空参考答案，也不要悄悄忽略失败行。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939580601693229056?sourceSSR=post" rel="noreferrer">INT-9e5f65a93e</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.ragas.io/en/stable/references/evaluate" rel="noreferrer">RAGAS：Ragas evaluation error handling and NaN results</a></p>
+<hr>
+<p><a id="Q-58b176c3d714"></a></p>
+<h2 id="73-除了业务准确率agent-上线后还需要观察哪些质量和运行指标">73. 除了业务准确率，Agent 上线后还需要观察哪些质量和运行指标？</h2>
+<p><strong>题目 ID</strong>：<code>Q-58b176c3d714</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>除最终成功率，还看违规/越权、错误引用、工具失败与未知结果、恢复/取消表现、端到端尾延迟、每个成功任务成本及人工接管率。按场景、版本和租户聚合，防止平均值掩盖风险。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>分清模型错误与工具/平台错误</li>
+<li>给告警配业务影响</li>
+</ul>
+<p><strong>追问</strong>：成功率升高但人工接管也升高意味着什么？</p>
+<p><strong>易错点</strong>：不能用模型调用次数或运行时长充当完成质量。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/bytedance-agent-2928966/" rel="noreferrer">INT-340e4aa1be</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-c59ef9c2b2be"></a></p>
+<h2 id="74-如何排除模型升级与测试集泄漏验证收益确实来自运行时设计">74. 如何排除模型升级与测试集泄漏，验证收益确实来自运行时设计？</h2>
+<p><strong>题目 ID</strong>：<code>Q-c59ef9c2b2be</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：vivo</p>
+<p><strong>参考答案</strong></p>
+<p>固定模型、工具、数据和预算作运行时消融，再单独评估模型升级；按文档/时间/实体划分测试集，防止近重复与人工调参泄漏。报告多次运行的方差及失败样本。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>保留独立冻结测试集</li>
+<li>让验收检查尽量独立于被测 Agent</li>
+</ul>
+<p><strong>追问</strong>：既换框架又换模型的结果能说明什么？</p>
+<p><strong>易错点</strong>：一张总分表不能区分收益来自哪个变量。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932565368587976704?sourceSSR=post" rel="noreferrer">INT-4aea8e37ae</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-e5f018ee87c9"></a></p>
+<h2 id="75-简历写准确率由七成升至接近九成如何交代分母样本和评测流程">75. 简历写“准确率由七成升至接近九成”，如何交代分母、样本和评测流程？</h2>
+<p><strong>题目 ID</strong>：<code>Q-e5f018ee87c9</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：美团</p>
+<p><strong>参考答案</strong></p>
+<p>交代任务定义、样本来源和数量、成功判据、标注方式及同一分母；尽量同样本配对比较并报告分桶、区间和无效样本。区分百分点提升与相对增幅。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>说明离线与线上差距</li>
+<li>数据不足时明确标为探索性结果</li>
+</ul>
+<p><strong>追问</strong>：任务难度分布变了还能直接比较吗？</p>
+<p><strong>易错点</strong>：不要把少量手挑样本的得分写成全量线上准确率。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/meituan-fullstack-first-round-931526208536182784/" rel="noreferrer">INT-0f90bd85b5</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-00629102084b"></a></p>
+<h2 id="76-评测集没有覆盖某些真实场景时如何发现缺口并安排后续补齐">76. 评测集没有覆盖某些真实场景时，如何发现缺口并安排后续补齐？</h2>
+<p><strong>题目 ID</strong>：<code>Q-00629102084b</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>通过线上未覆盖意图、工具组合、长尾错误与人工接管聚类发现缺口；按频率、风险和影响排序补样本，加入持续回归并定期重采样。保留冻结集评估，避免不停改测试来追分。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>负面和跨版本场景优先</li>
+<li>记录覆盖矩阵和新增原因</li>
+</ul>
+<p><strong>追问</strong>：低频但高损失场景如何排优先级？</p>
+<p><strong>易错点</strong>：没有失败样本不代表该场景已充分覆盖。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/bytedance-agent-2928966/" rel="noreferrer">INT-340e4aa1be</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-cea408f24ba2"></a></p>
+<h2 id="77-如何在评测成本有限时批量检查-skill-是否按预期完成任务">77. 如何在评测成本有限时批量检查 Skill 是否按预期完成任务？</h2>
+<p><strong>题目 ID</strong>：<code>Q-cea408f24ba2</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：快手</p>
+<p><strong>参考答案</strong></p>
+<p>用便宜规则先查契约、权限和产物，再对困难样本或抽样调用模型评审，人工查争议与高风险。按版本缓存可复用评分；小模型筛选也需测漏检率。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>覆盖 Skill 触发、执行和结果</li>
+<li>报告评分成本及置信度</li>
+</ul>
+<p><strong>追问</strong>：怎样防止低成本筛选漏掉严重违规？</p>
+<p><strong>易错点</strong>：不能只用文档相似度判断 Skill 执行正确。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938541475766206464?sourceSSR=post" rel="noreferrer">INT-bbcb367aed</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-ced565599ed3"></a></p>
+<h2 id="78-如果让你构建自动生成测试用例的-agent会怎样定义验收和质量门槛">78. 如果让你构建自动生成测试用例的 Agent，会怎样定义验收和质量门槛？</h2>
+<p><strong>题目 ID</strong>：<code>Q-ced565599ed3</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：百度</p>
+<p><strong>参考答案</strong></p>
+<p>输入应包括需求、接口契约和已有用例，输出用例需可执行、有合理断言并可追溯需求。隔离环境运行，检查重复、有效性、边界覆盖与缺陷检出能力，必要时用变异测试辅助。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>禁止把生成用例数量当质量</li>
+<li>控制测试资源和副作用</li>
+</ul>
+<p><strong>追问</strong>：一个生成的用例通过了，如何证明它有检测能力？</p>
+<p><strong>易错点</strong>：让同一 Agent 改实现直到自己生成的测试全过，会造成自证偏差。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/baidu-ai-test-development-second-round-2915577/" rel="noreferrer">INT-1795ef9456</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

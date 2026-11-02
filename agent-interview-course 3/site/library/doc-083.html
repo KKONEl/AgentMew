@@ -1,0 +1,168 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>AI Agent 工程师 - 通用技术知识点 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-083.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/技术知识点汇总.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/22-algorithms.html">22 算法与手写：检索、LRU缓存、堆与有界调度</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/%E6%8A%80%E6%9C%AF%E7%9F%A5%E8%AF%86%E7%82%B9%E6%B1%87%E6%80%BB.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/%E6%8A%80%E6%9C%AF%E7%9F%A5%E8%AF%86%E7%82%B9%E6%B1%87%E6%80%BB.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80agent-%E6%A0%B8%E5%BF%83%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB">一、Agent 核心知识体系</a><a href="#1-agent-%E5%9B%9B%E5%A4%A7%E6%A8%A1%E5%9D%97">1. Agent 四大模块</a><a href="#2-%E4%B8%BB%E6%B5%81-agent-%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94">2. 主流 Agent 框架对比</a><a href="#3-agent-%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F">3. Agent 设计模式</a><a href="#%E4%BA%8Crag-%E5%AE%8C%E6%95%B4%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB">二、RAG 完整知识体系</a><a href="#%E7%B4%A2%E5%BC%95%E4%BC%98%E5%8C%96">索引优化</a><a href="#%E6%A3%80%E7%B4%A2%E4%BC%98%E5%8C%96">检索优化</a><a href="#%E7%94%9F%E6%88%90%E4%BC%98%E5%8C%96">生成优化</a><a href="#%E8%AF%84%E4%BC%B0%E6%8C%87%E6%A0%87">评估指标</a><a href="#%E4%B8%89%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%85%AB%E8%82%A1%E6%96%87">三、大模型八股文</a><a href="#transformer-%E6%A0%B8%E5%BF%83">Transformer 核心</a><a href="#%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81">位置编码</a><a href="#%E8%A7%A3%E7%A0%81%E7%AD%96%E7%95%A5">解码策略</a><a href="#%E8%AE%AD%E7%BB%83%E6%8A%80%E6%9C%AF">训练技术</a><a href="#%E6%8E%A8%E7%90%86%E4%BC%98%E5%8C%96">推理优化</a><a href="#%E5%9B%9B%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E5%B8%B8%E8%80%83%E9%A2%98">四、系统设计常考题</a><a href="#%E4%BA%94%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80%E4%B8%8D%E8%A6%81%E5%BF%BD%E7%95%A5">五、计算机基础（不要忽略！）</a><a href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95">数据结构 &amp; 算法</a><a href="#%E7%BD%91%E7%BB%9C">网络</a><a href="#%E6%95%B0%E6%8D%AE%E5%BA%93">数据库</a><a href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F">操作系统</a><a href="#%E5%85%AD%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87-checklist">六、面试准备 Checklist</a></nav></details><article class="prose source-prose"><h1 id="ai-agent-工程师-通用技术知识点">AI Agent 工程师 - 通用技术知识点</h1>
+<p>跨公司高频考点汇总，适用于所有大厂 Agent 岗面试准备。</p>
+<hr>
+<h2 id="一agent-核心知识体系">一、Agent 核心知识体系</h2>
+<h3 id="1-agent-四大模块">1. Agent 四大模块</h3>
+<ul>
+<li><strong>规划（Planning）</strong>：任务分解、CoT、ToT、ReAct、Plan-and-Execute</li>
+<li><strong>记忆（Memory）</strong>：短期（上下文窗口）、长期（向量 DB）、工作记忆（任务状态）</li>
+<li><strong>工具（Tool Use）</strong>：Function Calling、MCP 协议、工具注册发现</li>
+<li><strong>行动（Action）</strong>：执行、观察、反思循环</li>
+</ul>
+<h3 id="2-主流-agent-框架对比">2. 主流 Agent 框架对比</h3>
+<table>
+<thead>
+<tr>
+<th>框架</th>
+<th>特点</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LangChain</td>
+<td>生态丰富，组件多</td>
+<td>快速原型</td>
+</tr>
+<tr>
+<td>LangGraph</td>
+<td>状态机式编排，可控性强</td>
+<td>生产级应用</td>
+</tr>
+<tr>
+<td>AutoGen</td>
+<td>多 Agent 对话框架</td>
+<td>多智能体协作</td>
+</tr>
+<tr>
+<td>MetaGPT</td>
+<td>SOP 驱动的多 Agent</td>
+<td>软件工程任务</td>
+</tr>
+<tr>
+<td>CrewAI</td>
+<td>角色化多 Agent</td>
+<td>团队协作模拟</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-agent-设计模式">3. Agent 设计模式</h3>
+<ul>
+<li><strong>ReAct</strong>：Reasoning + Acting 交替</li>
+<li><strong>Plan-and-Execute</strong>：先制定计划再执行</li>
+<li><strong>Reflexion</strong>：自我反思改进</li>
+<li><strong>Tool-use Agent</strong>：以工具调用为核心</li>
+<li><strong>Manager-Worker</strong>：管理者分配，工人执行</li>
+</ul>
+<hr>
+<h2 id="二rag-完整知识体系">二、RAG 完整知识体系</h2>
+<h3 id="索引优化">索引优化</h3>
+<ul>
+<li>文档分块策略：固定长度、语义分块、递归分块</li>
+<li>Embedding 模型选择：BGE、E5、text-embedding-3</li>
+<li>元数据标注：来源、时间、类别</li>
+</ul>
+<h3 id="检索优化">检索优化</h3>
+<ul>
+<li>混合检索：向量 + BM25</li>
+<li>重排序：Cross-Encoder Reranker</li>
+<li>Query 改写：HyDE、Multi-Query</li>
+</ul>
+<h3 id="生成优化">生成优化</h3>
+<ul>
+<li>上下文压缩</li>
+<li>Citation 生成（标注来源）</li>
+<li>自一致性校验</li>
+</ul>
+<h3 id="评估指标">评估指标</h3>
+<ul>
+<li>检索：Recall@K、MRR、NDCG</li>
+<li>生成：Faithfulness、Relevance、Answer Correctness</li>
+<li>框架：RAGAS、DeepEval</li>
+</ul>
+<hr>
+<h2 id="三大模型八股文">三、大模型八股文</h2>
+<h3 id="transformer-核心">Transformer 核心</h3>
+<ul>
+<li>Self-Attention: softmax(QK^T/√dk)V</li>
+<li>Multi-Head: 并行多组 QKV</li>
+<li>FFN: 两层线性 + 激活函数</li>
+<li>Layer Norm + Residual</li>
+</ul>
+<h3 id="位置编码">位置编码</h3>
+<ul>
+<li>正弦余弦（原始 Transformer）</li>
+<li>可学习位置编码</li>
+<li>RoPE（旋转位置编码）—— 当前主流</li>
+<li>ALiBi（线性偏置）</li>
+</ul>
+<h3 id="解码策略">解码策略</h3>
+<ul>
+<li>Greedy Search：取 argmax，快但质量差</li>
+<li>Beam Search：保留 top-k 路径</li>
+<li>Top-K Sampling：从 top-k token 采样</li>
+<li>Nucleus (Top-P) Sampling：从累积概率 &gt; p 的 token 中采样</li>
+<li>Temperature：控制分布平滑度</li>
+</ul>
+<h3 id="训练技术">训练技术</h3>
+<ul>
+<li>SFT（有监督微调）</li>
+<li>RLHF（人类反馈强化学习）</li>
+<li>DPO（直接偏好优化）</li>
+<li>LoRA / QLoRA（高效参数微调）</li>
+</ul>
+<h3 id="推理优化">推理优化</h3>
+<ul>
+<li>KV Cache</li>
+<li>PagedAttention (vLLM)</li>
+<li>Continuous Batching</li>
+<li>量化（INT8/INT4/GPTQ/AWQ）</li>
+<li>投机采样（Speculative Decoding）</li>
+</ul>
+<hr>
+<h2 id="四系统设计常考题">四、系统设计常考题</h2>
+<ol>
+<li>设计一个通用 Agent 框架</li>
+<li>设计一个 RAG 系统</li>
+<li>设计一个多 Agent 协作平台</li>
+<li>设计工具注册与发现系统</li>
+<li>设计 Agent 评估体系</li>
+</ol>
+<hr>
+<h2 id="五计算机基础不要忽略">五、计算机基础（不要忽略！）</h2>
+<h3 id="数据结构-算法">数据结构 &amp; 算法</h3>
+<ul>
+<li>数组、链表、栈、队列、哈希表</li>
+<li>二叉树、图、堆</li>
+<li>排序、搜索、动态规划、回溯</li>
+</ul>
+<h3 id="网络">网络</h3>
+<ul>
+<li>TCP 三次握手/四次挥手</li>
+<li>HTTP/HTTPS/HTTP2/HTTP3</li>
+<li>WebSocket（AI 流式输出常用）</li>
+</ul>
+<h3 id="数据库">数据库</h3>
+<ul>
+<li>MySQL：事务 ACID、隔离级别、索引 B+ 树</li>
+<li>Redis：数据结构、持久化（RDB/AOF）、集群</li>
+<li>向量数据库：Milvus、Pinecone、FAISS</li>
+</ul>
+<h3 id="操作系统">操作系统</h3>
+<ul>
+<li>进程 vs 线程 vs 协程</li>
+<li>死锁条件与预防</li>
+<li>内存管理</li>
+</ul>
+<hr>
+<h2 id="六面试准备-checklist">六、面试准备 Checklist</h2>
+<ul>
+<li>[ ] 准备 1-2 个 Agent 项目，能讲清楚每个技术决策</li>
+<li>[ ] 手写 RAG pipeline</li>
+<li>[ ] 理解 Transformer 每个组件</li>
+<li>[ ] 刷 50+ LeetCode（Medium 为主）</li>
+<li>[ ] 了解目标公司的 AI 产品和业务</li>
+<li>[ ] 准备"为什么选这个技术"的回答</li>
+<li>[ ] 了解 MCP/A2A 等新协议</li>
+<li>[ ] 读 1-2 篇 Agent 相关论文（如 ReAct、Reflexion、LATS）</li>
+</ul></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

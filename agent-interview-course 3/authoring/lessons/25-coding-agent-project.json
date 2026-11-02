@@ -1,0 +1,236 @@
+{
+  "id": "25",
+  "slug": "25-coding-agent-project",
+  "title": "项目二：多 Agent 研发、Code Review 与 Harness 门禁",
+  "stage": "06 模型、项目与面试",
+  "prerequisites": [
+    "11",
+    "15",
+    "18",
+    "19",
+    "20",
+    "23"
+  ],
+  "minutes": 75,
+  "goals": [
+    "把研发分工转成可核验的任务与产物协议",
+    "构建只审计和产出patch建议的Code Review原型",
+    "以Outcome、Trajectory、State和回归决定能否发布"
+  ],
+  "sources": [
+    "项目实战/02-多Agent协作系统.md",
+    "项目实战/实操考题/02-多Agent团队协作.md",
+    "项目实战/实操考题/06-AI-CodeReview-Agent.md",
+    "项目实战/实操考题/04-AI限时全栈开发.md",
+    "项目实战/实操考题/05-AI调试挑战.md",
+    "通用知识/Agent-Harness评测与发布门禁.md",
+    "通用知识/Agent Harness与编码代理测评.md"
+  ],
+  "body": "## 场景：两个Agent都说完成，为什么还不能合并\n你让一个Agent修改登录接口，另一个Agent补测试，第三个Agent审查。它们都报告完成，合并后却发现测试仍调用旧参数，审查只给出“代码结构清晰”。这个失败不来自Agent数量不足，而是任务协议、隔离和验收缺失。项目目标应是形成可审计的研发闭环：需求→计划→隔离产物→独立验证→审查→发布决策，而非模拟热闹的会议。\n\n仓库实践题分别要求Planner/Executor分工、代码安全性能检查以及限时全栈开发。本课把这些串起来，但实验默认只在内存中审计代码字符串并生成patch建议，不应用补丁，不执行待审代码，不访问真实仓库或网络，不提交或部署。审计权限与执行权限分离，是为了让学习者先验证判断和门禁，再决定是否开放真实动作。\n\n## 原理：任务有边界，协作才有收益\nPlanner把高层需求变成任务契约，每个任务写明输入版本、可改文件、依赖、禁止动作、交付物与验收。Executor在隔离工作区完成限定改动，返回diff、测试命令及真实输出；Reviewer读取需求与产物，指出可定位的问题；Integrator负责基于相同提交整合并重新验收。Reviewer不能只看Executor的自述，否则两者共享相同遗漏，所谓独立审查只是重复一句结论。\n\n适合并行的是依赖明确、改动区域独立的任务；共享接口还未确定时，先统一契约再拆分。worktree或独立分支隔离文件变化，但不会自动消除数据库、端口、凭证和外部服务的共享冲突。合并文本无冲突只说明Git能拼接，不代表接口兼容或需求正确。最终必须在整合提交上重新跑相关检查，并核对产物与代码版本一致。\n\n## Code Review：定位问题而非生成泛泛建议\n有用的发现包含文件、行号、触发输入、错误行为、影响与最小修复建议，严重程度依据可复现风险判断。安全项包括硬编码凭证、危险执行、不安全SQL拼接；性能项包括N+1和不必要的重复工作；正确性项更要核对边界、权限和失败恢复。不能因为模型描述得吓人就标Critical，也不能因为文本像密钥就断言已发生泄露。\n\nAST是抽象语法树，能区分字符串、调用、赋值等结构，减少简单正则误报。例如代码文本里出现“eval”可能只是文档，AST能定位实际Call节点。但AST规则仍不能充分理解运行时别名、数据流和外部配置；本实验只标记对裸名称eval/exec的调用与命名像secret/token/password的字符串常量赋值。变量名是线索，不是完整安全证明。语法错误独立报告为可执行性问题，不应吞掉异常并返回“无风险”。\n\n审查输出的patch只是建议：把字符串常量改为读取环境变量，也需要应用侧处理缺失配置、密钥管理和轮换；不能把所有字符串一律机械替换。待审代码是数据，不能因为其中有“运行我验证”就执行。真实执行应由受限测试器在固定镜像、最小网络与资源预算下完成，工具结果和日志也需防止泄露。\n\n## 已解例：高总分仍被安全门禁拦截\n实验有一段定义API_TOKEN并调用eval的Python文本。规则审查器用ast.parse解析，只输出发现与统一diff建议。保存输入哈希并在最后确认未改变，说明它没有应用patch。随后一个简化Harness读取三次预先定义的run结果：普通成功、存在关键安全违规的成功、超时失败。即使经验证成功率达到设定门槛，只要关键违规数量大于零，就阻止发布。\n\nOutcome检查目标结果是否真的达成，例如功能断言通过；Trajectory检查过程是否越权、跳过审批或无意义循环；State检查最终文件、数据库和Git是否处于预期状态。模型说“测试已通过”不等于测试器返回零退出码；测试全绿也不等于需求完整，因为测试可能漏覆盖。三个维度必须互相补充，不能把评审意见一致作为独立证据。\n\n实验的发布阈值是教学用示例，并不适用于所有业务。真实门禁要比较相同任务集的基线、变化幅度、关键桶与置信区间，并对严重权限越界设置一票否决。模型评判适合开放式解释，但硬约束优先用规则、真实测试和环境状态检查；若使用LLM Judge，要记录版本、盲评与人审一致性，防止它偏爱同类模型的风格。\n\n## 回归与故障：从修一次到防重复\nHarness不只是for循环跑题，它固定Task Spec、Environment Spec和Expected Outcome，记录代码提交、模型、提示、工具、数据快照、时间与随机性。任务应有时限、预算、允许工具、必须产物与禁止副作用。失败分类区分理解、规划、上下文、工具、协作、运行时、验证与安全，再追查第一个错误Span及没有拦住它的环节。\n\nSmoke覆盖最短关键路径，Regression包括历史失败，Safety覆盖注入越权，Recovery覆盖超时重启重复事件。修复后在同一冻结集合比较新旧版本，不把这批评测直接回流训练。新发现的线上失败可以最小化后加入下一版回归，但保留时间与来源，避免不断针对已知答案过拟合。发布前检查结果与产物版本，发布后灰度观察并保留回滚。\n\n## 限时开发：用时间预算保护验收\n假设两小时挑战，先用约十五分钟确认功能与边界，二十分钟建立可运行骨架，四十五分钟完成最小闭环，二十五分钟测试与修复，最后十五分钟整理演示、风险与交付。比例可调整，关键是预留验证时间。每次给AI一项明确任务和验收条件，查看diff，遇到失败先读日志、缩小复现和验证假设，不反复复制同一prompt祈求结果改变。\n\n## 技术表达与边界\n面试可以这样说：“多Agent只用于可独立的改动与交叉验证，我给任务限定文件和输入版本；Reviewer看真实diff与测试证据，整合后重跑。Harness分Outcome、Trajectory、State，关键安全违规直接拦截。当前离线实验只做AST审计和patch产物，未覆盖真实执行、复杂数据流和仓库集成。”若没有进行真实多Agent实测，不要声称效率提升数倍；应给出通信成本、重复劳动、失败率与单Agent基线后再判断是否值得。",
+  "diagram": {
+    "nodes": [
+      "保存待审文本哈希",
+      "解析AST不执行文本",
+      "匹配赋值与调用规则",
+      "断言命中和边界",
+      "生成候选diff并保留原文",
+      "计算固定记录门禁"
+    ],
+    "caption": "与source、audit、suggestion、runs逐项对应；正常脚本的发布结论本来就是False。",
+    "walkthrough": {
+      "scenario": "沿《simple：只读Code Review与安全门禁》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "原代码：审计完成但发布被阻止",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "保存待审文本哈希",
+              "input": "source含API_TOKEN='demo-secret'和calculate中的eval(text)。",
+              "action": "将source编码后取SHA256保存before。",
+              "output": "before保存原文本哈希；没有写入app.py。",
+              "state": "source仍为内存字符串。",
+              "failure": false,
+              "section": "已解例：高总分仍被安全门禁拦截",
+              "why": "之后比较哈希才能检查审计过程是否改动原文；这不是文件系统审计。",
+              "code_lines": [
+                5,
+                6
+              ]
+            },
+            {
+              "node": 1,
+              "title": "解析AST不执行文本",
+              "input": "同一个source字符串。",
+              "action": "audit调用ast.parse生成语法树；只遍历树，不执行源代码。",
+              "output": "解析得到赋值、函数与Call等节点。",
+              "state": "待审函数calculate没有被调用。",
+              "failure": false,
+              "section": "Code Review：定位问题而非生成泛泛建议",
+              "why": "解析能识别结构，而执行文本会把审计权限变成任意代码权限。",
+              "code_lines": [
+                8,
+                14
+              ]
+            },
+            {
+              "node": 2,
+              "title": "匹配赋值与调用规则",
+              "input": "API_TOKEN字符串赋值与裸名称eval调用。",
+              "action": "赋值规则检查名称包含token；调用规则检查eval/exec。",
+              "output": "findings=[(1,'possible-hardcoded-secret'),(3,'dynamic-execution')]。",
+              "state": "行号1和3属于source内部，不是lab脚本行号。",
+              "failure": false,
+              "section": "Code Review：定位问题而非生成泛泛建议",
+              "why": "规则定位真实语法节点；possible表示线索，不是已证明生产密钥泄露。",
+              "code_lines": [
+                15,
+                21
+              ]
+            },
+            {
+              "node": 3,
+              "title": "断言命中和边界",
+              "input": "上述findings；另有注释式字符串与语法错误边界。",
+              "action": "断言两项发现；字符串里的eval不命中；无效语法返回syntax-error。",
+              "output": "三条assert通过。",
+              "state": "边界输入均是独立audit调用，不覆盖source。",
+              "failure": false,
+              "section": "Code Review：定位问题而非生成泛泛建议",
+              "why": "同时验证命中、误报边界与解析失败，避免只展示成功检测。",
+              "code_lines": [
+                23,
+                26
+              ]
+            },
+            {
+              "node": 4,
+              "title": "生成候选diff并保留原文",
+              "input": "suggestion把常量改为os.environ，eval改为ast.literal_eval。",
+              "action": "difflib生成a/app.py到b/app.py的统一diff，检查补丁文本并比较原哈希。",
+              "output": "patch只被打印；source哈希未变。",
+              "state": "未执行suggestion、未应用patch。",
+              "failure": false,
+              "section": "已解例：高总分仍被安全门禁拦截",
+              "why": "literal_eval语义更窄，候选仍需需求与回归验证；哈希相同不代表已修复。",
+              "code_lines": [
+                27,
+                31
+              ]
+            },
+            {
+              "node": 5,
+              "title": "计算固定记录门禁",
+              "input": "runs为预先写好的三条布尔记录，并非运行待审代码产生。",
+              "action": "计算raw_success=2/3，verified=1/3，critical=1，再检查门禁逻辑与。",
+              "output": "outcome=0.667 verified=0.333 critical=1 release=False。",
+              "state": "原脚本正常完成；候选不获发布资格。",
+              "failure": false,
+              "section": "回归与故障：从修一次到防重复",
+              "why": "Outcome达0.60仍不够；关键违规和经验证成功率都会使发布失败。",
+              "code_lines": [
+                32,
+                41
+              ]
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "原代码：坏语法被显式报告",
+          "basis": "使用第26行已有audit测试；输入独立，不修改source，也不引入新的安全事件。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "保持原文，选择已有坏语法测试",
+              "input": "source与before不变；独立传入audit('def broken(:')。",
+              "action": "只为这次函数调用建立新的解析输入。",
+              "output": "不会进入calculate或执行任何待审代码。",
+              "state": "原source仍含API_TOKEN与eval。",
+              "failure": false,
+              "section": "Code Review：定位问题而非生成泛泛建议",
+              "why": "独立测试参数不是修改原文，错误结果也不应污染前一个findings。",
+              "code_lines": [
+                25,
+                26
+              ]
+            },
+            {
+              "node": 1,
+              "title": "捕获SyntaxError",
+              "input": "本次code='def broken(:'。",
+              "action": "ast.parse失败，except SyntaxError读取exc.lineno。",
+              "output": "返回[(1,'syntax-error')]，第26行断言通过。",
+              "state": "错误行号1是测试文本内部行号。",
+              "failure": true,
+              "section": "Code Review：定位问题而非生成泛泛建议",
+              "why": "无效语法不能被默默当作“未发现问题”；早返回避免不完整AST审查。",
+              "code_lines": [
+                10,
+                13
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "多Agent研发什么时候有收益，什么时候更糟？",
+      "a": "输入接口稳定、任务可独立验证且改动区域明确时，独立并行可能缩短关键路径。共享状态和文件重叠时，沟通、重复上下文和整合冲突可能超过收益。先做单Agent基线，记录总时长、token、返工与最终成功率；worktree解决文件隔离，整合后仍需验证接口和共享服务。",
+      "rubric": "3分：适用条件、代价、对照与整合验证各1分。"
+    },
+    {
+      "q": "Reviewer只看“执行者说测试通过”够吗？",
+      "a": "不够。应核对输入需求、具体diff、代码版本、测试命令、退出码与输出，必要时由独立测试器在对应提交复跑。自述可遗漏失败与误解，测试也可能未覆盖需求，因此同时检查行为、过程与最终状态。Reviewer不应被待审内容指令诱导执行任意代码。",
+      "rubric": "3分：证据列表、独立性原因、未覆盖及执行边界各1分。"
+    },
+    {
+      "q": "Outcome、Trajectory、State分别是什么？",
+      "a": "Outcome判断业务目标或产物是否满足；Trajectory判断工具顺序、权限、预算和审批过程；State判断环境最终是否正确且无残留副作用。例：答案正确却调用了越权数据库，Outcome好而Trajectory失败；声称生成文件但磁盘不存在，State失败。高总分不能抵消关键安全违规。",
+      "rubric": "3分：三个维度准确且给出可区分实例。"
+    },
+    {
+      "q": "AST规则没发现问题，能宣布代码安全吗？",
+      "a": "不能。AST规则只覆盖写出的语法模式，可能漏掉别名、动态调用、跨函数数据流和业务权限缺陷。结合类型/静态分析、依赖检查、需求测试与受控动态验证，记录覆盖边界和误报。生成patch只是一项候选，须审阅和回归，不能自动应用后宣称修复完成。",
+      "rubric": "3分：静态局限、补充验证、patch权限与验收各1分。"
+    }
+  ],
+  "lab": {
+    "title": "simple：只读Code Review与安全门禁",
+    "task": "运行审计器并阅读patch建议，说明为什么literal_eval只是受限替代而不是原eval的等价修复。",
+    "code": "import ast\nimport difflib\nimport hashlib\n\nsource = 'API_TOKEN = \"demo-secret\"\\ndef calculate(text):\\n    return eval(text)\\n'\nbefore = hashlib.sha256(source.encode()).hexdigest()\n\ndef audit(code):\n    findings = []\n    try:\n        tree = ast.parse(code)\n    except SyntaxError as exc:\n        return [(exc.lineno, 'syntax-error')]\n    for node in ast.walk(tree):\n        if isinstance(node, ast.Assign) and isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):\n            for target in node.targets:\n                if isinstance(target, ast.Name) and any(x in target.id.lower() for x in ('secret', 'token', 'password')):\n                    findings.append((node.lineno, 'possible-hardcoded-secret'))\n        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in ('eval', 'exec'):\n            findings.append((node.lineno, 'dynamic-execution'))\n    return sorted(findings)\n\nfindings = audit(source)\nassert findings == [(1, 'possible-hardcoded-secret'), (3, 'dynamic-execution')]\nassert audit('message = \"eval(text)\"\\n') == []\nassert audit('def broken(:') == [(1, 'syntax-error')]\n# A candidate only: it is never applied or executed.\nsuggestion = 'import ast\\nimport os\\nAPI_TOKEN = os.environ[\"API_TOKEN\"]\\ndef calculate(text):\\n    return ast.literal_eval(text)\\n'\npatch = ''.join(difflib.unified_diff(source.splitlines(True), suggestion.splitlines(True), fromfile='a/app.py', tofile='b/app.py'))\nassert 'literal_eval' in patch and 'os.environ' in patch\nassert hashlib.sha256(source.encode()).hexdigest() == before\nruns = [\n    dict(outcome=True, trajectory=True, state=True, critical=0),\n    dict(outcome=True, trajectory=False, state=True, critical=1),\n    dict(outcome=False, trajectory=True, state=False, critical=0),\n]\nverified = sum(r['outcome'] and r['trajectory'] and r['state'] for r in runs)/len(runs)\nraw_success = sum(r['outcome'] for r in runs)/len(runs)\ncritical = sum(r['critical'] for r in runs)\nrelease = raw_success >= 0.60 and critical == 0 and verified >= 0.60\nassert raw_success >= 0.60 and not release\nprint('findings:', findings)\nprint('candidate patch:')\nprint(patch, end='')\nprint(f'outcome={raw_success:.3f} verified={verified:.3f} critical={critical} release={release}')\nprint('original unchanged; reviewed code was never executed')\n",
+    "expected": "findings: [(1, 'possible-hardcoded-secret'), (3, 'dynamic-execution')]\ncandidate patch:\n--- a/app.py\n+++ b/app.py\n@@ -1,3 +1,5 @@\n-API_TOKEN = \"demo-secret\"\n+import ast\n+import os\n+API_TOKEN = os.environ[\"API_TOKEN\"]\n def calculate(text):\n-    return eval(text)\n+    return ast.literal_eval(text)\noutcome=0.667 verified=0.333 critical=1 release=False\noriginal unchanged; reviewed code was never executed\n",
+    "explanation": "ast.parse不执行代码；实验检查实际AST、生成统一diff并验证原文哈希不变。门禁输入为教学固定记录，并非真正运行受测代码得到的测试证据。literal_eval只解析字面量，不能实现任意表达式求值，所以仍需需求审阅。",
+    "extensions": [
+      "如果确实需要算术表达式，应怎样改候选修复？",
+      "加入一个结果正确但未经审批写入的run，门禁如何处理？"
+    ],
+    "extension_answers": [
+      "用AST白名单只允许数值常量和明确的算术运算符，自行解释节点，并限制深度、长度和运算资源；拒绝名称、属性、函数调用。给负数、除零、过大幂等写用例。不要执行compile或eval重回危险边界。",
+      "把该run的outcome设True、trajectory设False，并按业务风险标critical；verified必须为False，关键违规使release=False。保存审批事件、工具意图和实际状态，不能由正确最终答案洗掉过程越权。"
+    ]
+  },
+  "pitfalls": [
+    "用角色一致意见代替真实验证",
+    "应用建议patch后未经测试就称已修复",
+    "把文本合并无冲突等同需求验收通过"
+  ],
+  "checkpoint": "能定位AST发现、解释建议patch的语义变化，并证明高Outcome分数无法覆盖关键违规，描述整合后验证责任。",
+  "alignment": {
+    "case_title": "API_TOKEN与eval的只读审计、候选patch和门禁",
+    "insert_after": "已解例：高总分仍被安全门禁拦截",
+    "bridge": "这里把前文的研发协作与审查责任收敛到一份可重复核验的代码文本。lab里的source只有一个API_TOKEN字符串常量和一个调用eval的calculate函数。第一步先用before记录原文哈希，随后audit只解析语法树，根据变量名称与裸调用规则产生两个带源码行号的发现。你要分清两种行号：发现中的第一行和第三行指待审字符串内部位置，演示侧边的代码行号则定位整个实验脚本。\n\n接着suggestion提出读取环境变量和使用literal_eval的候选，patch只是统一差异文本，程序没有执行或应用它；哈希断言只验证原文未改，不能宣称漏洞修好了。最后runs提供三条人工设定的结果、过程与状态记录，门禁据此算出零点六六七的结果成功率与一个关键违规，最终拒绝发布。失败分支放大原代码已有的坏语法测试，而不是添加未知域名上传或真的运行代码。\n\n把这个例子看作独立审查职责的最小机制，再讨论真实团队如何补测试执行器、整合验证和授权。",
+    "coverage": "覆盖静态AST模式、三条审计断言、候选diff、内存原文哈希与固定布尔记录门禁；未运行多Agent、待审代码、补丁、真实功能测试、Git集成或发布。",
+    "question_sections": [
+      "原理：任务有边界，协作才有收益",
+      "Code Review：定位问题而非生成泛泛建议",
+      "回归与故障：从修一次到防重复",
+      "Code Review：定位问题而非生成泛泛建议"
+    ],
+    "coverage_summary": "只审计代码文本并生成建议，不执行待审代码，也不应用补丁。"
+  }
+}

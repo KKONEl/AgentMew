@@ -1,0 +1,137 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>OpenAI AI Agent 相关岗位要求 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-004.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">OpenAI/岗位要求.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/OpenAI/%E5%B2%97%E4%BD%8D%E8%A6%81%E6%B1%82.md">GitHub 固定版本</a> · <a href="../../source/OpenAI/%E5%B2%97%E4%BD%8D%E8%A6%81%E6%B1%82.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80%E6%A0%B8%E5%BF%83%E5%B2%97%E4%BD%8D%E6%A6%82%E8%A7%88">一、核心岗位概览</a><a href="#%E4%BA%8Cai-engineeragent-assistants-%E6%96%B9%E5%90%91">二、AI Engineer（Agent / Assistants 方向）</a><a href="#%E6%A0%B8%E5%BF%83%E8%81%8C%E8%B4%A3">核心职责</a><a href="#%E6%8A%80%E6%9C%AF%E8%A6%81%E6%B1%82">技术要求</a><a href="#%E4%B8%89research-engineeragent-systems-coding-environment">三、Research Engineer（Agent Systems / Coding Environment）</a><a href="#%E6%A0%B8%E5%BF%83%E8%81%8C%E8%B4%A3_1">核心职责</a><a href="#%E6%8A%80%E6%9C%AF%E8%A6%81%E6%B1%82_1">技术要求</a><a href="#%E5%9B%9B%E9%9D%A2%E8%AF%95%E6%B5%81%E7%A8%8B2025-2026-%E6%9C%80%E6%96%B0">四、面试流程（2025-2026 最新）</a><a href="#%E4%BA%94openai-%E9%9D%A2%E8%AF%95%E9%87%8D%E7%82%B9%E8%80%83%E5%AF%9F%E6%96%B9%E5%90%91">五、OpenAI 面试重点考察方向</a><a href="#1-ai-safety-mission-alignment%E5%BF%85%E8%80%83%E4%B8%8D%E5%8F%AF%E5%BF%BD%E8%A7%86">1. AI Safety &amp; Mission Alignment（必考，不可忽视）</a><a href="#2-agent-infrastructure-%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1">2. Agent Infrastructure 系统设计</a><a href="#3-%E6%9C%80%E6%96%B0-api-%E6%B7%B1%E5%BA%A6%E4%BD%BF%E7%94%A8">3. 最新 API 深度使用</a><a href="#%E5%85%AD%E5%AE%9E%E6%88%98%E5%A4%87%E8%80%83%E5%BB%BA%E8%AE%AE">六、实战备考建议</a></nav></details><article class="prose source-prose"><h1 id="openai-ai-agent-相关岗位要求">OpenAI AI Agent 相关岗位要求</h1>
+<blockquote>
+<p>最后更新：2026年6月（基于 OpenAI 官网 JD 及公开招聘信息整理）</p>
+</blockquote>
+<hr>
+<h2 id="一核心岗位概览">一、核心岗位概览</h2>
+<p>OpenAI 目前 Agent 相关岗位主要分为三个方向：</p>
+<table>
+<thead>
+<tr>
+<th>岗位方向</th>
+<th>典型职级</th>
+<th>薪资范围（美国）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AI Engineer（应用/系统）</td>
+<td>L4–L6</td>
+<td>$200k–$450k + 股权</td>
+</tr>
+<tr>
+<td>Research Engineer（Agent Systems）</td>
+<td>L4–L6</td>
+<td>$220k–$500k + 股权</td>
+</tr>
+<tr>
+<td>ML Engineer（Deployment/Infra）</td>
+<td>L4–L5</td>
+<td>$180k–$380k + 股权</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="二ai-engineeragent-assistants-方向">二、AI Engineer（Agent / Assistants 方向）</h2>
+<h3 id="核心职责">核心职责</h3>
+<ul>
+<li>构建和维护 ChatGPT、API 产品中 Agent 相关功能（Tools、Memory、Multi-step Reasoning）</li>
+<li>设计和实现 Agent 工具调用管道（Function Calling、Code Interpreter、Browser Use）</li>
+<li>研发 Agents SDK 相关能力，优化 Agent orchestration 和 handoff 机制</li>
+<li>与 Research 团队协作，将最新模型能力产品化（o3/o4-mini/GPT-5 等）</li>
+<li>评估 Agent 系统可靠性、安全性，设计 Guardrails 和 Fallback 机制</li>
+</ul>
+<h3 id="技术要求">技术要求</h3>
+<p><strong>必须具备：</strong>
+- 5年以上软件工程经验
+- Python 精通（是主力语言），熟悉 TypeScript/Node.js
+- 深入理解 LLM 工作原理：Transformer 架构、Attention 机制、Tokenization、Context Window 管理
+- RAG 系统全链路经验：Embedding 选型、向量数据库（Pinecone/Weaviate/pgvector）、检索策略、重排序
+- Agent 框架实际项目经验：LangChain/LangGraph、OpenAI Assistants API、Responses API 或自研框架
+- 分布式系统设计能力：高并发、低延迟系统架构
+- 扎实的数据结构与算法基础（LeetCode Medium/Hard 级别）</p>
+<p><strong>加分项：</strong>
+- OpenAI API 深度使用经验（包括 Realtime API、Batch API）
+- Agentic Coding 工具构建经验（如开发 Claude Code / Cursor 类工具）
+- 推理模型（o-series）应用优化经验
+- 开源社区贡献（Agent 框架、LLM 工具链）
+- AI Safety 相关研究背景或实践经验</p>
+<hr>
+<h2 id="三research-engineeragent-systems-coding-environment">三、Research Engineer（Agent Systems / Coding Environment）</h2>
+<h3 id="核心职责_1">核心职责</h3>
+<ul>
+<li>构建 Agent 执行环境（Code Execution Sandbox、Tool Integration、Sandboxing）</li>
+<li>开发可扩展的多步 Agent 工作流编排框架（Planning、Tool Use、Memory、Coordination）</li>
+<li>设计 Agent 性能评估和 Benchmark 系统</li>
+<li>通过 Prompting、数据精选、Post-training 提升 Agent 性能</li>
+<li>与 Policy/Safety 团队协作，确保 Agent 系统符合安全标准</li>
+</ul>
+<h3 id="技术要求_1">技术要求</h3>
+<p><strong>必须具备：</strong>
+- PhD 或同等研究经验（或 5年以上相关工程经验）
+- LLM 系统/Pipeline/Tool-Integrated Workflow 构建经验
+- 分布式系统和编排工具经验（Docker、Kubernetes、Ray、PyTorch Distributed）
+- 系统设计能力：可扩展推理基础设施架构
+- 强算法基础</p>
+<p><strong>加分项：</strong>
+- 强化学习工作流经验（Rollout、Trajectory Collection、Policy Optimization）
+- 评估框架、Prompting/Finetuning/RL 大规模实验经验
+- 安全沙箱和代码执行环境构建经验</p>
+<hr>
+<h2 id="四面试流程2025-2026-最新">四、面试流程（2025-2026 最新）</h2>
+<pre><code>1. 招聘方初筛（15-30min 电话）
+   - 背景了解、岗位匹配度、薪资预期
+
+2. 有偿 Work Trial（5-8小时，付费约$200-500）
+   - 模拟真实工作任务，评估生产级代码质量
+   - 典型题目：设计并实现一个 mini Agent 工具调用系统
+   - 评估维度：代码质量、架构设计、错误处理、测试覆盖
+
+3. 技术电话面（60min）
+   - LeetCode 算法题（Medium/Hard）
+   - ML 基础概念考察
+
+4. Onsite Loop（4-5轮，可远程）
+   - 轮次1：Coding（算法 + 数据结构）
+   - 轮次2：系统设计（重点：Inference Serving、RAG Pipeline、Agent Infrastructure）
+   - 轮次3：ML/AI 深度（LLM 原理、Agent 设计、Safety）
+   - 轮次4：Mission Alignment（价值观、对 AI Safety 的理解）
+   - 轮次5：Cross-functional（与 PM/Research 合作经验）
+</code></pre>
+<hr>
+<h2 id="五openai-面试重点考察方向">五、OpenAI 面试重点考察方向</h2>
+<h3 id="1-ai-safety-mission-alignment必考不可忽视">1. AI Safety &amp; Mission Alignment（必考，不可忽视）</h3>
+<p>OpenAI 的面试中，Safety 不是加分项，是<strong>门槛</strong>。面试官会直接问：</p>
+<blockquote>
+<p>"你如何看待 AI 对齐问题？"
+"如果你发现模型可能被滥用，你会怎么做？"
+"OpenAI 的使命是'确保 AGI 造福全人类'，你认为这个使命的挑战在哪里？"</p>
+</blockquote>
+<p>准备方向：
+- 了解 OpenAI 的 Safety 研究（Constitutional AI、RLHF、Superalignment）
+- 有自己的观点，能清晰阐述，不需要与公司立场完全一致，但要展示深度思考</p>
+<h3 id="2-agent-infrastructure-系统设计">2. Agent Infrastructure 系统设计</h3>
+<p>典型题目：</p>
+<blockquote>
+<p>设计一个支持 100 万并发用户的 AI 助手系统，支持工具调用和多轮对话</p>
+</blockquote>
+<p>考察要点：
+- LLM Inference 层：批处理、KV Cache、Token Streaming
+- 工具调用层：异步执行、超时处理、错误恢复
+- 状态管理层：会话记忆持久化、分布式 Context 同步
+- 安全层：Rate Limiting、Prompt Injection 防御、输出过滤</p>
+<h3 id="3-最新-api-深度使用">3. 最新 API 深度使用</h3>
+<p>2025-2026 重点：
+- <strong>Responses API</strong> vs <strong>Chat Completions API</strong> 的设计差异
+- <strong>Agents SDK</strong>：Agent 编排、Handoff、Tool 定义
+- <strong>Realtime API</strong>：语音 Agent 的延迟优化
+- <strong>Reasoning Models（o-series）</strong>：何时用 o3 vs gpt-4o，成本/性能权衡</p>
+<hr>
+<h2 id="六实战备考建议">六、实战备考建议</h2>
+<ol>
+<li><strong>动手构建</strong>：用 OpenAI Agents SDK 做一个有实际功能的 Agent（工具调用+记忆+流式输出）</li>
+<li><strong>读源码</strong>：研究 OpenAI Agents SDK 源码，理解 handoff 和 tracing 机制</li>
+<li><strong>Safety 必读</strong>：阅读 <a href="https://openai.com/index/openai-o3-system-card" rel="noreferrer">OpenAI System Card</a>，了解最新安全机制</li>
+<li><strong>Work Trial 准备</strong>：写干净的、production-ready 代码，加完善的错误处理和测试</li>
+<li><strong>算法不能偷懒</strong>：即使是 Applied AI 岗位，依然要刷 LeetCode（Medium 为主）</li>
+</ol></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

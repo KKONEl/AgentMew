@@ -1,0 +1,510 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>最新 AI Agent / 大模型面经索引（2026） · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-084.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/最新AI-Agent面经索引.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/%E6%9C%80%E6%96%B0AI-Agent%E9%9D%A2%E7%BB%8F%E7%B4%A2%E5%BC%95.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/%E6%9C%80%E6%96%B0AI-Agent%E9%9D%A2%E7%BB%8F%E7%B4%A2%E5%BC%95.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E9%87%87%E9%9B%86%E6%A6%82%E5%86%B5">采集概况</a><a href="#2026-09-%E6%9C%80%E6%96%B0%E8%A1%A5%E5%85%85">2026-09 最新补充</a><a href="#2026-08-%E6%9C%80%E6%96%B0%E8%A1%A5%E5%85%85">2026-08 最新补充</a><a href="#p0%E4%BC%98%E5%85%88%E9%98%85%E8%AF%BB%E7%9A%84%E7%9C%9F%E5%AE%9E%E9%9D%A2%E7%BB%8F">P0：优先阅读的真实面经</a><a href="#%E5%AD%97%E8%8A%82%E8%B7%B3%E5%8A%A8">字节跳动</a><a href="#%E8%85%BE%E8%AE%AF">腾讯</a><a href="#%E9%98%BF%E9%87%8C-%E8%9A%82%E8%9A%81-%E6%B7%98%E5%A4%A9">阿里 / 蚂蚁 / 淘天</a><a href="#%E7%BE%8E%E5%9B%A2-%E5%BF%AB%E6%89%8B-%E7%99%BE%E5%BA%A6-%E4%BA%AC%E4%B8%9C-%E5%B0%8F%E7%BA%A2%E4%B9%A6">美团 / 快手 / 百度 / 京东 / 小红书</a><a href="#p1%E4%B8%93%E9%A2%98%E9%A2%98%E5%BA%93%E4%B8%8E%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9">P1：专题题库与高频考点</a><a href="#p2%E5%A4%96%E9%83%A8%E9%AB%98%E8%B4%A8%E9%87%8F-github-%E8%B5%84%E6%96%99">P2：外部高质量 GitHub 资料</a><a href="#%E5%A4%8D%E4%B9%A0%E4%BC%98%E5%85%88%E7%BA%A7">复习优先级</a><a href="#%E5%85%A5%E5%BA%93%E5%8E%9F%E5%88%99">入库原则</a></nav></details><article class="prose source-prose"><h1 id="最新-ai-agent-大模型面经索引2026">最新 AI Agent / 大模型面经索引（2026）</h1>
+<blockquote>
+<p>最近核对：2026-09-11。本文整理自公开网页搜索结果，用作面经入口和复习优先级索引。为避免搬运平台原文，本文只保留来源链接、摘要和考点标签。结构化数据见 <a href="../../source/data/interviews.json"><code>data/interviews.json</code></a>。</p>
+<p><strong>2026-10 批次补充</strong>：<a href="doc-048.html">156 道主题练习与参考答案</a> · <a href="doc-047.html">63 条来源与分级说明</a>。来源快照为 2026-10-22，答案整理于 2026-10-23；均为报道主题改写练习，非公司官方真题。本页下方原有统计仍属 9 月批次，不包含该补充，也不代表重新核验旧来源。</p>
+</blockquote>
+<h2 id="采集概况">采集概况</h2>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>高质量候选</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>小红书</td>
+<td>13</td>
+<td>时效强，覆盖字节、腾讯、美团、快手、阿里、百度、小红书等一面/二面</td>
+</tr>
+<tr>
+<td>GitHub</td>
+<td>14</td>
+<td>高质量题库和学习资料，适合作为系统复习资料</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td>24</td>
+<td>国内大厂面经密度高，适合补充真实面试流程和追问</td>
+</tr>
+<tr>
+<td>CSDN / 博客园 / 掘金</td>
+<td>8</td>
+<td>适合作为 Agent/RAG 高频题和专题归纳来源</td>
+</tr>
+<tr>
+<td>知乎</td>
+<td>2</td>
+<td>适合作为大模型算法实习和海外 AI 面试补充</td>
+</tr>
+<tr>
+<td>海外研究</td>
+<td>1</td>
+<td>汇总 OpenAI / Anthropic 公开候选人经历，适合做流程与考察重点对比</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>注：小红书搜索结果链接依赖登录态和平台签名，公开静态站直链容易失效。因此本文只保留小红书原标题，阅读时请在小红书站内搜索对应标题。</p>
+</blockquote>
+<h2 id="2026-09-最新补充">2026-09 最新补充</h2>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>公司</th>
+<th>来源类型</th>
+<th>标题</th>
+<th>新增考点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-09-07</td>
+<td>快手</td>
+<td>一手复盘（中等置信）</td>
+<td><a href="https://www.nowcoder.com/discuss/926274020192841728" rel="noreferrer">AI 全栈开发二面凉经（Agent 应用方向）</a></td>
+<td>Agent 项目深挖、Skill、工具使用、全栈交付</td>
+</tr>
+<tr>
+<td>2026-09-04</td>
+<td>字节跳动</td>
+<td>一手复盘</td>
+<td><a href="https://www.nowcoder.com/discuss/925342611194286080" rel="noreferrer">9.3 Agent 开发一面面经</a></td>
+<td>Harness、长任务延迟、工具可靠性、上下文压缩、结构化评分</td>
+</tr>
+<tr>
+<td>2026-09-03</td>
+<td>快手</td>
+<td>一手复盘</td>
+<td><a href="https://www.nowcoder.com/discuss/925163549431742464" rel="noreferrer">AI 应用开发 / Agent 开发一面</a></td>
+<td>AI Coding 质量、工具结果缓存、长期偏好、隐私、并发基础</td>
+</tr>
+<tr>
+<td>2026-08-31</td>
+<td>阿里</td>
+<td>汇总题源</td>
+<td><a href="https://www.nowcoder.com/discuss/923740641878646784" rel="noreferrer">Agent 开发近期面经汇总</a></td>
+<td>MCP Server 评测、Agent Trace、超长任务续跑、Skill 渐进加载、推理基础设施</td>
+</tr>
+<tr>
+<td>2026-08-28</td>
+<td>字节跳动</td>
+<td>汇总题源</td>
+<td><a href="https://www.nowcoder.com/discuss/922659050167226368" rel="noreferrer">Agent 开发近期面经汇总</a></td>
+<td>Harness/Orchestrator、路径震荡、工具检索、Coding Agent 并发、首次成功率</td>
+</tr>
+<tr>
+<td>2026-08-24</td>
+<td>字节跳动</td>
+<td>一手复盘</td>
+<td><a href="https://www.nowcoder.com/discuss/921444774287003648" rel="noreferrer">Agent 开发一面（8.12）</a></td>
+<td>RAG、AI Coding 质量、SSE/WebSocket、高并发、索引与线程安全</td>
+</tr>
+</tbody>
+</table>
+<p>本轮新增考点已整理成独立专题：<a href="doc-059.html">2026 AI Agent 工程化新考点</a>。它只补充本仓库此前缺少或覆盖不足的 Runtime、可恢复执行、路径震荡、规模化工具路由、Trace 和生产级评测，不重复已有 RAG/MCP 基础。</p>
+<h2 id="2026-08-最新补充">2026-08 最新补充</h2>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>公司</th>
+<th>来源</th>
+<th>标题</th>
+<th>核心考点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-08-07</td>
+<td>小红书</td>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/feed/main/detail/e5e9311a623940eead6ec98c65e7f9e8" rel="noreferrer">大模型平台 Agentic 全栈研发练习生一面凉经</a></td>
+<td>Harness、编排层、Skill/Tool、LangGraph、模型一致性、扩容</td>
+</tr>
+<tr>
+<td>2026-08-09</td>
+<td>米哈游</td>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/916476300372500480" rel="noreferrer">AI Agent 开发提前批一面面经分享</a></td>
+<td>AI coding、幻觉治理、Skill/MCP、项目深挖、Agent 评估</td>
+</tr>
+<tr>
+<td>2026-07-22</td>
+<td>阿里淘天</td>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/909920471301226496" rel="noreferrer">Agent 社招一面面经分享</a></td>
+<td>多任务冲突、DPO/GRPO、Memory、Skill、多步轨迹奖励</td>
+</tr>
+<tr>
+<td>2026-07-07</td>
+<td>字节/蚂蚁/腾讯</td>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/904029765160497152" rel="noreferrer">Agent 实习面经</a></td>
+<td>Transformer、RAG、LoRA、训练参数、算法与场景题</td>
+</tr>
+<tr>
+<td>2026-08-06</td>
+<td>OpenAI/Anthropic</td>
+<td>Blanked</td>
+<td><a href="https://www.blanked.work/blog/openai-vs-anthropic-interviews" rel="noreferrer">28 份公开面试经历对比</a></td>
+<td>OpenAI 的规模/可靠性，Anthropic 的安全/价值判断</td>
+</tr>
+</tbody>
+</table>
+<h2 id="p0优先阅读的真实面经">P0：优先阅读的真实面经</h2>
+<h3 id="字节跳动">字节跳动</h3>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>标题</th>
+<th>核心考点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>小红书</td>
+<td>字节跳动Agent开发岗二面（贼难）（小红书站内搜索原标题）</td>
+<td>多Agent、LangGraph、Skills、上下文工程、Agent评估、SFT</td>
+</tr>
+<tr>
+<td>小红书</td>
+<td>字节 agent开发 1-3面面经 5月（小红书站内搜索原标题）</td>
+<td>豆包场景、长会话、多Agent A2A、Memory、RAG、幻觉治理</td>
+</tr>
+<tr>
+<td>小红书</td>
+<td>字节跳动AI开发 一面（小红书站内搜索原标题）</td>
+<td>AI 应用开发一面</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/882634966025175040" rel="noreferrer">字节 AI 应用岗面试真题</a></td>
+<td>法律RAG、工具路由、评测、chunking、rerank</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/746382064101908480" rel="noreferrer">4轮拿下字节Offer！LLM面试题合集</a></td>
+<td>RAG召回排序、Prompt评测、ReAct、LoRA、SFT、Attention、幻觉</td>
+</tr>
+<tr>
+<td>博客园</td>
+<td><a href="https://www.cnblogs.com/tuaran/p/20164742" rel="noreferrer">字节 AI Agent 二面（飞连）面试题与参考解答</a></td>
+<td>Tool Calling、bad case、Memory、RAG优化、Agentic RAG</td>
+</tr>
+<tr>
+<td>CSDN</td>
+<td><a href="https://gitcode.csdn.net/6a2ccdca10ee7a33f27c07bf.html" rel="noreferrer">字节跳动大模型实习面经：从 Agent 记忆到 RAG 优化</a></td>
+<td>长短期记忆、Query Rewrite、Hybrid Retrieval、RRF、Rerank、HyDE</td>
+</tr>
+<tr>
+<td>CSDN</td>
+<td><a href="https://devpress.csdn.net/v1/article/detail/151567056" rel="noreferrer">双非本｜字节跳动飞书团队 RAG 面经</a></td>
+<td>BGE-M3、Qwen3-Embedding、LoRA、多路召回、父子文档</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/feed/main/detail/91c5394e57c14927841d7a86bfe427c2" rel="noreferrer">字节 Agent 开发一面 90 分钟凉经</a></td>
+<td>代码 Agent、覆盖率/插桩、查询改写、上下文工程、Skills</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/feed/main/detail/6506d4b4addf447c9a3ae73570c5d00b6" rel="noreferrer">字节 Agent 开发实习一面</a></td>
+<td>Memory、上下文压缩、MCP、Skill、OpenClaw、A2A</td>
+</tr>
+</tbody>
+</table>
+<h3 id="腾讯">腾讯</h3>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>标题</th>
+<th>核心考点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>小红书</td>
+<td>腾讯ai应用一面面经（小红书站内搜索原标题）</td>
+<td>多Agent协作、AgentContext、Run Trace、Skills、上下文注入、风控Agent</td>
+</tr>
+<tr>
+<td>小红书</td>
+<td>腾讯 Agent二面凉经带答案（小红书站内搜索原标题）</td>
+<td>Agent 二面深挖</td>
+</tr>
+<tr>
+<td>小红书</td>
+<td>腾讯 ai 应用开发 一面（小红书站内搜索原标题）</td>
+<td>AI 应用开发一面</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/878600528970735616" rel="noreferrer">大模型、Agent面经总结【04/28】腾讯 / 百度 总结</a></td>
+<td>Agent编排、RAG热更新、失败重试、金融安全、LoRA/DPO</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/feed/main/detail/28edcddf0c204c08b6562a3e6e6b73ae" rel="noreferrer">腾讯 AI Agent 应用开发一面凉经</a></td>
+<td>Coding Agent、SubAgent、上下文管理、GRPO/QLoRA、AI 工具边界</td>
+</tr>
+</tbody>
+</table>
+<h3 id="阿里-蚂蚁-淘天">阿里 / 蚂蚁 / 淘天</h3>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>标题</th>
+<th>核心考点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>小红书</td>
+<td>淘天AI Agent一面 问麻了（小红书站内搜索原标题）</td>
+<td>RAG、BM25、OCR、多Agent State、Checkpoint、MCP、LangGraph、SSE</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/879393838081597440" rel="noreferrer">阿里淘宝闪购 · Agent 算法工程师 · 27届实习一面</a></td>
+<td>Agent框架选型、HITL、风险控制、Memory、AI Coding</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/888874988554448896" rel="noreferrer">5月20日，蚂蚁智能体与大模型应用 一面</a></td>
+<td>幻觉治理、Skill、Spring AI、Claude Code、混合检索</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/877151327091027968" rel="noreferrer">Agent 开发面经总结【04/24】阿里巴巴 / 蚂蚁 / 字节跳动 总结</a></td>
+<td>Multi-Agent、RAG、MCP、Function Calling、LangChain/LangGraph</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/800426409796624384" rel="noreferrer">蚂蚁秋招时间线+面经</a></td>
+<td>RAG vs Fine-tuning、Rerank、NDCG、Agent评测、MCP/A2A</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/909920471301226496" rel="noreferrer">淘天 Agent 社招一面面经分享</a></td>
+<td>多任务训练、DPO/GRPO、Memory、Skill、轨迹奖励</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/feed/main/detail/566fa6594dcc446a82bd203f139c45c2" rel="noreferrer">淘天 Agent 开发日常实习一面</a></td>
+<td>状态机/Workflow、动态上下文、MCP/Skill、AI coding</td>
+</tr>
+<tr>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/feed/main/detail/78d6c8c30f1741e6b0a1a02d7b4bbfab" rel="noreferrer">淘天大模型 Agent 校招面经</a></td>
+<td>SFT、RAG 评估、DPO/GRPO、工具调度、延迟优化</td>
+</tr>
+</tbody>
+</table>
+<h3 id="美团-快手-百度-京东-小红书">美团 / 快手 / 百度 / 京东 / 小红书</h3>
+<table>
+<thead>
+<tr>
+<th>公司</th>
+<th>来源</th>
+<th>标题</th>
+<th>核心考点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>美团</td>
+<td>小红书</td>
+<td>美团 AI Agent开发 一面面经（小红书站内搜索原标题）</td>
+<td>PDF RAG、RAGAS、MCP、ReAct、Rerank、JSON工具调用</td>
+</tr>
+<tr>
+<td>美团</td>
+<td>小红书</td>
+<td>美团AI-Agent工程师面经，看看难度（小红书站内搜索原标题）</td>
+<td>AI-Agent 工程师面经</td>
+</tr>
+<tr>
+<td>美团</td>
+<td>知乎</td>
+<td><a href="https://www.zhihu.com/en/article/688624199" rel="noreferrer">Meituan Large Model Algorithm Intern questions</a></td>
+<td>RAG项目、指标、Qwen、LoRA、PDF/表格解析</td>
+</tr>
+<tr>
+<td>快手</td>
+<td>小红书</td>
+<td>快手AI Agent开发一面（小红书站内搜索原标题）</td>
+<td>父子索引、BM25、Rerank、Memory、Prompt注入防御、RAG评测</td>
+</tr>
+<tr>
+<td>快手</td>
+<td>小红书</td>
+<td>快手AI Agent开发实习生面经2026.6.12（小红书站内搜索原标题）</td>
+<td>ReAct、多模型API、单/多Agent、RAG优化、算法题</td>
+</tr>
+<tr>
+<td>百度</td>
+<td>小红书</td>
+<td>百度 大模型应用开发 一面面经（小红书站内搜索原标题）</td>
+<td>多模态RAG、表格切片、Memory总结、Function Call、语义缓存</td>
+</tr>
+<tr>
+<td>京东</td>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/876932752833077248" rel="noreferrer">京东 Agent开发 暑期一面</a></td>
+<td>电商RAG、意图识别、Redis向量检索、HNSW、幻觉兜底</td>
+</tr>
+<tr>
+<td>小红书</td>
+<td>小红书</td>
+<td>小红书 AI Agent开发一面（小红书站内搜索原标题）</td>
+<td>电商Agent、主从架构、Tool调用、RAG索引、Prompt调试</td>
+</tr>
+<tr>
+<td>小红书</td>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/feed/main/detail/e5e9311a623940eead6ec98c65e7f9e8" rel="noreferrer">大模型平台 Agentic 全栈研发练习生一面凉经</a></td>
+<td>Harness、编排层、Skill、模型一致性、LangGraph、扩容</td>
+</tr>
+<tr>
+<td>米哈游</td>
+<td>牛客</td>
+<td><a href="https://www.nowcoder.com/discuss/916476300372500480" rel="noreferrer">AI Agent 开发提前批一面面经分享</a></td>
+<td>AI coding、幻觉治理、Skill/MCP、项目深挖、现场编码</td>
+</tr>
+<tr>
+<td>理想汽车</td>
+<td>知乎</td>
+<td><a href="https://www.zhihu.com/en/article/680860432" rel="noreferrer">Li Auto Large Model Algorithm Intern experience</a></td>
+<td>RAG、数据集规模、SFT、CoT/ToT、部署、vLLM</td>
+</tr>
+</tbody>
+</table>
+<h2 id="p1专题题库与高频考点">P1：专题题库与高频考点</h2>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>标题</th>
+<th>建议用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CSDN</td>
+<td><a href="https://blog.csdn.net/Trb701012/article/details/162102884" rel="noreferrer">AI Agent开发面试高频题曝光！从203篇面经提炼</a></td>
+<td>提炼 Agent 高频题，补充通用题库</td>
+</tr>
+<tr>
+<td>掘金</td>
+<td><a href="https://juejin.cn/post/7652557621874409522" rel="noreferrer">RAG大厂面试题汇总：向量检索、混合检索、Rerank、幻觉处理</a></td>
+<td>补充 RAG 专项题</td>
+</tr>
+<tr>
+<td>掘金</td>
+<td><a href="https://juejin.cn/post/7625576464485842979" rel="noreferrer">2026 最新 AI Agent 岗面试复盘：拿到三个 offer</a></td>
+<td>做 Agent 岗准备策略</td>
+</tr>
+<tr>
+<td>博客园</td>
+<td><a href="https://www.cnblogs.com/itech/p/20111938" rel="noreferrer">面试 AI Agent 工程师会被问什么？40+ 真题 + 知识图谱全梳理</a></td>
+<td>通用 Agent 知识图谱</td>
+</tr>
+<tr>
+<td>CSDN</td>
+<td><a href="https://devpress.csdn.net/v1/article/detail/151832648" rel="noreferrer">大模型应用开发面试宝典：22家公司真实面试经验与技术考点总结</a></td>
+<td>多公司 LLM 应用岗总结</td>
+</tr>
+</tbody>
+</table>
+<h2 id="p2外部高质量-github-资料">P2：外部高质量 GitHub 资料</h2>
+<blockquote>
+<p>这些资源更适合作为“参考资料索引”，不应标记为真实面经。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>资源</th>
+<th>价值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/adongwanai/AgentGuide" rel="noreferrer">AgentGuide</a></td>
+<td>AI Agent开发指南、LangGraph、高级RAG、大模型面试</td>
+</tr>
+<tr>
+<td><a href="https://github.com/bcefghj/ai-agent-interview-guide" rel="noreferrer">ai-agent-interview-guide</a></td>
+<td>AI Agent 面试全攻略，含题库、项目、简历和系统设计</td>
+</tr>
+<tr>
+<td><a href="https://github.com/luhengshiwo/LLMForEverybody" rel="noreferrer">LLMForEverybody</a></td>
+<td>大模型知识与面试准备</td>
+</tr>
+<tr>
+<td><a href="https://github.com/aceliuchanghong/FAQ_Of_LLM_Interview" rel="noreferrer">FAQ_Of_LLM_Interview</a></td>
+<td>大模型算法岗面试题含答案</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Lau-Jonathan/LLM-Agent-Interview-Guide" rel="noreferrer">LLM-Agent-Interview-Guide</a></td>
+<td>300+ Q&amp;A，字节/阿里/腾讯真题</td>
+</tr>
+<tr>
+<td><a href="https://github.com/AngleMAXIN/llm-application-interview" rel="noreferrer">AngleMAXIN/llm-application-interview</a></td>
+<td>多家大厂真实 LLM 应用面试问题</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Snailclimb/JavaGuide/tree/main/docs/ai" rel="noreferrer">JavaGuide docs/ai</a></td>
+<td>高可信中文 AI 面试体系</td>
+</tr>
+<tr>
+<td><a href="https://github.com/itwanger/toBeBetterJavaer/tree/master/docs/src/sidebar/itwanger/ai" rel="noreferrer">toBeBetterJavaer AI section</a></td>
+<td>Agent 258题、大模型333题、RAG+Agent+MCP</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wdndev/llm_interview_note" rel="noreferrer">wdndev/llm_interview_note</a></td>
+<td>中文 LLM 面试笔记</td>
+</tr>
+<tr>
+<td><a href="https://github.com/KalyanKS-NLP/RAG-Interview-Questions-and-Answers-Hub" rel="noreferrer">RAG-Interview-Questions-and-Answers-Hub</a></td>
+<td>英文 RAG 100+ Q&amp;A</td>
+</tr>
+<tr>
+<td><a href="https://github.com/EmberRavager/agent-interview" rel="noreferrer">Agent Engineering Handbook · 2026</a></td>
+<td>Runtime、Durable Execution、Harness、Sandbox、HITL、Tracing 与 Evals</td>
+</tr>
+<tr>
+<td><a href="https://github.com/keepkeen/keepkeen.github.io" rel="noreferrer">KeepKeen Agent 工程研究笔记</a></td>
+<td>面经证据等级、岗位分型、Coding Agent 源码对比、Benchmark、失败分类与 Agentic RL</td>
+</tr>
+<tr>
+<td><a href="https://github.com/smile-struggler/kaomian" rel="noreferrer">kaomian</a></td>
+<td>高频题排序、项目拷打链、LeetCode 与 AI 模型手撕题；仅借鉴结构，不复制无许可内容</td>
+</tr>
+<tr>
+<td><a href="https://github.com/WeThinkIn/AIGC-Interview-Book" rel="noreferrer">AIGC-Interview-Book</a></td>
+<td>AgentOS、AgentOps、企业平台、自进化 Agent 与 Agentic RL；直接复用需遵守 GPL-3.0</td>
+</tr>
+</tbody>
+</table>
+<h2 id="复习优先级">复习优先级</h2>
+<ol>
+<li><strong>先看公司面经</strong>：字节、腾讯、阿里/蚂蚁、美团、快手、百度。</li>
+<li><strong>再刷 RAG 专项</strong>：Chunk、混合检索、Rerank、RAGAS、语义缓存、表格/PDF。</li>
+<li><strong>补 Agent 工程化</strong>：LangGraph、State/Checkpoint、Skills、MCP、Tool safety、Run trace。</li>
+<li><strong>补 2026 新考点</strong>：Runtime、恢复与幂等、路径震荡、工具检索、Verified Success、Coding Agent 并发冲突。</li>
+<li><strong>最后补 LLM 基础</strong>：LoRA/SFT/DPO、KV Cache、推理框架、量化、上下文压缩。</li>
+</ol>
+<h2 id="入库原则">入库原则</h2>
+<ul>
+<li>只保留摘要、问题要点和来源链接，不大段复制原文。</li>
+<li>带明确日期、轮次和个人项目追问的一手复盘优先作为真实面经来源。</li>
+<li>汇总型文章只用于发现趋势，必须标记为 <code>aggregation</code>，不能包装成一手面经。</li>
+<li>CSDN、掘金、知乎中推广内容较多，优先作为题目种子和专题归纳来源。</li>
+<li>GitHub 资源标记为 <code>reference</code>，单独作为外部资料索引。</li>
+</ul></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

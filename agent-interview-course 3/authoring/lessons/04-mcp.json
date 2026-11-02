@@ -1,0 +1,244 @@
+{
+  "id": "04",
+  "slug": "04-mcp",
+  "title": "MCP：Host、Client、Server 与工具数据流",
+  "stage": "02 工具、上下文与记忆",
+  "prerequisites": [
+    "03"
+  ],
+  "minutes": 75,
+  "goals": [
+    "按组件职责解释 MCP 协议边界",
+    "区分工具发现与传给模型的 schema",
+    "画出发现、调用、观察的完整数据流"
+  ],
+  "sources": [
+    "通用知识/Agent核心概念与设计模式.md",
+    "通用知识/核心概念详解与参考答案.md"
+  ],
+  "body": "## 场景：同一个助手接入三个系统\n一个企业助手要访问代码仓库、内部文档和工单系统。如果每个接入都自定义一套发现工具、描述参数、发送调用和解释结果的方式，接入方与应用之间会出现大量重复适配。MCP（Model Context Protocol，模型上下文协议）为应用与外部能力提供者建立统一交互约定。它解决的是能力接入与上下文交换的协议问题，并不替你决定任务如何规划，也不自动保证工具安全。\n\n教材以稳定架构和数据流为主。MCP 仍会演进，具体请求元数据、发现机制、传输和能力声明应以项目锁定版本为准。编写时核验的官方 latest 指向 2026-07-28；早期资料常出现连接初始化、旧 HTTP+SSE 等表述，不能把这些旧实现细节背成所有版本永恒成立的定义。本课演示仅模拟协议形状，不是可上线的完整 MCP 实现。\n\n## 三个角色各自负责什么\nHost 是承载用户交互、模型集成和策略控制的应用，例如桌面助手或 IDE。Client 是 Host 中与特定 Server 交互的协议组件。Server 提供聚焦的外部能力，例如查询工单、读取受权文档。一个 Host 可以管理多个 Client；每个 Client 面向一个 Server，这是职责映射，不应被误讲成“所有版本都必须一直保留一条网络长连接”。\n\n可以用餐厅作类比：Host 像决定顾客需求和服务规则的前台，Client 像负责与特定厨房对接的服务窗口，Server 像提供菜品的厨房。这个类比只帮助分工，权限和数据处理仍要落到代码。Server 不应默认获得用户完整聊天历史，Host 只传递本次工具操作必要的数据，也应控制不同 Server 之间的数据流。\n\n## 工具发现与模型 schema 不是同一步\n应用通过 MCP 发现 Server 暴露的工具，例如 tools/list 返回工具名、说明与 inputSchema。此时工具定义到达的是 Host 的协议层，还没有天然变成模型的可调用工具。Host 需要按当前任务、身份权限和预算选择子集，处理命名冲突，并转换成所用模型接口接受的工具描述格式。\n\n假设文档 Server 和工单 Server 都暴露 search。模型只看见一个 search 会产生歧义。Host 可以为模型命名为 docs_search 和 tickets_search，并保存映射表。模型提出 tickets_search 时，Host 通过映射找到对应 Client，再发送该 Server 的 tools/call，参数中的真实工具名仍是 search。这个适配层同时连接两种契约：Server 的 MCP schema 与模型接口的工具 schema；二者可能相似，却不能未经检查就假定完全一致。\n\n## 一次调用如何往返\n以“查工单 T42 状态”为例。Host 获取当前用户的可信身份和可用能力，发现工单工具，向模型提供已筛选的描述。模型返回候选调用及调用标识。Host 校验参数与策略，Client 发起工具调用，Server 再次验证凭据与资源访问范围，返回结构化状态。Host 对结果限制体积并关联模型调用 ID，把观察送回模型，模型再生成用户可读结论。\n\n这里至少有三种标识：模型工具调用 ID 用于把观察配回消息，JSON-RPC 请求 ID 用于协议请求响应关联，业务幂等键用于写操作跨重试去重。它们解决不同问题，不能因为都叫 id 就混成一个字段。只读查询不需要业务幂等键也应有请求关联和审计；创建工单则需要处理上一课讲的提交后超时未知状态。\n\n## Server 有哪些能力，边界又在哪里\nTools 表示可执行操作；Resources 表示可读取的上下文资源；Prompts 表示可复用提示模板。它们的具体呈现方式由 Host 设计，不能假定“提供了资源，模型就自动读完”。Host 仍需决定什么时候读、读多少、如何标注来源，以及哪些内容可以进入当前上下文。Server 返回一段“忽略之前规则”的文字，只能当作外部数据，不能提升为系统授权。\n\n工具元数据中的只读性、破坏性等描述可以辅助界面与策略，但不能替代后端权限。即使 Server 说自己只读，Host 仍要按实际能力配置策略；Server 也不能只因请求来自 Host 就跳过资源归属检查。对于远程接入还需要明确认证、凭据作用域、传输保护与审计。协议统一的是消息契约，不会替业务承担全部风险。\n\n## 如何避免版本型面试陷阱\n不要把 MCP 简化成“JSON 包一层 HTTP”。JSON-RPC 是消息约定，传输是承载消息的方式，工具发现和权限是应用与服务协作的语义。也不要把某一时期的初始化握手、SSE 长连接或 SDK 写法当作协议的全部。回答时先明确“我项目锁定的是哪个版本”，再说明架构不变的职责与该版本的具体交互。跨版本迁移需要检查能力声明、元数据、错误和结果类型，并做兼容性测试。\n\n面试可以这样表述：“MCP 帮助 Host 通过 Client 接入 Server 的能力。发现结果先到 Host，再经权限筛选和模型 schema 适配；模型提议调用后，Host 校验并路由，Server 做最终资源授权，结果按调用标识返回模型。协议不替代计划器、业务幂等和安全边界。”版本细节参见 [官方架构](https://modelcontextprotocol.io/specification/2026-07-28/architecture) 与 [官方工具说明](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)。本课其余场景和实验是教练补充，原文主题不能替代规范。\n",
+  "diagram": {
+    "nodes": [
+      "创建两个示例Server",
+      "发现同名search并建映射",
+      "读取预写model_call",
+      "构造请求19并路由",
+      "Server返回ticket:T42",
+      "关联model-8并打印"
+    ],
+    "caption": "本实验的机制轨迹：构建一个离线 Host 工具路由器。节点只追踪代码实际状态；变式边界另行标明。",
+    "walkthrough": {
+      "scenario": "沿《构建一个离线 Host 工具路由器》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "原实验代码对照",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "建立两个对象",
+              "input": "Server类；label参数",
+              "action": "创建docs=document，tickets=ticket",
+              "output": "servers包含两项",
+              "state": "routes尚为空",
+              "failure": false,
+              "section": "三个角色各自负责什么",
+              "why": "对象标签决定本次返回字符串的来源。",
+              "code_lines": [
+                1,
+                14
+              ]
+            },
+            {
+              "node": 1,
+              "title": "发现与名称映射",
+              "input": "两个list_tools都给出search",
+              "action": "以namespace前缀建立routes",
+              "output": "docs_search、tickets_search",
+              "state": "routes保存(Server对象,search)",
+              "failure": false,
+              "section": "工具发现与模型 schema 不是同一步",
+              "why": "加前缀避免同名工具冲突，内部名称仍保留。",
+              "code_lines": [
+                15,
+                17
+              ]
+            },
+            {
+              "node": 2,
+              "title": "读取模拟模型提议",
+              "input": "model_call固定字典",
+              "action": "读取model-8、tickets_search、query=T42",
+              "output": "选择tickets的路由",
+              "state": "real_name=search；server.label=ticket",
+              "failure": false,
+              "section": "工具发现与模型 schema 不是同一步",
+              "why": "模型提议与真正Server名称通过映射解耦。",
+              "code_lines": [
+                18,
+                19
+              ]
+            },
+            {
+              "node": 3,
+              "title": "构造协议请求",
+              "input": "模型id=model-8；路由内部名search",
+              "action": "建立JSON-RPC样式字典，独立id=19",
+              "output": "method=tools/call；name=search；query=T42",
+              "state": "request.id=19",
+              "failure": false,
+              "section": "一次调用如何往返",
+              "why": "协议响应关联不应混用模型调用ID。",
+              "code_lines": [
+                20,
+                21
+              ]
+            },
+            {
+              "node": 4,
+              "title": "执行模拟Server",
+              "input": "request方法与内部名",
+              "action": "断言后拼接label与query",
+              "output": "response.result.text=ticket:T42；id=19",
+              "state": "仅生成测试字符串，没有工单状态",
+              "failure": false,
+              "section": "一次调用如何往返",
+              "why": "拼接结果可验证路由来源，但不能证明查询了真实工单。",
+              "code_lines": [
+                6,
+                11
+              ]
+            },
+            {
+              "node": 5,
+              "title": "核验关联并打印",
+              "input": "response.id=19；model_call.id=model-8",
+              "action": "检查协议id，再建立tool_call_id",
+              "output": "available: docs_search,tickets_search\nobservation: model-8 ticket:T42",
+              "state": "observation绑定model-8",
+              "failure": false,
+              "section": "一次调用如何往返",
+              "why": "分别检查请求响应与模型观察，避免错配。",
+              "code_lines": [
+                22,
+                27
+              ]
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "边界与故障分支",
+          "basis": "已验证变式：仅将第18行tickets_search替换为admin_delete，触发第19行KeyError且无stdout。原代码未捕获该异常，演示不会假装已有受控错误包装。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "创建同样Server",
+              "input": "docs和tickets",
+              "action": "保持原对象与内部search",
+              "output": "两个Server对象已创建",
+              "state": "工具注册形状不变",
+              "failure": false,
+              "section": "三个角色各自负责什么",
+              "why": "变式只修改模型提议名称，不修改服务定义。",
+              "code_lines": [
+                13,
+                14
+              ]
+            },
+            {
+              "node": 1,
+              "title": "建立原路由表",
+              "input": "list_tools结果",
+              "action": "只注册docs_search与tickets_search",
+              "output": "routes中没有admin_delete",
+              "state": "两个授权暴露名",
+              "failure": false,
+              "section": "工具发现与模型 schema 不是同一步",
+              "why": "未在映射中出现的名字不能被随意动态执行。",
+              "code_lines": [
+                15,
+                17
+              ]
+            },
+            {
+              "node": 2,
+              "title": "变式：请求未知工具",
+              "input": "仅第18行name改为admin_delete",
+              "action": "第19行索引routes[admin_delete]",
+              "output": "KeyError: admin_delete；stdout为空",
+              "state": "未构造request；未调用Server",
+              "failure": true,
+              "section": "工具发现与模型 schema 不是同一步",
+              "why": "路由查找先失败，后续构造、调用和打印都未发生。",
+              "code_lines": [
+                18,
+                19
+              ]
+            }
+          ],
+          "code_overrides": {
+            "18": "model_call = {\"id\": \"model-8\", \"name\": \"admin_delete\", \"arguments\": {\"query\": \"T42\"}}"
+          }
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "tools/list 返回以后，为什么模型可能还看不到工具？",
+      "a": "发现结果首先由 Host 收到；Host 还需按权限、任务、预算选取工具，转换成模型接口支持的 schema 后加入请求。没有暴露给本次模型调用的工具，不会因 Server 已安装就自动可用。",
+      "rubric": "分开协议发现与模型请求装配。"
+    },
+    {
+      "q": "两个 Server 都有 search，如何避免错路由？",
+      "a": "Host 为模型建立有命名空间的外部名，如 docs_search 和 tickets_search，并维护外部名到 Client 与 Server 内工具名的映射。执行时先查映射而非按字符串猜测，结果也保留来源。",
+      "rubric": "包括命名、映射、结果来源。"
+    },
+    {
+      "q": "MCP 是否意味着 Server 能看到完整聊天记录？",
+      "a": "不意味着。Host 应只发送操作必要参数和受控上下文，控制跨 Server 信息交换。Server 不能因为提供工具就默认获得完整对话或其他 Server 的数据。",
+      "rubric": "说明最小必要数据与 Host 隔离职责。"
+    },
+    {
+      "q": "如何回答“MCP 只支持 HTTP+SSE”这个说法？",
+      "a": "先说明该表述把特定版本或传输方案泛化了。MCP 的角色与消息语义和具体传输应分开，检查项目锁定规范和 SDK 支持的传输；不要用旧资料推断当前全部实现。",
+      "rubric": "辨析版本与协议层，不需要背未经核验的传输清单。"
+    }
+  ],
+  "lab": {
+    "title": "构建一个离线 Host 工具路由器",
+    "task": "模拟两个 Server 都叫 search，Host 通过名称映射正确路由，并把 JSON-RPC ID 配回结果。",
+    "code": "class Server:\n    def __init__(self, label):\n        self.label = label\n    def list_tools(self):\n        return [{\"name\": \"search\", \"inputSchema\": {\"type\": \"object\"}}]\n    def call(self, request):\n        assert request[\"method\"] == \"tools/call\"\n        assert request[\"params\"][\"name\"] == \"search\"\n        query = request[\"params\"][\"arguments\"][\"query\"]\n        return {\"jsonrpc\": \"2.0\", \"id\": request[\"id\"],\n                \"result\": {\"text\": self.label + \":\" + query}}\n\nservers = {\"docs\": Server(\"document\"), \"tickets\": Server(\"ticket\")}\nroutes = {}\nfor namespace, server in servers.items():\n    for tool in server.list_tools():\n        routes[namespace + \"_\" + tool[\"name\"]] = (server, tool[\"name\"])\nmodel_call = {\"id\": \"model-8\", \"name\": \"tickets_search\", \"arguments\": {\"query\": \"T42\"}}\nserver, real_name = routes[model_call[\"name\"]]\nrequest = {\"jsonrpc\": \"2.0\", \"id\": 19, \"method\": \"tools/call\",\n           \"params\": {\"name\": real_name, \"arguments\": model_call[\"arguments\"]}}\nresponse = server.call(request)\nassert response[\"id\"] == request[\"id\"]\nobservation = {\"tool_call_id\": model_call[\"id\"], \"text\": response[\"result\"][\"text\"]}\nassert observation[\"text\"] == \"ticket:T42\"\nprint(\"available:\", \",\".join(sorted(routes)))\nprint(\"observation:\", observation[\"tool_call_id\"], observation[\"text\"])\n",
+    "expected": "available: docs_search,tickets_search\nobservation: model-8 ticket:T42\n",
+    "explanation": "两个 Server 的内部名称完全相同，但 Host 暴露不同模型名称。路由表保留真实名称，执行时完成反向转换。协议请求 ID 19 和模型调用 ID model-8 分开管理。脚本省略真实规范要求的元数据、认证与传输，仅验证适配和关联机制。",
+    "extensions": [
+      "将模型工具名改为 docs_search，预期来源如何变化？",
+      "怎样拒绝模型请求未暴露的 admin_delete？"
+    ],
+    "extension_answers": [
+      "返回 document:T42，路由器选择 docs 的 Server；同时修改文本断言为 document:T42。",
+      "在索引 routes 前检查 name in routes，缺失时返回 unknown_or_forbidden_tool，不能动态执行同名 Python 函数。"
+    ]
+  },
+  "pitfalls": [
+    "认为接入 MCP 自动完成模型工具注册",
+    "把协议 ID、模型调用 ID 和业务幂等键混用",
+    "把旧版传输和初始化行为当作全部版本的固定事实"
+  ],
+  "checkpoint": "能手绘发现与调用两条链，并解释 Host 的 schema 适配、名称映射、权限筛选和结果关联职责。",
+  "alignment": {
+    "case_title": "构建一个离线 Host 工具路由器",
+    "insert_after": "一次调用如何往返",
+    "bridge": "servers 只有 docs 与 tickets 两个对象，二者的 list_tools 都返回内部工具名 search。routes 是 Host 侧的映射表：model_call 是预先写好的字典，不是实际模型输出：id 为 model-8，name 为 tickets_search，query 为 T42。\n\n第19行查路由后，request 使用独立协议请求 id=19、method=tools/call、name=search；Server.call 只检查方法与内部名称，然后拼接出 ticket:T42。response 的 id 必须仍为19，随后 observation 再绑定回 model-8，最终 stdout 两行分别展示可用外部名和关联后的观察。\n\n演示将严格跟随这些变量，不额外演出认证或模型回复。边界分支把预写工具名改成未暴露的 admin_delete，只会在查 routes 时发生 KeyError；安全产品需要把它转换为受控拒绝，而本脚本还没有实现错误包装。",
+    "coverage": "只模拟内存方法调用、名称映射与两层ID关联；没有完整MCP传输、协议元数据、Client实例、工具schema转换、身份权限、真实LLM或工单状态查询。",
+    "question_sections": [
+      "工具发现与模型 schema 不是同一步",
+      "工具发现与模型 schema 不是同一步",
+      "三个角色各自负责什么",
+      "如何避免版本型面试陷阱"
+    ],
+    "coverage_summary": "本地类模拟工具发现与路由，不连接真实MCP服务或模型。"
+  }
+}

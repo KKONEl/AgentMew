@@ -1,0 +1,243 @@
+{
+  "id": "06",
+  "slug": "06-memory",
+  "title": "记忆系统：存储、检索、写回与租户隔离",
+  "stage": "02 工具、上下文与记忆",
+  "prerequisites": [
+    "05"
+  ],
+  "minutes": 75,
+  "goals": [
+    "分开工作状态、历史日志和长期记忆",
+    "设计有来源、时效和更新规则的记忆",
+    "实现先隔离再召回的多租户检索"
+  ],
+  "sources": [
+    "通用知识/Agent核心概念与设计模式.md",
+    "通用知识/2026-10-上下文与记忆面试题与参考答案.md"
+  ],
+  "body": "## 场景：记住偏好，也可能记错人\n用户说：“以后技术解释先给例子，我不喜欢只有定义。”如果下一次对话仍能遵从，体验会更连贯。但若系统把这句话与所有租户资料一起做相似度检索，另一个公司的用户也可能收到这条偏好，甚至看到前者的敏感业务信息。记忆不是简单把历史全部向量化；它是一个带身份、来源、时效、写入规则和删除机制的数据系统。\n\n本课把记忆理解为跨决策复用的信息。不同资料对短期、工作和长期记忆的命名有所不同，面试时应先定义自己使用的边界。当前任务状态记录“已经查过什么、下一步做什么”，对话日志保留事件经过，长期记忆保存跨任务仍有价值的事实或偏好。它们可以放在同一数据库，但生命周期、检索方式和更新要求不同。教材中的 schema 与实验是教练补充，不代表某框架的唯一实现。\n\n## 四层对象不要混为一谈\n第一层是持久存储，里面可能有百万条记录。第二层是检索候选，根据身份、范围、时间和相关性筛选。第三层是最终注入本次上下文的记忆片段，需要再做预算和冲突处理。第四层是模型生成时实际使用了哪些信息，这只能通过行为与引用评估，不能因为“数据库有”就假定“模型知道”。\n\n例如用户喜欢中文解释的偏好存进数据库，并不会自动改变模型权重；下一次请求仍需要应用识别用户、召回该偏好、检查有效性，再加入当前上下文。如果本次用户明确要求英文，当前指令应优先处理，旧偏好只是默认偏好，不能变成不可更改的规则。区分默认偏好与硬性授权也很重要：喜欢自动化不代表授权系统自动付款。\n\n## 一条可维护的记忆至少包含什么\n可以记录 memory_id、tenant_id、subject_id、type、content、source_ref、created_at、valid_until、version 和 status。tenant_id 是隔离边界，subject_id 说明这是哪个主体的偏好或事实；source_ref 支持回查；有效期处理变化；version 和 status 支持修订、撤回与删除。还可以记录证据等级，例如用户明确陈述、工具确认事实、模型推断候选。模型推断不应未经核实就升级成持久事实。\n\n不是每条信息都值得保存。一次网络错误属于运行日志，通常不是用户长期偏好；临时订单状态应有短有效期；凭据和敏感秘密不应因为“未来也许有用”而复制到普通记忆库。长期价值、用户预期、用途与保留依据要一起判断。保存过多噪声不仅浪费空间，也会让无关或过时记录被召回，增加错误决策。\n\n## 写入流水线比一句“请记住”更重要\n一个可控流程是：先从事件提取候选，判断是否值得长期保留；绑定可信身份和范围；验证内容与来源；检索已有同主题记录；决定新增、更新、冲突待核实或拒绝写入；最后落盘并记录版本。重复出现同一偏好可以更新证据或访问记录，不必无限新增副本。用户说“我换到上海了”，应更新当前城市的有效版本，而不是让北京和上海两条无时态记录长期竞争。\n\n当两条信息冲突，不能简单把较晚写入当真。晚写入可能是后台摘要重跑了旧材料。需要比较来源事件时间、证据可靠性、适用范围与用户最新明确更正。无法确定时保留冲突状态，下一次决策前确认，不让检索排序器用高相似度替你裁决事实。\n\n## 已解例：先隔离，再排序\n有三条记录：租户 A 的“中文解释”、租户 B 的“英文解释”、租户 A 的过期“旧地址”。当前请求来自 A。第一步从运行时取得租户 A，不能从模型参数相信 tenant=B。第二步过滤为 A、当前有效且未删除的记录。第三步在候选内计算相关性，例如偏好关键词匹配或向量相似度。第四步检查预算，把相关记忆和来源放入上下文。\n\n为什么不能先全库 top-k，再删除其他租户？假如全库最高的前五条都是 B 的记录，删除后 A 一条也拿不到，召回质量受其他租户影响；若任何后续组件、日志或模型先看到候选，数据已经泄露。正确做法是在数据库访问边界就施加租户和权限过滤，并在结果使用前再校验。向量近邻只是排序机制，不能充当访问控制。\n\n## 更新与删除必须贯穿派生数据\n用户要求忘记某个地址，不能只删主表行，还要考虑向量索引、摘要、缓存、导出和其他派生记忆。可以使用删除标记立即阻断召回，再异步清理派生数据，明确备份与审计的保留策略。索引尚未同步时，读取层仍应以有效状态为准。写入完成不代表所有缓存立即一致，因此需要版本或更新时间来避免旧记录回流。\n\n评估时分别测试记忆写入是否正确、召回是否相关、是否过时、冲突是否可解释、跨租户是否泄露。再做任务级测试：在新会话要求英文，系统是否覆盖旧中文偏好；删除后是否仍被摘要引用；恶意用户能否通过参数召回别人的记录。记忆命中率高不能单独证明系统好，命中的可能正是错误或过期信息。\n\n面试表达可以这样组织：“我把长期记忆视为有生命周期的用户数据。写入经过候选提取、来源验证、冲突处理和版本更新；读取先用运行时身份做权限与有效性过滤，再相关性排序，最后预算注入。当前用户明确指令可以覆盖默认偏好，但不能凭偏好扩大授权。删除需要覆盖索引和摘要等派生副本，并用隔离与时态测试验证。”\n",
+  "diagram": {
+    "nodes": [
+      "准备三条记忆",
+      "A在时刻10先过滤",
+      "排序并输出中文偏好",
+      "更新A/style为版本2",
+      "删除A并复核B未变"
+    ],
+    "caption": "本实验的机制轨迹：实现租户隔离、时效过滤和版本更新。节点只追踪代码实际状态；变式边界另行标明。",
+    "walkthrough": {
+      "scenario": "沿《实现租户隔离、时效过滤和版本更新》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "原实验代码对照",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "准备记录",
+              "input": "A/style、B/style、A/address",
+              "action": "设置expires分别100、100、5，版本均1",
+              "output": "三条内存记录",
+              "state": "A/style=Chinese examples；B/style=English examples examples",
+              "failure": false,
+              "section": "已解例：先隔离，再排序",
+              "why": "明确所有者与有效期，才可验证隔离和过期处理。",
+              "code_lines": [
+                1,
+                5
+              ]
+            },
+            {
+              "node": 1,
+              "title": "A查询先过滤",
+              "input": "runtime_tenant=A；query=examples；now=10",
+              "action": "排除B租户，排除expires=5的A地址",
+              "output": "allowed=[A/style]",
+              "state": "只有一条合法候选",
+              "failure": false,
+              "section": "已解例：先隔离，再排序",
+              "why": "其他租户高相关内容和过期地址均不能进入排序。",
+              "code_lines": [
+                7,
+                9
+              ]
+            },
+            {
+              "node": 2,
+              "title": "排序并首次输出",
+              "input": "allowed只有A/style",
+              "action": "关键词计数排序，再检查A归属与数量",
+              "output": "A retrieval: Chinese examples",
+              "state": "found[0].version=1",
+              "failure": false,
+              "section": "已解例：先隔离，再排序",
+              "why": "先过滤再排序，排序器无需承担权限判断。",
+              "code_lines": [
+                18,
+                20
+              ]
+            },
+            {
+              "node": 3,
+              "title": "更新并再检索",
+              "input": "update(A,style,English examples)",
+              "action": "找到唯一A/style，改文本、version自增，再检索",
+              "output": "A updated: English examples version 2",
+              "state": "A/style.version=2；B/style.version=1",
+              "failure": false,
+              "section": "写入流水线比一句“请记住”更重要",
+              "why": "按租户与key更新使另一租户同主题记录不变。",
+              "code_lines": [
+                21,
+                24
+              ]
+            },
+            {
+              "node": 4,
+              "title": "删除并验证隔离",
+              "input": "found引用A/style当前字典",
+              "action": "设置deleted=True，断言A空、B版本1",
+              "output": "A after delete: 0\nB unchanged: 1",
+              "state": "A/style删除；A/address过期；B保留",
+              "failure": false,
+              "section": "更新与删除必须贯穿派生数据",
+              "why": "删除标记阻断本例读取，不能据此声称已清理生产索引和缓存。",
+              "code_lines": [
+                25,
+                29
+              ]
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "边界与故障分支",
+          "basis": "已验证变式：仅把第18行now=10改成now=101，从初始records重新执行，第19行AssertionError且stdout为空。空候选是正确过期结果，失败的是原用例的数量断言。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "从初始记录重跑时间变式",
+              "input": "三条记录及原有效期不变",
+              "action": "仅第18行now从10改101",
+              "output": "未进行更新或删除",
+              "state": "version全部仍1",
+              "failure": false,
+              "section": "已解例：先隔离，再排序",
+              "why": "这是独立重跑，不沿用正常分支已删除的状态。",
+              "code_lines": [
+                1,
+                5
+              ]
+            },
+            {
+              "node": 1,
+              "title": "时刻101过滤A",
+              "input": "A/style.expires=100；A/address.expires=5",
+              "action": "检查expires>101，均不满足",
+              "output": "allowed=[]",
+              "state": "found=[]",
+              "failure": false,
+              "section": "已解例：先隔离，再排序",
+              "why": "等于或超过到期时刻均不再可用。",
+              "code_lines": [
+                7,
+                9
+              ]
+            },
+            {
+              "node": 2,
+              "title": "空候选排序",
+              "input": "allowed=[]",
+              "action": "sorted仍返回空列表",
+              "output": "found=[]",
+              "state": "没有任何偏好文本被读取",
+              "failure": false,
+              "section": "已解例：先隔离，再排序",
+              "why": "相关性无法让已经过期的记录重新进入集合。",
+              "code_lines": [
+                10,
+                10
+              ]
+            },
+            {
+              "node": 2,
+              "title": "原断言发现前提变了",
+              "input": "第19行仍要求len(found)==1",
+              "action": "len(found)=0，断言失败",
+              "output": "AssertionError；stdout为空",
+              "state": "后续更新、删除、打印都未执行",
+              "failure": true,
+              "section": "已解例：先隔离，再排序",
+              "why": "测试断言是为now=10写的，时间变式揭示其适用前提。",
+              "code_lines": [
+                18,
+                20
+              ]
+            }
+          ],
+          "code_overrides": {
+            "18": "found = retrieve(\"A\", \"examples\", now=101)"
+          }
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "长期记忆和模型上下文有什么区别？",
+      "a": "长期记忆是应用可持久存储并跨任务复用的数据，上下文是这一次推理可见的工作集。记忆必须经身份过滤、检索、有效性检查和预算装配才能进入上下文，保存不等于模型自动可见，更不等于更新模型权重。",
+      "rubric": "分开存储、召回、注入和参数学习。"
+    },
+    {
+      "q": "为什么先全库 top-k 再按租户删除仍不好？",
+      "a": "其他租户会挤占候选，降低本租户召回；全局候选若进入日志、模型或中间组件还可能已泄露。应在可信数据访问层先施加租户与 ACL 过滤，再在授权集合内做相关排序，并对结果复核。",
+      "rubric": "说出质量与安全两类问题。"
+    },
+    {
+      "q": "用户新指令与旧偏好冲突时如何处理？",
+      "a": "先区分偏好与授权。本次明确要求英文可以覆盖旧的默认中文偏好；若用户表示以后都改英文，经过验证后更新长期记忆版本。偏好不能覆盖系统权限，也不能代表自动发信或付款的授权。",
+      "rubric": "当前覆盖、长期更新、授权独立三个点。"
+    },
+    {
+      "q": "删除主表记录以后为什么还可能“记得”？",
+      "a": "向量索引、摘要、缓存或本次已有上下文仍带旧信息。应立即在读取层使用删除状态阻断召回，传播清理派生数据，重建相关摘要或标记失效，并验证新会话与缓存路径。",
+      "rubric": "覆盖派生副本与本次上下文，提出验证。"
+    }
+  ],
+  "lab": {
+    "title": "实现租户隔离、时效过滤和版本更新",
+    "task": "运行一个纯内存记忆库，验证租户 B 的高相关记录不会进入 A 的结果，并验证旧偏好被更新。",
+    "code": "records = [\n    {\"tenant\": \"A\", \"key\": \"style\", \"text\": \"Chinese examples\", \"expires\": 100, \"version\": 1},\n    {\"tenant\": \"B\", \"key\": \"style\", \"text\": \"English examples examples\", \"expires\": 100, \"version\": 1},\n    {\"tenant\": \"A\", \"key\": \"address\", \"text\": \"old examples\", \"expires\": 5, \"version\": 1},\n]\n\ndef retrieve(runtime_tenant, query, now):\n    allowed = [r for r in records if r[\"tenant\"] == runtime_tenant\n               and r[\"expires\"] > now and not r.get(\"deleted\", False)]\n    return sorted(allowed, key=lambda r: -r[\"text\"].lower().count(query.lower()))\n\ndef update(runtime_tenant, key, text):\n    matches = [r for r in records if r[\"tenant\"] == runtime_tenant and r[\"key\"] == key]\n    assert len(matches) == 1\n    matches[0][\"text\"] = text\n    matches[0][\"version\"] += 1\n\nfound = retrieve(\"A\", \"examples\", now=10)\nassert len(found) == 1 and found[0][\"tenant\"] == \"A\"\nprint(\"A retrieval:\", found[0][\"text\"])\nupdate(\"A\", \"style\", \"English examples\")\nfound = retrieve(\"A\", \"examples\", now=10)\nassert found[0][\"version\"] == 2\nprint(\"A updated:\", found[0][\"text\"], \"version\", found[0][\"version\"])\nfound[0][\"deleted\"] = True\nassert retrieve(\"A\", \"examples\", now=10) == []\nassert retrieve(\"B\", \"examples\", now=10)[0][\"version\"] == 1\nprint(\"A after delete:\", len(retrieve(\"A\", \"examples\", now=10)))\nprint(\"B unchanged:\", retrieve(\"B\", \"examples\", now=10)[0][\"version\"])\n",
+    "expected": "A retrieval: Chinese examples\nA updated: English examples version 2\nA after delete: 0\nB unchanged: 1\n",
+    "explanation": "retrieve 先按可信租户、时效、删除状态过滤，再计算演示相关性。update 只更改当前租户同一主题，版本自增。删除后立即不再召回，而租户 B 不受影响。关键词计数只用于隔离机制演示，生产可换排序器，但过滤边界必须保留。",
+    "extensions": [
+      "now 改成 101 时，A 与 B 应召回多少条？",
+      "为每条记忆增加 source_ref，更新时应保留什么？"
+    ],
+    "extension_answers": [
+      "所有 expires=100 的记录也已到期，因此 A、B 都返回空；断言 retrieve(\"B\",\"examples\",101)==[]。",
+      "保存旧版本来源、更新时间与新来源，当前记录指向新证据；历史版本用于审计并受同样权限与保留策略约束，不能把旧来源覆盖到不可追溯。"
+    ]
+  },
+  "pitfalls": [
+    "聊天日志全量永久复制成长期记忆",
+    "用相似度或模型参数代替租户权限过滤",
+    "只删除主表却保留摘要、缓存与索引中的有效副本"
+  ],
+  "checkpoint": "能实现并解释先权限过滤后排序，明确偏好覆盖、事实更新与删除传播，并运行跨租户反例测试。",
+  "alignment": {
+    "case_title": "实现租户隔离、时效过滤和版本更新",
+    "insert_after": "已解例：先隔离，再排序",
+    "bridge": "本例的三条记忆保存在 records：租户 A 的 style 文本是 Chinese examples、expires=100、version=1；租户 B 的 style 是 English examples examples，期限同样为100；A 的 address 是 old examples，但 expires=5。\n\nretrieve 先筛选租户、未到期和未删除，得到的 allowed 只剩 A 的 style；然后才按关键词出现次数排序，所以 B 文本虽然有两次 examples，也不能抢进 A 的候选。首次输出 Chinese examples 后，update 只改 A/style，把文本换成 English examples，并把版本从1加到2；再取一次便得到第二行输出。\n\n接下来通过 found 引用给同一条内存记录加 deleted=True，A 的召回立刻变空，B 的原版本仍为1，正好对应后两行 stdout。边界分支从相同初始记录出发把查询时间改成101，A和B的有效期都已过，候选为空；",
+    "coverage": "仅验证内存记录的租户/到期/删除过滤、关键词排序与版本自增；没有认证系统、数据库持久化、向量索引、来源审计、冲突裁决、上下文注入或派生副本删除传播。",
+    "question_sections": [
+      "四层对象不要混为一谈",
+      "已解例：先隔离，再排序",
+      "四层对象不要混为一谈",
+      "更新与删除必须贯穿派生数据"
+    ],
+    "coverage_summary": "内存记录模拟隔离、时效和版本更新；真实记忆库还需可靠存储与授权。"
+  }
+}

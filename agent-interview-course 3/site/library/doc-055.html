@@ -1,0 +1,169 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>2026-10 性能与成本面试题与参考答案 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-055.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/2026-10-性能与成本面试题与参考答案.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/20-performance-serving.html">20 性能、成本与推理服务原理</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-%E6%80%A7%E8%83%BD%E4%B8%8E%E6%88%90%E6%9C%AC%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-%E6%80%A7%E8%83%BD%E4%B8%8E%E6%88%90%E6%9C%AC%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F">使用方式</a><a href="#99-%E7%BB%99%E5%AE%9A%E6%97%A5%E8%AF%B7%E6%B1%82%E9%87%8F%E6%AF%8F%E4%BB%BB%E5%8A%A1%E5%B7%A5%E5%85%B7%E6%AC%A1%E6%95%B0%E5%92%8C%E5%BB%B6%E8%BF%9F%E5%A6%82%E4%BD%95%E4%BC%B0%E7%AE%97%E5%B9%B6%E5%8F%91%E9%9C%80%E6%B1%82%E5%B9%B6%E8%AF%B4%E6%98%8E%E5%81%87%E8%AE%BE">99. 给定日请求量、每任务工具次数和延迟，如何估算并发需求并说明假设？</a><a href="#100-%E4%B8%8A%E5%8D%83%E4%B8%AA%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%B2%99%E7%AE%B1%E5%90%8C%E6%97%B6%E6%B4%BB%E8%B7%83%E6%97%B6%E4%BD%A0%E4%BC%9A%E6%80%8E%E6%A0%B7%E8%AE%BE%E8%AE%A1%E8%B5%84%E6%BA%90%E6%B1%A0%E5%92%8C%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5">100. 上千个代码执行沙箱同时活跃时，你会怎样设计资源池和调度策略？</a><a href="#101-%E7%AB%AF%E5%88%B0%E7%AB%AF%E8%80%97%E6%97%B6%E4%B8%8A%E5%8D%87%E6%97%B6%E6%80%8E%E6%A0%B7%E6%8B%86%E5%88%86%E6%A8%A1%E5%9E%8B%E6%A3%80%E7%B4%A2%E5%B7%A5%E5%85%B7%E5%8F%8A%E8%B0%83%E5%BA%A6%E5%90%84%E6%AE%B5%E7%9A%84%E8%B4%A1%E7%8C%AE">101. 端到端耗时上升时，怎样拆分模型、检索、工具及调度各段的贡献？</a><a href="#102-%E9%99%8D%E4%BD%8E-token-%E8%B4%B9%E7%94%A8%E6%97%B6%E6%80%8E%E6%A0%B7%E5%90%8C%E6%97%B6%E8%AF%81%E6%98%8E%E8%B4%A8%E9%87%8F%E6%B2%A1%E6%9C%89%E6%98%8E%E6%98%BE%E9%80%80%E5%8C%96">102. 降低 Token 费用时，怎样同时证明质量没有明显退化？</a><a href="#103-rag-%E5%BB%B6%E8%BF%9F%E5%81%8F%E9%AB%98%E6%97%B6%E6%80%8E%E6%A0%B7%E5%9C%A8%E5%8F%AC%E5%9B%9E%E8%A7%84%E6%A8%A1%E9%87%8D%E6%8E%92%E5%92%8C%E7%94%9F%E6%88%90%E4%B9%8B%E9%97%B4%E7%A1%AE%E5%AE%9A%E4%BC%98%E5%85%88%E4%BC%98%E5%8C%96%E9%A1%B9">103. RAG 延迟偏高时，怎样在召回规模、重排和生成之间确定优先优化项？</a><a href="#104-%E6%9C%8D%E5%8A%A1%E5%93%8D%E5%BA%94%E6%85%A2%E4%BD%86-cpu-%E5%88%A9%E7%94%A8%E7%8E%87%E5%BE%88%E4%BD%8E%E4%BD%A0%E4%BC%9A%E5%85%88%E6%A3%80%E6%9F%A5%E5%93%AA%E4%BA%9B%E7%AD%89%E5%BE%85%E7%8E%AF%E8%8A%82">104. 服务响应慢但 CPU 利用率很低，你会先检查哪些等待环节？</a><a href="#105-%E7%BA%BF%E4%B8%8A-cpu-%E7%AA%81%E7%84%B6%E5%8D%A0%E6%BB%A1%E6%97%B6%E5%A6%82%E4%BD%95%E4%BB%8E%E7%8E%B0%E8%B1%A1%E6%94%B6%E6%95%9B%E5%88%B0%E8%BF%9B%E7%A8%8B%E5%92%8C%E5%85%B7%E4%BD%93%E8%B0%83%E7%94%A8%E9%93%BE">105. 线上 CPU 突然占满时，如何从现象收敛到进程和具体调用链？</a><a href="#106-%E6%80%80%E7%96%91-redis-%E4%BE%9D%E8%B5%96%E5%AF%BC%E8%87%B4%E6%8E%A5%E5%8F%A3%E5%8D%A1%E9%A1%BF%E6%97%B6%E4%BD%A0%E4%BC%9A%E9%87%87%E9%9B%86%E5%93%AA%E4%BA%9B%E8%AF%81%E6%8D%AE">106. 怀疑 Redis 依赖导致接口卡顿时，你会采集哪些证据？</a><a href="#107-%E5%B7%A5%E5%85%B7%E6%89%A7%E8%A1%8C%E5%B9%B6%E5%8F%91%E5%A2%9E%E5%8A%A0%E5%90%8E%E6%80%8E%E6%A0%B7%E5%88%86%E6%9E%90%E5%90%9E%E5%90%90%E6%94%B6%E7%9B%8A%E4%B8%8E%E5%85%B1%E4%BA%AB%E7%8A%B6%E6%80%81%E9%A3%8E%E9%99%A9">107. 工具执行并发增加后，怎样分析吞吐收益与共享状态风险？</a><a href="#108-%E5%B7%A5%E5%85%B7%E6%8F%8F%E8%BF%B0%E5%8D%A0%E6%BB%A1%E6%8F%90%E7%A4%BA%E8%AF%8D%E9%A2%84%E7%AE%97%E6%97%B6%E6%80%8E%E6%A0%B7%E5%87%8F%E5%B0%91%E8%BE%93%E5%85%A5%E5%8F%88%E4%BF%9D%E8%AF%81%E6%AD%A3%E7%A1%AE%E8%B7%AF%E7%94%B1">108. 工具描述占满提示词预算时，怎样减少输入又保证正确路由？</a></nav></details><article class="prose source-prose"><h1 id="2026-10-性能与成本面试题与参考答案">2026-10 性能与成本面试题与参考答案</h1>
+<blockquote>
+<p>来源快照：2026-10-22；答案整理：2026-10-23。此次迁入不代表重新抓取。
+本批题目按公开面经报道主题改写，是练习题，不是公司官方真题；答案为编辑综合参考，未经独立专家逐题复核，不是公司标准答案。</p>
+</blockquote>
+<p><a href="doc-048.html">返回本批索引</a> · <a href="doc-047.html">来源分级与资料</a></p>
+<h2 id="使用方式">使用方式</h2>
+<p>先独立回答，再对照得分点、追问和易错点。难度为编辑估计，非公司定级。
+公司标签只表示来源报道过相关主题，不证明逐字问过本题。B 仅代表曾找到原帖，不保证全文可读、作者亲历或题目真实；C 为待核验聚合线索。</p>
+<p><a id="Q-29bf58eb3163"></a></p>
+<h2 id="99-给定日请求量每任务工具次数和延迟如何估算并发需求并说明假设">99. 给定日请求量、每任务工具次数和延迟，如何估算并发需求并说明假设？</h2>
+<p><strong>题目 ID</strong>：<code>Q-29bf58eb3163</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>先用到达率 λ 与平均在途时间 W 估算 L=λW。举例：日10万任务、每任务串行5步、每步0.8秒模型加0.2秒工具，则全天均匀平均约5.8个在途任务；峰值与尾延迟另算。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>模型/工具配额分别核算</li>
+<li>声明并行、到达分布及利用率假设</li>
+</ul>
+<p><strong>追问</strong>：如果0.8秒是每任务一次而非每步一次，结果如何变化？</p>
+<p><strong>易错点</strong>：平均并发不是所需机器数，更不是峰值容量承诺。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939623386806751232?sourceSSR=post" rel="noreferrer">INT-2bfa666e65</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-217a9345a3b4"></a></p>
+<h2 id="100-上千个代码执行沙箱同时活跃时你会怎样设计资源池和调度策略">100. 上千个代码执行沙箱同时活跃时，你会怎样设计资源池和调度策略？</h2>
+<p><strong>题目 ID</strong>：<code>Q-217a9345a3b4</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：小米</p>
+<p><strong>参考答案</strong></p>
+<p>先按任务隔离与资源规格做池化，设置租户配额、队列、公平调度和并发上限；热池改善启动延迟，强清理或重建防状态残留。按 CPU、内存、进程数和网络分别限额。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>拒绝或排队优于无限超卖</li>
+<li>空闲回收并可观测</li>
+</ul>
+<p><strong>追问</strong>：恶意租户持续占满资源池怎么办？</p>
+<p><strong>易错点</strong>：1000个沙箱不能直接换算为1000核，需按实测负载规划。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938541088820695040?sourceSSR=post" rel="noreferrer">INT-91419e91fb</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://gvisor.dev/docs/architecture_guide/intro/" rel="noreferrer">SANDBOX：gVisor architecture guide</a></p>
+<hr>
+<p><a id="Q-1fdfe4f59d0b"></a></p>
+<h2 id="101-端到端耗时上升时怎样拆分模型检索工具及调度各段的贡献">101. 端到端耗时上升时，怎样拆分模型、检索、工具及调度各段的贡献？</h2>
+<p><strong>题目 ID</strong>：<code>Q-1fdfe4f59d0b</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>用同一任务 trace 标记排队、模型、检索、工具及提交耗时，重试和并行分支单独统计；端到端看关键路径而非把重叠 span 全相加。按版本、场景和尾分位定位变化。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>区分服务等待与实际执行</li>
+<li>控制时钟和采样影响</li>
+</ul>
+<p><strong>追问</strong>：平均变好但 p99 变差怎么解释？</p>
+<p><strong>易错点</strong>：总耗时不能简单等于所有子调用耗时之和。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/bytedance-agent-2928966/" rel="noreferrer">INT-340e4aa1be</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-a417916ecd0d"></a></p>
+<h2 id="102-降低-token-费用时怎样同时证明质量没有明显退化">102. 降低 Token 费用时，怎样同时证明质量没有明显退化？</h2>
+<p><strong>题目 ID</strong>：<code>Q-a417916ecd0d</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动、百度</p>
+<p><strong>参考答案</strong></p>
+<p>在固定样本与验收门槛下比较上下文裁剪、缓存、模型路由和调用次数优化，统计每个成功任务成本而非单次便宜程度。质量与高风险指标不达门槛则回退。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>计入失败、重试与人工接管</li>
+<li>缓存带来源和权限版本</li>
+</ul>
+<p><strong>追问</strong>：少用大模型后更多任务需要人工，真的更便宜吗？</p>
+<p><strong>易错点</strong>：不能只报告 token 减少而省略成功率下降。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939623386806751232?sourceSSR=post" rel="noreferrer">INT-2bfa666e65</a>（B：曾定位公开原帖）；<a href="https://www.nowcoder.com/discuss/938540748394217472?sourceSSR=post" rel="noreferrer">INT-15d1d6b299</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-10c2be69fb87"></a></p>
+<h2 id="103-rag-延迟偏高时怎样在召回规模重排和生成之间确定优先优化项">103. RAG 延迟偏高时，怎样在召回规模、重排和生成之间确定优先优化项？</h2>
+<p><strong>题目 ID</strong>：<code>Q-10c2be69fb87</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：拼多多</p>
+<p><strong>参考答案</strong></p>
+<p>先分解检索、重排和生成占比，再对候选数、索引策略、批处理、缓存及条件式重排做消融。设置证据质量最低线，优化关键路径并观察尾延迟和数据新鲜度。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>保持相同任务与最终上下文预算</li>
+<li>别让缓存绕过权限</li>
+</ul>
+<p><strong>追问</strong>：重排最快但召回不足时该先改哪里？</p>
+<p><strong>易错点</strong>：把 Top-K 降到很小可能只是把延迟换成错误。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/pdd-agent-first-round-2923332/" rel="noreferrer">INT-a896abf415</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity" rel="noreferrer">BM25：Elasticsearch similarity settings: BM25</a>；<a href="https://learn.microsoft.com/en-us/azure/search/hybrid-search-ranking" rel="noreferrer">RRF：Reciprocal rank fusion in hybrid search</a></p>
+<hr>
+<p><a id="Q-0032dbf7a79f"></a></p>
+<h2 id="104-服务响应慢但-cpu-利用率很低你会先检查哪些等待环节">104. 服务响应慢但 CPU 利用率很低，你会先检查哪些等待环节？</h2>
+<p><strong>题目 ID</strong>：<code>Q-0032dbf7a79f</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：科大讯飞</p>
+<p><strong>参考答案</strong></p>
+<p>低 CPU 往往意味着在等网络、锁、磁盘、数据库连接、线程池或模型配额。先关联慢请求与排队/依赖耗时，再用线程栈、连接池和系统 I/O 指标确认，不能只看 CPU。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>比较正常基线与异常时段</li>
+<li>排除队列满或超时重试</li>
+</ul>
+<p><strong>追问</strong>：CPU 低但请求全堆积，如何判断是连接池还是远端慢？</p>
+<p><strong>易错点</strong>：加 CPU 不一定改善 I/O 或锁等待。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/iflytek-agent-development-2918952/" rel="noreferrer">INT-666456d67d</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-978fa8246cfe"></a></p>
+<h2 id="105-线上-cpu-突然占满时如何从现象收敛到进程和具体调用链">105. 线上 CPU 突然占满时，如何从现象收敛到进程和具体调用链？</h2>
+<p><strong>题目 ID</strong>：<code>Q-978fa8246cfe</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：科大讯飞</p>
+<p><strong>参考答案</strong></p>
+<p>先定位异常进程与线程，再采样调用栈和 CPU/GC 指标，区分业务热循环、序列化、正则、GC、重试风暴或系统开销；关联发布和流量变化，复现后优化或回滚。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>保留故障证据</li>
+<li>生产诊断控制开销</li>
+</ul>
+<p><strong>追问</strong>：如何防止采样工具加重故障？</p>
+<p><strong>易错点</strong>：看到 CPU 高就扩容，可能只是暂时掩盖死循环。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/iflytek-agent-development-2918952/" rel="noreferrer">INT-666456d67d</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：未单列外部机制资料，属于编辑推导，须结合具体契约独立验证。</p>
+<hr>
+<p><a id="Q-b8870e7eda34"></a></p>
+<h2 id="106-怀疑-redis-依赖导致接口卡顿时你会采集哪些证据">106. 怀疑 Redis 依赖导致接口卡顿时，你会采集哪些证据？</h2>
+<p><strong>题目 ID</strong>：<code>Q-b8870e7eda34</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：水滴公司</p>
+<p><strong>参考答案</strong></p>
+<p>关联客户端排队、连接池等待、网络 RTT、命令耗时、超时和服务端延迟；查看慢命令、热点大 key、CPU、内存、淘汰、持久化和复制状态。SLOWLOG 不覆盖所有网络等待。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>先量化 Redis 是否在关键路径</li>
+<li>诊断避免生产大范围重扫描</li>
+</ul>
+<p><strong>追问</strong>：为什么客户端很慢而 SLOWLOG 很干净？</p>
+<p><strong>易错点</strong>：不要把所有 Redis 慢问题都归因于单线程。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/shuidi-ai-fullstack-first-round-2930334/" rel="noreferrer">INT-2599a140bd</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://redis.io/docs/latest/operate/oss_and_stack/management/optimization/latency/" rel="noreferrer">REDISLATENCY：Redis latency troubleshooting</a></p>
+<hr>
+<p><a id="Q-bc20e4b36884"></a></p>
+<h2 id="107-工具执行并发增加后怎样分析吞吐收益与共享状态风险">107. 工具执行并发增加后，怎样分析吞吐收益与共享状态风险？</h2>
+<p><strong>题目 ID</strong>：<code>Q-bc20e4b36884</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：百度</p>
+<p><strong>参考答案</strong></p>
+<p>先验证工具彼此独立，再限制并发，测吞吐、排队、尾延迟、配额拒绝和共享资源冲突。并发会缩短独立分支的墙钟时间，但可能增加争用、重试和下游负载。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>关注幂等、取消及结果顺序</li>
+<li>并发上限按瓶颈调</li>
+</ul>
+<p><strong>追问</strong>：并发翻倍、吞吐不变但错误增加意味着什么？</p>
+<p><strong>易错点</strong>：不能只按工具数量开启无限并发。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938541608092303360?sourceSSR=post" rel="noreferrer">INT-eb93d2a417</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/graph-api" rel="noreferrer">REPLAY：LangGraph Graph API: re-execution and idempotency</a></p>
+<hr>
+<p><a id="Q-500777713c82"></a></p>
+<h2 id="108-工具描述占满提示词预算时怎样减少输入又保证正确路由">108. 工具描述占满提示词预算时，怎样减少输入又保证正确路由？</h2>
+<p><strong>题目 ID</strong>：<code>Q-500777713c82</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>按权限和业务域筛选工具，再检索少量候选，用简短区分性描述初选，按需加载完整 schema。为近义工具和长尾任务测路由覆盖，并提供有界的扩展或澄清路径。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>缓存目录与版本绑定</li>
+<li>把“工具没召回”计入失败</li>
+</ul>
+<p><strong>追问</strong>：精简后模型选错相似工具怎么定位？</p>
+<p><strong>易错点</strong>：只看 prompt 长度下降，不足以证明优化有效。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938913714646929408?sourceSSR=post" rel="noreferrer">INT-c233db2a53</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a></p>
+<hr></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

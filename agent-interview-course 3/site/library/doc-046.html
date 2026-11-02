@@ -1,0 +1,201 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>2026-10 Agent架构面试题与参考答案 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-046.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/2026-10-Agent架构面试题与参考答案.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/02-agent-control.html">02 Agent 与 Workflow：有界控制流与观察反馈</a> · <a href="../lessons/03-tool-calling.html">03 工具调用：校验、权限、幂等与未知结果</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-Agent%E6%9E%B6%E6%9E%84%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-Agent%E6%9E%B6%E6%9E%84%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F">使用方式</a><a href="#1-%E4%B8%80%E4%B8%AA%E7%B3%BB%E7%BB%9F%E8%A6%81%E6%BB%A1%E8%B6%B3%E5%93%AA%E4%BA%9B%E8%BF%90%E8%A1%8C%E6%97%B6%E7%89%B9%E5%BE%81%E6%89%8D%E4%B8%8D%E5%8F%AA%E6%98%AF%E6%8A%8A%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8E%A5%E5%8F%A3%E5%8C%85%E6%88%90%E8%81%8A%E5%A4%A9%E5%BA%94%E7%94%A8">1. 一个系统要满足哪些运行时特征，才不只是把大模型接口包成聊天应用？</a><a href="#2-%E6%8A%8A-react-%E8%90%BD%E6%88%90%E4%BB%A3%E7%A0%81%E6%97%B6%E6%8E%A8%E7%90%86%E7%BB%93%E6%9E%9C%E5%B7%A5%E5%85%B7%E5%8A%A8%E4%BD%9C%E5%92%8C%E6%89%A7%E8%A1%8C%E5%8F%8D%E9%A6%88%E5%88%86%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84">2. 把 ReAct 落成代码时，推理结果、工具动作和执行反馈分别是什么数据结构？</a><a href="#3-%E9%9D%A2%E5%AF%B9%E5%90%8C%E4%B8%80%E4%B8%AA%E4%B8%9A%E5%8A%A1%E9%9C%80%E6%B1%82%E4%BD%A0%E6%80%8E%E6%A0%B7%E6%AF%94%E8%BE%83-react-%E4%B8%8E%E5%85%88%E8%A7%84%E5%88%92%E5%90%8E%E6%89%A7%E8%A1%8C%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%A1%88">3. 面对同一个业务需求，你怎样比较 ReAct 与先规划后执行两种方案？</a><a href="#4-%E8%AF%B7%E6%8B%86%E8%A7%A3-harness-%E7%9A%84%E6%A8%A1%E5%9D%97%E8%BE%B9%E7%95%8C%E5%B9%B6%E8%AF%B4%E6%98%8E%E5%93%AA%E4%BA%9B%E8%81%8C%E8%B4%A3%E4%B8%8D%E5%BA%94%E4%BA%A4%E7%BB%99%E6%A8%A1%E5%9E%8B%E8%87%AA%E5%B7%B1%E5%AE%8C%E6%88%90">4. 请拆解 Harness 的模块边界，并说明哪些职责不应交给模型自己完成。</a><a href="#5-%E6%A8%A1%E5%9E%8B%E8%BF%90%E8%A1%8C%E6%97%B6%E5%92%8C%E5%B7%A5%E5%85%B7%E8%BF%90%E8%A1%8C%E6%97%B6%E5%BA%94%E5%A6%82%E4%BD%95%E8%A7%A3%E8%80%A6%E6%89%8D%E8%83%BD%E6%9B%BF%E6%8D%A2%E4%B8%8D%E5%90%8C%E5%8E%82%E5%95%86%E7%9A%84%E6%A8%A1%E5%9E%8B">5. 模型运行时和工具运行时应如何解耦，才能替换不同厂商的模型？</a><a href="#6-%E5%9C%A8%E4%BD%A0%E7%9A%84%E9%A1%B9%E7%9B%AE%E4%B8%AD%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9%E5%9B%BE%E5%BC%8F%E7%BC%96%E6%8E%92%E8%80%8C%E4%B8%8D%E6%98%AF%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8%E9%93%BE%E5%BC%8F%E8%B0%83%E7%94%A8">6. 在你的项目中，为什么选择图式编排，而不是直接使用链式调用？</a><a href="#7-%E4%BD%8E%E4%BB%A3%E7%A0%81%E8%8A%82%E7%82%B9%E7%BC%96%E6%8E%92%E4%B8%8E%E8%87%AA%E4%B8%BB%E5%86%B3%E7%AD%96-agent-%E5%90%84%E9%80%82%E7%94%A8%E4%BA%8E%E4%BB%80%E4%B9%88%E4%BB%BB%E5%8A%A1%E5%A6%82%E4%BD%95%E8%AF%B4%E6%98%8E%E5%8F%96%E8%88%8D">7. 低代码节点编排与自主决策 Agent 各适用于什么任务，如何说明取舍？</a><a href="#8-%E5%A4%9A%E5%B1%82-agent-%E6%9E%B6%E6%9E%84%E6%AF%94%E5%8D%95%E5%B1%82%E6%96%B9%E6%A1%88%E5%A4%9A%E8%A7%A3%E5%86%B3%E4%BA%86%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%E6%80%8E%E6%A0%B7%E8%AF%81%E6%98%8E%E9%A2%9D%E5%A4%96%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%80%BC%E5%BE%97">8. 多层 Agent 架构比单层方案多解决了什么问题，怎样证明额外复杂度值得？</a><a href="#9-%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%E5%8F%91%E7%8E%B0%E5%8E%9F%E8%AE%A1%E5%88%92%E4%B8%8D%E6%88%90%E7%AB%8B%E6%97%B6%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E5%BA%94%E8%AF%A5%E9%87%8D%E6%96%B0%E8%A7%84%E5%88%92%E8%80%8C%E9%9D%9E%E7%BB%A7%E7%BB%AD%E9%87%8D%E8%AF%95">9. 执行过程发现原计划不成立时，什么时候应该重新规划而非继续重试？</a><a href="#10-%E5%B0%86%E5%9B%BA%E5%AE%9A-workflow-%E6%94%B9%E6%88%90-skill-%E5%90%8E%E5%93%AA%E4%BA%9B%E7%BA%A6%E6%9D%9F%E4%BB%8D%E9%9C%80%E7%94%B1%E7%A1%AE%E5%AE%9A%E6%80%A7%E4%BB%A3%E7%A0%81%E4%BF%9D%E8%AF%81">10. 将固定 workflow 改成 Skill 后，哪些约束仍需由确定性代码保证？</a><a href="#11-%E5%A6%82%E4%BD%95%E8%AE%A9-agent-%E7%BB%93%E6%9D%9F%E4%BB%BB%E5%8A%A1%E9%81%BF%E5%85%8D%E6%8A%8A%E7%BB%A7%E7%BB%AD%E6%80%9D%E8%80%83%E5%BD%93%E6%88%90%E6%97%A0%E9%99%90%E5%BE%AA%E7%8E%AF%E7%9A%84%E7%90%86%E7%94%B1">11. 如何让 Agent 结束任务，避免把“继续思考”当成无限循环的理由？</a><a href="#12-%E5%9C%A8%E4%B8%9A%E5%8A%A1%E5%B1%82%E9%9D%A2%E5%A6%82%E4%BD%95%E8%A1%A1%E9%87%8F%E4%B8%80%E4%B8%AA-skill-%E6%98%AF%E5%90%A6%E7%9C%9F%E6%AD%A3%E6%8F%90%E5%8D%87%E4%BA%86%E4%BB%BB%E5%8A%A1%E5%AE%8C%E6%88%90%E6%95%88%E6%9E%9C">12. 在业务层面，如何衡量一个 Skill 是否真正提升了任务完成效果？</a></nav></details><article class="prose source-prose"><h1 id="2026-10-agent架构面试题与参考答案">2026-10 Agent架构面试题与参考答案</h1>
+<blockquote>
+<p>来源快照：2026-10-22；答案整理：2026-10-23。此次迁入不代表重新抓取。
+本批题目按公开面经报道主题改写，是练习题，不是公司官方真题；答案为编辑综合参考，未经独立专家逐题复核，不是公司标准答案。</p>
+</blockquote>
+<p><a href="doc-048.html">返回本批索引</a> · <a href="doc-047.html">来源分级与资料</a></p>
+<h2 id="使用方式">使用方式</h2>
+<p>先独立回答，再对照得分点、追问和易错点。难度为编辑估计，非公司定级。
+公司标签只表示来源报道过相关主题，不证明逐字问过本题。B 仅代表曾找到原帖，不保证全文可读、作者亲历或题目真实；C 为待核验聚合线索。</p>
+<p><a id="Q-ad917a171e37"></a></p>
+<h2 id="1-一个系统要满足哪些运行时特征才不只是把大模型接口包成聊天应用">1. 一个系统要满足哪些运行时特征，才不只是把大模型接口包成聊天应用？</h2>
+<p><strong>题目 ID</strong>：<code>Q-ad917a171e37</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：快手、网易</p>
+<p><strong>参考答案</strong></p>
+<p>关键不是是否用了框架，而是系统能围绕目标，根据环境反馈选择下一步动作，并管理行动后的状态与结果。固定流程也可含 Agent 节点，两者不是互斥标签。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>解释目标、状态、工具、反馈和终止条件</li>
+<li>用一个需要动态决策的实际任务对照单次问答</li>
+</ul>
+<p><strong>追问</strong>：什么场景根本不需要 Agent？</p>
+<p><strong>易错点</strong>：不要把循环调用模型就等同于可靠自治系统。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/netease-agent-development-first-round-2927708/" rel="noreferrer">INT-6784717d92</a>（C：仅聚合线索）；<a href="https://www.nowcoder.com/discuss/938541475766206464?sourceSSR=post" rel="noreferrer">INT-bbcb367aed</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" rel="noreferrer">GRAPH：LangGraph: Workflows and agents</a>；<a href="https://arxiv.org/abs/2210.03629" rel="noreferrer">REACT：ReAct: Synergizing Reasoning and Acting in Language Models</a></p>
+<hr>
+<p><a id="Q-6d8d1d4df0eb"></a></p>
+<h2 id="2-把-react-落成代码时推理结果工具动作和执行反馈分别是什么数据结构">2. 把 ReAct 落成代码时，推理结果、工具动作和执行反馈分别是什么数据结构？</h2>
+<p><strong>题目 ID</strong>：<code>Q-6d8d1d4df0eb</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动、网易</p>
+<p><strong>参考答案</strong></p>
+<p>将一次决策表示为结构化动作提议：工具名、参数、调用 ID 或结束结果；运行时执行后生成关联该 ID 的成功/错误观察，再进入下一轮。可保存简短决策依据，不要求暴露或依赖模型私有思维链。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>分离模型提议与真实执行</li>
+<li>给状态、动作和观察定义可验证的类型</li>
+</ul>
+<p><strong>追问</strong>：怎样处理同轮多个工具调用？</p>
+<p><strong>易错点</strong>：不要把模型输出的“已执行”文本当作工具成功凭证。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939623386806751232?sourceSSR=post" rel="noreferrer">INT-2bfa666e65</a>（B：曾定位公开原帖）；<a href="https://mj.mianlingai.com/interview/netease-agent-development-first-round-2927708/" rel="noreferrer">INT-6784717d92</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://arxiv.org/abs/2210.03629" rel="noreferrer">REACT：ReAct: Synergizing Reasoning and Acting in Language Models</a>；<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a></p>
+<hr>
+<p><a id="Q-304afc4d6cde"></a></p>
+<h2 id="3-面对同一个业务需求你怎样比较-react-与先规划后执行两种方案">3. 面对同一个业务需求，你怎样比较 ReAct 与先规划后执行两种方案？</h2>
+<p><strong>题目 ID</strong>：<code>Q-304afc4d6cde</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动、美团</p>
+<p><strong>参考答案</strong></p>
+<p>路径短且需边观察边选工具时，ReAct 易于迭代；步骤可分解且需审查成本或权限时，先规划再执行更可控。两者都需外部预算和失败恢复，可在执行中受控重规划。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>用同一任务集比较成功率、成本、延迟与可解释性</li>
+<li>说明规划错误如何反馈</li>
+</ul>
+<p><strong>追问</strong>：计划会不会在第一步就过时？</p>
+<p><strong>易错点</strong>：不能仅凭框架流行度决定架构。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938913714646929408?sourceSSR=post" rel="noreferrer">INT-c233db2a53</a>（B：曾定位公开原帖）；<a href="https://mj.mianlingai.com/interview/meituan-fullstack-intern-first-round-2924710/" rel="noreferrer">INT-77ca6f4ba2</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://arxiv.org/abs/2210.03629" rel="noreferrer">REACT：ReAct: Synergizing Reasoning and Acting in Language Models</a>；<a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" rel="noreferrer">GRAPH：LangGraph: Workflows and agents</a></p>
+<hr>
+<p><a id="Q-afcc85b30293"></a></p>
+<h2 id="4-请拆解-harness-的模块边界并说明哪些职责不应交给模型自己完成">4. 请拆解 Harness 的模块边界，并说明哪些职责不应交给模型自己完成。</h2>
+<p><strong>题目 ID</strong>：<code>Q-afcc85b30293</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>Harness 可拆为输入/上下文构造、模型适配、工具执行、持久化状态、权限审批、资源预算、观测评测及恢复。模型可提出计划，权限判定、资金校验、超时和提交不能仅由它自行决定。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>控制平面与模型决策分离</li>
+<li>给每个模块说明输入、输出和失败边界</li>
+</ul>
+<p><strong>追问</strong>：哪些部分能替换，哪些必须统一？</p>
+<p><strong>易错点</strong>：一份长提示词不能代替运行时控制。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/939623386806751232?sourceSSR=post" rel="noreferrer">INT-2bfa666e65</a>（B：曾定位公开原帖）；<a href="https://www.nowcoder.com/discuss/938913714646929408?sourceSSR=post" rel="noreferrer">INT-c233db2a53</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" rel="noreferrer">GRAPH：LangGraph: Workflows and agents</a>；<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a>；<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a></p>
+<hr>
+<p><a id="Q-dcf5a66c4160"></a></p>
+<h2 id="5-模型运行时和工具运行时应如何解耦才能替换不同厂商的模型">5. 模型运行时和工具运行时应如何解耦，才能替换不同厂商的模型？</h2>
+<p><strong>题目 ID</strong>：<code>Q-dcf5a66c4160</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动、百度</p>
+<p><strong>参考答案</strong></p>
+<p>模型层统一消息、工具定义、结构化动作、流事件、用量和错误；工具层统一鉴权、参数校验、执行回执与幂等。为不同厂商写能力适配器，保留不支持能力的显式降级。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>协议统一不等于能力相同</li>
+<li>模型升级须跑工具兼容和任务回归</li>
+</ul>
+<p><strong>追问</strong>：厂商不支持并行工具调用怎么办？</p>
+<p><strong>易错点</strong>：不要丢掉原始错误和用量，造成兼容层“假成功”。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938913714646929408?sourceSSR=post" rel="noreferrer">INT-c233db2a53</a>（B：曾定位公开原帖）；<a href="https://www.nowcoder.com/discuss/938540748394217472?sourceSSR=post" rel="noreferrer">INT-15d1d6b299</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a>；<a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" rel="noreferrer">GRAPH：LangGraph: Workflows and agents</a></p>
+<hr>
+<p><a id="Q-c90fa62b5d5c"></a></p>
+<h2 id="6-在你的项目中为什么选择图式编排而不是直接使用链式调用">6. 在你的项目中，为什么选择图式编排，而不是直接使用链式调用？</h2>
+<p><strong>题目 ID</strong>：<code>Q-c90fa62b5d5c</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：携程、金蝶</p>
+<p><strong>参考答案</strong></p>
+<p>当任务有分支、循环、并行、审批与断点恢复时，图能显式表达状态转换；线性链路则更简单。LangGraph 的 checkpoint 不是任意代码行快照，节点重执行仍要考虑幂等。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>先给出业务所需控制流</li>
+<li>用复杂度和恢复测试证明选型</li>
+</ul>
+<p><strong>追问</strong>：一个节点内部崩溃后从哪里重跑？</p>
+<p><strong>易错点</strong>：不能声称使用图框架就自动获得业务 exactly-once。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/ctrip-agent-dev-first-round-2916102/" rel="noreferrer">INT-5906c726ec</a>（C：仅聚合线索）；<a href="https://mj.mianlingai.com/interview/kingdee-agent-dev-first-round-2914937/" rel="noreferrer">INT-85c5706c08</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" rel="noreferrer">GRAPH：LangGraph: Workflows and agents</a>；<a href="https://docs.langchain.com/oss/python/langgraph/graph-api" rel="noreferrer">REPLAY：LangGraph Graph API: re-execution and idempotency</a>；<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr>
+<p><a id="Q-b186a30ed291"></a></p>
+<h2 id="7-低代码节点编排与自主决策-agent-各适用于什么任务如何说明取舍">7. 低代码节点编排与自主决策 Agent 各适用于什么任务，如何说明取舍？</h2>
+<p><strong>题目 ID</strong>：<code>Q-b186a30ed291</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：网易</p>
+<p><strong>参考答案</strong></p>
+<p>固定、可枚举且高合规的链路更适合确定性编排；中间信息未知、需动态选工具的环节适合 Agent。可用工作流约束总体阶段，让 Agent 仅在授权节点内探索。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>比较变化频率、失败代价与维护成本</li>
+<li>先用更简单的方案作基线</li>
+</ul>
+<p><strong>追问</strong>：怎样防止 Agent 越过工作流阶段？</p>
+<p><strong>易错点</strong>：拖拽式编排也可能包含自主节点，不要按界面形态分类。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/netease-agent-development-first-round-2927708/" rel="noreferrer">INT-6784717d92</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" rel="noreferrer">GRAPH：LangGraph: Workflows and agents</a></p>
+<hr>
+<p><a id="Q-644669edd5ed"></a></p>
+<h2 id="8-多层-agent-架构比单层方案多解决了什么问题怎样证明额外复杂度值得">8. 多层 Agent 架构比单层方案多解决了什么问题，怎样证明额外复杂度值得？</h2>
+<p><strong>题目 ID</strong>：<code>Q-644669edd5ed</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>分层可隔离职责、上下文与工具权限，也引入通信、汇总和调度开销。只有同预算的单层对照实验显示质量或吞吐净收益，才证明层次值得保留。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>按任务难度分桶比较</li>
+<li>记录各层调用数、失败归因和成本</li>
+</ul>
+<p><strong>追问</strong>：去掉中间编排 Agent 会怎样？</p>
+<p><strong>易错点</strong>：增加 Agent 数量不是能力增长的证明。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/932407145864130560?sourceSSR=post" rel="noreferrer">INT-bfd0fa0cf9</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" rel="noreferrer">GRAPH：LangGraph: Workflows and agents</a></p>
+<hr>
+<p><a id="Q-2f7d852b9804"></a></p>
+<h2 id="9-执行过程发现原计划不成立时什么时候应该重新规划而非继续重试">9. 执行过程发现原计划不成立时，什么时候应该重新规划而非继续重试？</h2>
+<p><strong>题目 ID</strong>：<code>Q-2f7d852b9804</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：字节跳动</p>
+<p><strong>参考答案</strong></p>
+<p>瞬时网络故障适合有界重试；目标变化、前提被否定、工具永久不可用或多次重试无进展时应重新规划。新计划要与原验收和权限对照，必要时请求用户确认。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>区分可重试与需改计划错误</li>
+<li>限制重规划次数和总预算</li>
+</ul>
+<p><strong>追问</strong>：重规划是否可以改变原验收条件？</p>
+<p><strong>易错点</strong>：不要用无限重规划掩盖不可完成的任务。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/bytedance-backend-intern-group-information-system-first-round-00e3488329c041c5a5a357c14ce138b4/" rel="noreferrer">INT-5001eff5c7</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" rel="noreferrer">GRAPH：LangGraph: Workflows and agents</a>；<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr>
+<p><a id="Q-390ea2bbeafe"></a></p>
+<h2 id="10-将固定-workflow-改成-skill-后哪些约束仍需由确定性代码保证">10. 将固定 workflow 改成 Skill 后，哪些约束仍需由确定性代码保证？</h2>
+<p><strong>题目 ID</strong>：<code>Q-390ea2bbeafe</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：快手</p>
+<p><strong>参考答案</strong></p>
+<p>Skill 可以组织操作说明与可复用步骤，但身份、租户隔离、参数语义、审批、预算和状态转换仍由执行层强制。对关键动作实行默认拒绝，不能把文档约束当安全边界。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>把自然语言规则转成可执行策略</li>
+<li>为绕过路径设计负面测试</li>
+</ul>
+<p><strong>追问</strong>：模型忽略 Skill 时系统会发生什么？</p>
+<p><strong>易错点</strong>：“模型看过说明”不等于操作已获授权。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938541475766206464?sourceSSR=post" rel="noreferrer">INT-bbcb367aed</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCPTOOLS：MCP tools</a>；<a href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/" rel="noreferrer">INJECTION：OWASP LLM01: Prompt Injection</a></p>
+<hr>
+<p><a id="Q-897e02fc69c3"></a></p>
+<h2 id="11-如何让-agent-结束任务避免把继续思考当成无限循环的理由">11. 如何让 Agent 结束任务，避免把“继续思考”当成无限循环的理由？</h2>
+<p><strong>题目 ID</strong>：<code>Q-897e02fc69c3</code> · <strong>编辑难度</strong>：<code>medium</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：海康威视、网易</p>
+<p><strong>参考答案</strong></p>
+<p>同时定义业务完成、显式失败、等待外部输入和预算耗尽等出口；运行时监测重复动作、无进展、最大步数、截止时间及成本。完成需由可检查产物证明，而非只看模型说结束。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>软终止与硬上限配合</li>
+<li>超限保存状态和未完成原因</li>
+</ul>
+<p><strong>追问</strong>：如何判断两次动作其实没有进展？</p>
+<p><strong>易错点</strong>：最大步数只保证停下来，不保证做对。</p>
+<p><strong>面经主题线索</strong>：<a href="https://mj.mianlingai.com/interview/hikvision-agent-first-round-2929422/" rel="noreferrer">INT-1f14c11bcf</a>（C：仅聚合线索）；<a href="https://mj.mianlingai.com/interview/netease-agent-development-first-round-2927708/" rel="noreferrer">INT-6784717d92</a>（C：仅聚合线索）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" rel="noreferrer">GRAPH：LangGraph: Workflows and agents</a>；<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">STATE：LangGraph persistence</a></p>
+<hr>
+<p><a id="Q-c95c1cf24d36"></a></p>
+<h2 id="12-在业务层面如何衡量一个-skill-是否真正提升了任务完成效果">12. 在业务层面，如何衡量一个 Skill 是否真正提升了任务完成效果？</h2>
+<p><strong>题目 ID</strong>：<code>Q-c95c1cf24d36</code> · <strong>编辑难度</strong>：<code>hard</code></p>
+<p><strong>相关主题的报道公司（非逐题归属）</strong>：快手</p>
+<p><strong>参考答案</strong></p>
+<p>冻结模型、样本、工具版本和预算，比较有/无 Skill 的任务成功率、违规率、成本和延迟。还要区分是文档内容、工具改进还是执行约束带来收益。</p>
+<p><strong>得分点</strong></p>
+<ul>
+<li>按业务验收计分</li>
+<li>加入失败与边界场景，报告样本量</li>
+</ul>
+<p><strong>追问</strong>：Skill 内容变长是否反而降低成功率？</p>
+<p><strong>易错点</strong>：不要拿几个演示案例替代对照评测。</p>
+<p><strong>面经主题线索</strong>：<a href="https://www.nowcoder.com/discuss/938541475766206464?sourceSSR=post" rel="noreferrer">INT-bbcb367aed</a>（B：曾定位公开原帖）</p>
+<p><strong>答案机制资料</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" rel="noreferrer">GRAPH：LangGraph: Workflows and agents</a></p>
+<hr></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

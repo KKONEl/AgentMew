@@ -1,0 +1,322 @@
+{
+  "id": "22",
+  "slug": "22-algorithms",
+  "title": "算法与手写：检索、LRU缓存、堆与有界调度",
+  "stage": "06 模型、项目与面试",
+  "prerequisites": [
+    "05",
+    "08",
+    "15",
+    "理解Python字典、集合与循环"
+  ],
+  "minutes": 75,
+  "goals": [
+    "写出可解释的词法检索与top-k",
+    "实现带明确边界的LRU与优先队列调度",
+    "分析复杂度并构造反例"
+  ],
+  "sources": [
+    "通用知识/2026-10-模型与算法面试题与参考答案.md",
+    "通用知识/2026-10-后端基础面试题与参考答案.md",
+    "通用知识/RAG核心知识与面试题.md",
+    "通用知识/技术知识点汇总.md"
+  ],
+  "body": "## 场景：模型接好了，服务却依然慢\n一个问答服务需要从大量片段找候选，缓存重复查询，并把昂贵任务送入队列。面试官让你“先不用框架写出来”，考察的不只是语法，而是数据结构能否支撑正确契约。仓库模型与算法题涉及注意力、训练和表示评测，后端题涉及异步任务与线程池，RAG材料涉及召回和排序。本课按这些真实能力主题编写算法练习；不能由此断言某家公司逐字考过某个手写题，也不扩写成毫无边界的刷题大全。\n\n首先把需求写清：查询是否分词、同分如何处理、k等于零返回什么、缓存是否按用户隔离、优先级数值越小是否越先、任务取消后会不会执行。没有契约的“最优算法”经常只是在优化错误问题。离线实验采用空格分词的英文token，目的是观察机制；真实中文不能直接依靠split，需要分词器、字符n-gram或其他匹配设计。\n\n## 原理一：把扫描改成倒排索引\n最直观的检索遍历每篇文档，统计与query重合的词。倒排索引把词映射到包含它的文档ID集合，查询只访问相关posting list。集合表示文档是否包含词，词频需要另存计数。若语料总token数为T，建索引约O(T)，索引空间取决于不同词与文档的关联数；查询成本与访问的posting总长相关，常见词会使候选接近全库，不能一律宣称O(1)。\n\n本课用“不同查询词匹配个数”作评分，容易解释但不是BM25。BM25还考虑词频饱和、文档长度归一化和逆文档频率，能降低常见词价值。Dense retrieval即稠密向量检索，适合语义相近而词面不同的问题，但有索引构建、向量版本与资源成本。简单算法应当作为可复现基线，帮助判断复杂组件是否真有贡献。\n\n## 原理二：top-k与堆的不变量\n如果N个候选全部排序，需要O(N log N)时间；只保留k个时可维护大小为k的最小堆，候选扫描约O(N log k)，最后对k项再排序。最小堆的不变量是父节点不大于子节点，堆顶是当前被保留集合中最差者；若新候选更好，就替换堆顶。它不是“整个数组有序”。若你用最大堆维护候选，却没有反转比较方向，很可能留下最差k个。\n\n同分时要指定稳定规则，比如分数降序、ID升序。实验把质量写成(score, -doc_id)，使小ID在同分下更优；最小堆顶则恰好是分数低或ID大的候选。最后排序的方向也要一致。k=0直接返回空；k大于候选数返回所有命中；没有命中不能硬塞无关文档。若ID可能是字符串，应换显式比较键，不能照抄负号技巧。\n\n## 原理三：LRU是访问顺序，不是插入顺序\nLRU意为最近最少使用淘汰：命中读和更新写都应把条目移到最近使用位置，满容量淘汰最久未使用者。哈希表定位配合双向链表能做到均摊O(1)的查找和移动；Python标准库OrderedDict已提供顺序与移动操作。用普通列表查找后移动可能退化为O(N)。容量零可定义为禁止缓存，负数应拒绝；不能把None作为未命中标记又允许缓存None而不加区分。\n\n缓存正确性比命中率更优先。答案缓存键至少考虑租户、用户权限范围、查询规范化、知识版本和模型/提示版本。只用问题字符串当键，可能把A租户的片段答给B租户。TTL限制陈旧时间，LRU限制空间，两者解决不同问题，真实系统常结合；本实验只做LRU，知识变化后通过版本键隔离，不假装实现了TTL。并发访问时读后移动与写入淘汰需要同步，不能把单进程演示当成分布式缓存。\n\n## 已解例：同一请求穿过三个数据结构\n文档0含“agent tool policy”，文档1含“rag retrieval evidence”，文档2含“agent retrieval”。查询“agent retrieval”时文档2命中两个不同词，排第一；0与1各命中一个词，按ID先0再1，top-2是2、0。把结果存入容量2的LRU，写a和b，读取a，再写c，应淘汰b；如果仍淘汰a，说明你只记录插入顺序。\n\n调度器接收两个高优先级任务和一个普通任务，可以用(priority, sequence, task_id)最小堆。sequence是递增入队序号，保证同优先级先到先服务，避免对不可比较的task对象做比较。任务取消通过集合标记，出堆时跳过取消项；这是惰性删除，会留下占空间的失效项，因此长跑服务需要定期重建堆。实验队列限制的是等待堆长度，明确不包含正在执行任务。满时抛出错误形成背压，而不是悄悄丢任务。\n\n## 边界：优先队列不等于可靠运行时\n高优先级不断到来可能导致普通任务饥饿，可用aging逐渐提升等待任务的有效优先级，或分租户加权轮转。优先队列只决定开始顺序，不会抢占已经运行的长任务。持久化、租约、超时恢复、幂等与结果存储，属于可靠异步服务的额外职责。线程池最大线程数也不能代替有界队列；队列无限增大会把过载变成长尾延迟和内存问题。\n\n算法回答应先给不变量，再给复杂度和测试反例。例如：“我用倒排降低扫描候选数，用大小k的堆筛选；最坏常见词仍可能遍历全库。缓存键加入权限与索引版本。队列同优先级稳定，满时显式拒绝，取消使用惰性删除。”最后说明数据规模和负载若改变，哪项设计先失效。面试现场可先实现正确的排序版本，再在相同断言下换堆，避免为了复杂度牺牲可验证正确性。\n\n## 从反例检查实现\n\n手写结束后，不要只打印一组正常输出。将重复查询词、完全无命中、同分文档、超过候选数的结果上限、重复更新缓存和队列满等情况逐个断言。复杂度讨论也要指出变量是什么：语料总词数、命中文档数、保留结果数与等待任务数不能混用同一个N。若需要测性能，用固定随机种子构造不同规模的输入，分开统计建索引和在线查询时间；微小数据的偶然耗时差不构成速度提升证据。先保证输出相同，再比较资源，才能把优化与改变任务偷偷混在一起的错误排除掉。",
+  "diagram": {
+    "nodes": [
+      "建立三篇文档倒排表",
+      "累计查询词分数",
+      "最小堆选出文档2和0",
+      "读取a更新LRU顺序",
+      "写c淘汰b",
+      "入队并检查容量",
+      "跳过取消任务出队"
+    ],
+    "caption": "三个局部练习使用原代码同一组数据；缓存并未接到检索结果上。",
+    "walkthrough": {
+      "scenario": "沿《simple：一个检索服务的三个核心结构》的同一组输入，观察每一步变量和输出。",
+      "cases": [
+        {
+          "id": "normal",
+          "label": "原代码：检索、缓存和调度",
+          "basis": "沿参考程序的原始输入逐步观察；你可以在下方运行同一程序并核对输出。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "建立三篇文档倒排表",
+              "input": "texts的文档ID为0、1、2；查询是'agent retrieval'。",
+              "action": "对每篇文档的不同词建立set倒排。",
+              "output": "agent→{0,2}；retrieval→{1,2}。",
+              "state": "index按词保存唯一文档ID。",
+              "failure": false,
+              "section": "原理一：把扫描改成倒排索引",
+              "why": "索引先把词映射到文档，查询不必对每篇重新split。",
+              "code_lines": [
+                4,
+                8
+              ]
+            },
+            {
+              "node": 1,
+              "title": "累计查询词分数",
+              "input": "search('agent retrieval',2)；两词各只计一次。",
+              "action": "遍历查询词对应的posting，为每个doc_id累加scores。",
+              "output": "scores[0]=1，scores[1]=1，scores[2]=2。",
+              "state": "分数是不同查询词命中数，不是BM25。",
+              "failure": false,
+              "section": "原理一：把扫描改成倒排索引",
+              "why": "文档2覆盖两个词，因此应优于各覆盖一个词的文档。",
+              "code_lines": [
+                13,
+                16
+              ]
+            },
+            {
+              "node": 2,
+              "title": "最小堆选出文档2和0",
+              "input": "k=2；上一步三项分数。",
+              "action": "用(score,-doc_id)最小堆保留两项，最后按键逆序还原ID。",
+              "output": "search返回[2,0]，第59行断言通过。",
+              "state": "同分时ID小者更优；heap长度不超过2。",
+              "failure": false,
+              "section": "原理二：top-k与堆的不变量",
+              "why": "负ID让同分文档0优于1；结果不依赖set遍历先后。",
+              "code_lines": [
+                17,
+                24
+              ]
+            },
+            {
+              "node": 3,
+              "title": "读取a更新LRU顺序",
+              "input": "cache=LRU(2)，先put('a',1)、put('b',2)。",
+              "action": "get('a')读取1，并通过move_to_end将a移到末尾。",
+              "output": "从旧到新顺序变为['b','a']。",
+              "state": "LRU顺序反映读访问。",
+              "failure": false,
+              "section": "原理三：LRU是访问顺序，不是插入顺序",
+              "why": "如果读不移动，下一次写入会错误淘汰刚被用过的a。",
+              "code_lines": [
+                61,
+                63
+              ]
+            },
+            {
+              "node": 4,
+              "title": "写c淘汰b",
+              "input": "容量2；当前顺序['b','a']；写入c=3。",
+              "action": "put把c移到末尾，超容量后从最旧端popitem。",
+              "output": "缓存键为['a','c']，断言通过。",
+              "state": "b被淘汰，缓存长度仍为2。",
+              "failure": false,
+              "section": "原理三：LRU是访问顺序，不是插入顺序",
+              "why": "容量约束与访问顺序一起决定被淘汰者，不涉及代码尚未实现的TTL或版本键。",
+              "code_lines": [
+                36,
+                42
+              ]
+            },
+            {
+              "node": 5,
+              "title": "入队并检查容量",
+              "input": "q=Queue(3)；入ordinary优先级5，再入urgent-a与urgent-b优先级1。",
+              "action": "push为三项写入递增seq；等待堆长度达到容量。",
+              "output": "三项入队，同级顺序由seq固定。",
+              "state": "seq=3；len(q.heap)=3。",
+              "failure": false,
+              "section": "已解例：同一请求穿过三个数据结构",
+              "why": "序号避免同级任务顺序漂移，容量限制等待项数量。",
+              "code_lines": [
+                67,
+                68
+              ]
+            },
+            {
+              "node": 6,
+              "title": "跳过取消任务出队",
+              "input": "普通任务仍在堆中；cancelled加入'ordinary'。",
+              "action": "先取两个高优先级任务；再次pop时跳过已取消普通任务并抛空队列错误。",
+              "output": "order=['urgent-a','urgent-b']；取消与空队列测试通过。",
+              "state": "取消为惰性删除；没有执行ordinary。",
+              "failure": false,
+              "section": "边界：优先队列不等于可靠运行时",
+              "why": "取消不会立即移除堆内元素，出队检查才使它不被返回。",
+              "code_lines": [
+                74,
+                81
+              ]
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "原代码：第四项入队被拒绝",
+          "basis": "使用第69—73行已有边界测试；前三项入队状态与正常案例一致，取消发生在它之后。",
+          "steps": [
+            {
+              "node": 0,
+              "title": "建立三篇文档倒排表",
+              "input": "texts的文档ID为0、1、2；查询是'agent retrieval'。",
+              "action": "对每篇文档的不同词建立set倒排。",
+              "output": "agent→{0,2}；retrieval→{1,2}。",
+              "state": "index按词保存唯一文档ID。",
+              "failure": false,
+              "section": "原理一：把扫描改成倒排索引",
+              "why": "索引先把词映射到文档，查询不必对每篇重新split。",
+              "code_lines": [
+                4,
+                8
+              ]
+            },
+            {
+              "node": 1,
+              "title": "累计查询词分数",
+              "input": "search('agent retrieval',2)；两词各只计一次。",
+              "action": "遍历查询词对应的posting，为每个doc_id累加scores。",
+              "output": "scores[0]=1，scores[1]=1，scores[2]=2。",
+              "state": "分数是不同查询词命中数，不是BM25。",
+              "failure": false,
+              "section": "原理一：把扫描改成倒排索引",
+              "why": "文档2覆盖两个词，因此应优于各覆盖一个词的文档。",
+              "code_lines": [
+                13,
+                16
+              ]
+            },
+            {
+              "node": 2,
+              "title": "最小堆选出文档2和0",
+              "input": "k=2；上一步三项分数。",
+              "action": "用(score,-doc_id)最小堆保留两项，最后按键逆序还原ID。",
+              "output": "search返回[2,0]，第59行断言通过。",
+              "state": "同分时ID小者更优；heap长度不超过2。",
+              "failure": false,
+              "section": "原理二：top-k与堆的不变量",
+              "why": "负ID让同分文档0优于1；结果不依赖set遍历先后。",
+              "code_lines": [
+                17,
+                24
+              ]
+            },
+            {
+              "node": 3,
+              "title": "读取a更新LRU顺序",
+              "input": "cache=LRU(2)，先put('a',1)、put('b',2)。",
+              "action": "get('a')读取1，并通过move_to_end将a移到末尾。",
+              "output": "从旧到新顺序变为['b','a']。",
+              "state": "LRU顺序反映读访问。",
+              "failure": false,
+              "section": "原理三：LRU是访问顺序，不是插入顺序",
+              "why": "如果读不移动，下一次写入会错误淘汰刚被用过的a。",
+              "code_lines": [
+                61,
+                63
+              ]
+            },
+            {
+              "node": 4,
+              "title": "写c淘汰b",
+              "input": "容量2；当前顺序['b','a']；写入c=3。",
+              "action": "put把c移到末尾，超容量后从最旧端popitem。",
+              "output": "缓存键为['a','c']，断言通过。",
+              "state": "b被淘汰，缓存长度仍为2。",
+              "failure": false,
+              "section": "原理三：LRU是访问顺序，不是插入顺序",
+              "why": "容量约束与访问顺序一起决定被淘汰者，不涉及代码尚未实现的TTL或版本键。",
+              "code_lines": [
+                36,
+                42
+              ]
+            },
+            {
+              "node": 5,
+              "title": "入队并检查容量",
+              "input": "q=Queue(3)；入ordinary优先级5，再入urgent-a与urgent-b优先级1。",
+              "action": "push为三项写入递增seq；等待堆长度达到容量。",
+              "output": "三项入队，同级顺序由seq固定。",
+              "state": "seq=3；len(q.heap)=3。",
+              "failure": false,
+              "section": "已解例：同一请求穿过三个数据结构",
+              "why": "序号避免同级任务顺序漂移，容量限制等待项数量。",
+              "code_lines": [
+                67,
+                68
+              ]
+            },
+            {
+              "node": 5,
+              "title": "满队列拒绝overflow",
+              "input": "沿用三个已入队项，再调用q.push('overflow',0)。",
+              "action": "push在入堆前检查len(self.heap)>=self.capacity。",
+              "output": "抛出OverflowError('backpressure')，被except捕获。",
+              "state": "原有三项不被替换；尚未执行取消。",
+              "failure": true,
+              "section": "边界：优先队列不等于可靠运行时",
+              "why": "即使新任务优先级最高，满队列也不能偷偷突破容量。",
+              "code_lines": [
+                69,
+                73
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "top-k为什么用最小堆，堆顶保存什么？",
+      "a": "当我们要保留最大的k个分数时，最小堆顶是已保留集合中最差者，新候选比它好才替换。扫描N项需O(N log k)，输出有序结果另需O(k log k)，空间O(k)。同分规则必须进入比较键，否则输入顺序变化可能改变输出。若k接近N或数据很小，直接排序更简单，不能只追求渐近表达。",
+      "rubric": "3分：不变量、复杂度、同分/取舍各1分。"
+    },
+    {
+      "q": "LRU缓存为什么不能只按写入时间淘汰？",
+      "a": "LRU按最近访问，读命中也应移动；只按写入顺序更像FIFO。哈希表与双向链表支持O(1)定位和移动。TTL处理陈旧，LRU处理空间；多租户答案还必须把权限与知识版本放入键，迁移到线上需考虑并发和失效策略。",
+      "rubric": "3分：读更新、结构复杂度、正确性边界各1分。"
+    },
+    {
+      "q": "优先级队列保证所有任务最终执行吗？",
+      "a": "不保证。高优先级持续到达可使低优先级饥饿，同级也需序号保证稳定。可用aging或分租户公平调度，但会增加策略复杂度。队列还不提供持久化与幂等，Worker崩溃需租约恢复；有副作用任务不能靠简单重新出队实现exactly-once。",
+      "rubric": "3分：饥饿、策略取舍、运行时边界各1分。"
+    },
+    {
+      "q": "词法检索实验结果很好，是否可以替代向量检索？",
+      "a": "只能说明该小语料与查询上有效。词面不重合、同义表达和多语言问题可能漏召回；先建立含相关证据和难负例的隔离集，比较Recall@K、排序和端到端成功率。词法更可解释且成本低，向量可补语义召回；采用混合前要做消融，不能把重合计数宣称BM25或生产最优。",
+      "rubric": "3分：分布局限、评测、取舍与命名准确各1分。"
+    }
+  ],
+  "lab": {
+    "title": "simple：一个检索服务的三个核心结构",
+    "task": "直接运行并解释top2同分、LRU读命中、队列取消的每条assert。",
+    "code": "from collections import defaultdict, OrderedDict\nimport heapq\n\ntexts = ['agent tool policy', 'rag retrieval evidence', 'agent retrieval']\nindex = defaultdict(set)\nfor doc_id, text in enumerate(texts):\n    for token in set(text.split()):\n        index[token].add(doc_id)\n\ndef search(query, k):\n    if k <= 0:\n        return []\n    scores = defaultdict(int)\n    for token in set(query.split()):\n        for doc_id in index.get(token, ()):\n            scores[doc_id] += 1\n    heap = []\n    for doc_id, score in scores.items():\n        item = (score, -doc_id)\n        if len(heap) < k:\n            heapq.heappush(heap, item)\n        elif item > heap[0]:\n            heapq.heapreplace(heap, item)\n    return [-neg_id for score, neg_id in sorted(heap, reverse=True)]\n\nclass LRU:\n    def __init__(self, capacity):\n        if capacity < 0:\n            raise ValueError('capacity must be nonnegative')\n        self.capacity, self.data = capacity, OrderedDict()\n    def get(self, key):\n        if key not in self.data:\n            raise KeyError(key)\n        self.data.move_to_end(key)\n        return self.data[key]\n    def put(self, key, value):\n        if self.capacity == 0:\n            return\n        self.data[key] = value\n        self.data.move_to_end(key)\n        while len(self.data) > self.capacity:\n            self.data.popitem(last=False)\n\nclass Queue:\n    def __init__(self, capacity):\n        self.capacity, self.heap, self.seq, self.cancelled = capacity, [], 0, set()\n    def push(self, task, priority):\n        if len(self.heap) >= self.capacity:\n            raise OverflowError('backpressure')\n        heapq.heappush(self.heap, (priority, self.seq, task))\n        self.seq += 1\n    def pop(self):\n        while self.heap:\n            _, _, task = heapq.heappop(self.heap)\n            if task not in self.cancelled:\n                return task\n        raise IndexError('empty')\n\nassert search('agent retrieval', 2) == [2, 0]\nassert search('missing', 4) == [] and search('agent', 0) == []\ncache = LRU(2)\ncache.put('a', 1); cache.put('b', 2)\nassert cache.get('a') == 1\ncache.put('c', 3)\nassert list(cache.data) == ['a', 'c']\nzero = LRU(0); zero.put('a', 1); assert not zero.data\nq = Queue(3)\nq.push('ordinary', 5); q.push('urgent-a', 1); q.push('urgent-b', 1)\ntry:\n    q.push('overflow', 0)\n    raise AssertionError('must reject')\nexcept OverflowError:\n    pass\nq.cancelled.add('ordinary')\norder = [q.pop(), q.pop()]\nassert order == ['urgent-a', 'urgent-b']\ntry:\n    q.pop()\n    raise AssertionError('cancelled task ran')\nexcept IndexError:\n    pass\nprint('top2:', search('agent retrieval', 2))\nprint('LRU keys:', list(cache.data))\nprint('scheduled:', order)\nprint('edge checks: empty, zero-capacity, backpressure, cancellation passed')\n",
+    "expected": "top2: [2, 0]\nLRU keys: ['a', 'c']\nscheduled: ['urgent-a', 'urgent-b']\nedge checks: empty, zero-capacity, backpressure, cancellation passed\n",
+    "explanation": "搜索是真倒排与大小k的堆，评分只是词集合交集。OrderedDict实现访问顺序；队列在内存中运行，取消采用惰性删除，既没有多进程持久化，也没有模型调用。",
+    "extensions": [
+      "补一条同分情况下输入顺序不同仍稳定的断言。",
+      "设计缓存键，避免同一问题跨租户或索引版本串用。"
+    ],
+    "extension_answers": [
+      "可以用search(\"tool evidence\", 2)，文档0和1同为1分，断言结果为[0, 1]。再将scores遍历改为逆序，输出仍相同，因为(score,-doc_id)完整规定了同分顺序。",
+      "可使用(tenant_id, permission_scope_version, index_version, model_prompt_version, normalized_query)作为键。知识或权限变更使版本变化而隔离旧缓存，同时规划旧键过期清理。不能只把用户名字拼进query当访问控制。"
+    ]
+  },
+  "pitfalls": [
+    "把堆当整体有序数组",
+    "把split重合计数命名为BM25",
+    "有队列就宣称可靠exactly-once"
+  ],
+  "checkpoint": "能不看代码解释每个数据结构的不变量，写出k=0、同分、读后淘汰、取消和满队列五类反例。",
+  "alignment": {
+    "case_title": "三篇文档top-2、两格LRU与三格队列",
+    "insert_after": "已解例：同一请求穿过三个数据结构",
+    "bridge": "本例有零、一、二号三篇文档，接下来沿同一个查询观察它们的排名。texts规定了每篇文本，查询固定为agent retrieval，index先把两个查询词映射到各自的文档集合，scores得到一、一、二三个分数。接着看search怎样用负文档编号处理同分，最终输出必须是二号与零号，而不能换成另一套字母编号。\n\n检索结果之后是独立的数据结构练习：cache先存a与b，读取a，再写入c，观察OrderedDict保存的访问顺序；代码没有把检索结果自动放进缓存，因此演示也不虚构这条数据连接。最后q按原程序加入一个普通任务和两个紧急任务，先观察容量，再观察cancelled怎样让普通任务在出队时被跳过。正常演示的三个打印结果分别对应这三个小实验，局部状态在各自对象内延续。\n\n失败演示复用同一个已装满的队列，展示原代码确实捕获的overflow异常，不再引入程序没有实现的重复结果错误。阅读时请把每次对象创建、变更和断言连起来，先判断正确性，再讨论复杂度。",
+    "coverage": "覆盖空格分词倒排、重合计数、top-k、内存LRU和有界优先队列；未实现BM25、语义模型、权限版本缓存、TTL、持久化或真实任务执行。",
+    "question_sections": [
+      "原理二：top-k与堆的不变量",
+      "原理三：LRU是访问顺序，不是插入顺序",
+      "边界：优先队列不等于可靠运行时",
+      "原理一：把扫描改成倒排索引"
+    ],
+    "coverage_summary": "三篇英文文本用于观察数据结构；真实中文检索还需适合的分词和表示。"
+  }
+}

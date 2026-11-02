@@ -1,0 +1,494 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>2026 AI Agent 工程化新考点：Runtime、可靠性与规模化执行 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-059.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/2026-Agent工程化新考点.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-Agent%E5%B7%A5%E7%A8%8B%E5%8C%96%E6%96%B0%E8%80%83%E7%82%B9.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-Agent%E5%B7%A5%E7%A8%8B%E5%8C%96%E6%96%B0%E8%80%83%E7%82%B9.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E4%BA%9B%E5%86%85%E5%AE%B9%E6%88%90%E4%B8%BA%E6%96%B0%E8%80%83%E7%82%B9">一、为什么这些内容成为新考点</a><a href="#%E4%BA%8Cagentorchestratorharness-%E4%B8%8E-runtime-%E7%9A%84%E8%BE%B9%E7%95%8C">二、Agent、Orchestrator、Harness 与 Runtime 的边界</a><a href="#21-%E5%9B%9B%E4%B8%AA%E6%A6%82%E5%BF%B5%E4%B8%8D%E8%A6%81%E6%B7%B7%E7%94%A8">2.1 四个概念不要混用</a><a href="#22-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E5%8F%AA%E9%9D%A0-langgraph-%E6%88%96%E4%B8%80%E4%B8%AA-while-%E5%BE%AA%E7%8E%AF">2.2 为什么不能只靠 LangGraph 或一个 while 循环</a><a href="#%E4%B8%89durable-execution%E5%8F%AF%E6%81%A2%E5%A4%8D%E7%9A%84%E9%95%BF%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C">三、Durable Execution：可恢复的长任务执行</a><a href="#31-%E6%9C%80%E5%B0%8F%E6%8C%81%E4%B9%85%E5%8C%96%E7%8A%B6%E6%80%81">3.1 最小持久化状态</a><a href="#32-checkpoint-%E4%B8%8D%E7%AD%89%E4%BA%8E%E4%BF%9D%E5%AD%98-messages">3.2 Checkpoint 不等于保存 messages</a><a href="#33-exactly-once-%E9%80%9A%E5%B8%B8%E5%81%9A%E4%B8%8D%E5%88%B0">3.3 Exactly-once 通常做不到</a><a href="#34-%E6%8E%A8%E8%8D%90%E7%8A%B6%E6%80%81%E6%9C%BA">3.4 推荐状态机</a><a href="#%E5%9B%9B%E8%B7%AF%E5%BE%84%E9%9C%87%E8%8D%A1%E6%AD%BB%E5%BE%AA%E7%8E%AF%E4%B8%8E%E6%97%A0%E6%95%88%E9%87%8D%E8%AF%95">四、路径震荡、死循环与无效重试</a><a href="#41-%E4%BB%80%E4%B9%88%E6%98%AF%E8%B7%AF%E5%BE%84%E9%9C%87%E8%8D%A1">4.1 什么是路径震荡</a><a href="#42-%E6%A3%80%E6%B5%8B%E6%96%B9%E6%B3%95">4.2 检测方法</a><a href="#43-%E5%A4%B1%E8%B4%A5%E9%A2%84%E7%AE%97">4.3 失败预算</a><a href="#%E4%BA%94%E4%BB%8E-10-%E4%B8%AA%E5%B7%A5%E5%85%B7%E6%89%A9%E5%B1%95%E5%88%B0-1000-%E4%B8%AA%E5%B7%A5%E5%85%B7">五、从 10 个工具扩展到 1000 个工具</a><a href="#51-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E6%8A%8A%E6%89%80%E6%9C%89%E5%B7%A5%E5%85%B7%E5%AE%9A%E4%B9%89%E9%83%BD%E6%94%BE%E8%BF%9B-prompt">5.1 为什么不能把所有工具定义都放进 Prompt</a><a href="#52-%E5%88%86%E5%B1%82%E5%B7%A5%E5%85%B7%E8%B7%AF%E7%94%B1">5.2 分层工具路由</a><a href="#53-skill-%E7%9A%84%E6%B8%90%E8%BF%9B%E5%BC%8F%E6%8A%AB%E9%9C%B2">5.3 Skill 的渐进式披露</a><a href="#54-%E5%B7%A5%E5%85%B7-schema-%E7%89%88%E6%9C%AC%E5%8C%96">5.4 工具 Schema 版本化</a><a href="#%E5%85%ADagent-%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E4%BB%8E%E6%97%A5%E5%BF%97%E5%8D%87%E7%BA%A7%E4%B8%BA-trace">六、Agent 可观测性：从日志升级为 Trace</a><a href="#61-%E4%B8%80%E6%9D%A1-trace-%E5%BA%94%E8%AF%A5%E5%8C%85%E5%90%AB%E4%BB%80%E4%B9%88">6.1 一条 Trace 应该包含什么</a><a href="#62-%E7%BA%BF%E4%B8%8A%E6%8E%92%E9%9A%9C%E9%A1%BA%E5%BA%8F">6.2 线上排障顺序</a><a href="#%E4%B8%832026-%E5%B9%B4%E5%BA%94%E6%8E%8C%E6%8F%A1%E7%9A%84-agent-%E8%AF%84%E6%B5%8B%E6%8C%87%E6%A0%87">七、2026 年应掌握的 Agent 评测指标</a><a href="#71-%E4%BB%BB%E5%8A%A1%E7%BB%93%E6%9E%9C">7.1 任务结果</a><a href="#72-%E8%BF%87%E7%A8%8B%E8%B4%A8%E9%87%8F">7.2 过程质量</a><a href="#73-%E6%88%90%E6%9C%AC%E5%92%8C%E6%80%A7%E8%83%BD">7.3 成本和性能</a><a href="#74-%E5%AE%89%E5%85%A8">7.4 安全</a><a href="#75-%E8%AF%84%E6%B5%8B%E9%9B%86%E6%9E%84%E5%BB%BA">7.5 评测集构建</a><a href="#%E5%85%ABcoding-agent-%E7%9A%84%E5%B9%B6%E5%8F%91%E4%BF%AE%E6%94%B9%E5%86%B2%E7%AA%81">八、Coding Agent 的并发修改冲突</a><a href="#81-%E5%B8%B8%E8%A7%81%E5%86%B2%E7%AA%81">8.1 常见冲突</a><a href="#82-%E6%8E%A8%E8%8D%90%E9%9A%94%E7%A6%BB%E7%AD%96%E7%95%A5">8.2 推荐隔离策略</a><a href="#%E4%B9%9D%E8%BF%91%E6%9C%9F%E5%A4%A7%E5%8E%82%E9%9D%A2%E8%AF%95%E6%96%B0%E5%A2%9E%E4%BF%A1%E5%8F%B7">九、近期大厂面试新增信号</a><a href="#%E5%AD%97%E8%8A%82%E8%B7%B3%E5%8A%A8harness%E9%95%BF%E4%BB%BB%E5%8A%A1%E4%B8%8E-coding-agent">字节跳动：Harness、长任务与 Coding Agent</a><a href="#%E9%98%BF%E9%87%8C-%E6%B7%98%E5%A4%A9mcp-%E8%AF%84%E6%B5%8Btrace-%E4%B8%8E-agent-infra">阿里 / 淘天：MCP 评测、Trace 与 Agent Infra</a><a href="#%E8%85%BE%E8%AE%AF%E5%A4%B1%E8%B4%A5%E6%81%A2%E5%A4%8D%E5%B9%82%E7%AD%89%E5%92%8C%E9%87%91%E8%9E%8D%E5%AE%89%E5%85%A8">腾讯：失败恢复、幂等和金融安全</a><a href="#%E7%BE%8E%E5%9B%A2%E6%A1%86%E6%9E%B6%E5%8F%96%E8%88%8D%E8%AF%84%E6%B5%8B%E9%97%AD%E7%8E%AF%E5%92%8C%E6%B2%99%E7%AE%B1">美团：框架取舍、评测闭环和沙箱</a><a href="#%E5%8D%81%E9%9D%A2%E8%AF%95%E5%9B%9E%E7%AD%94%E6%A8%A1%E6%9D%BF">十、面试回答模板</a><a href="#%E5%8D%81%E4%B8%80%E9%AB%98%E9%A2%91%E8%87%AA%E6%B5%8B%E9%A2%98">十一、高频自测题</a><a href="#%E5%8D%81%E4%BA%8C%E5%85%AC%E5%BC%80%E9%9D%A2%E7%BB%8F%E6%9D%A5%E6%BA%90">十二、公开面经来源</a><a href="#%E5%85%B3%E8%81%94%E9%98%85%E8%AF%BB">关联阅读</a></nav></details><article class="prose source-prose"><h1 id="2026-ai-agent-工程化新考点runtime可靠性与规模化执行">2026 AI Agent 工程化新考点：Runtime、可靠性与规模化执行</h1>
+<blockquote>
+<p>更新时间：2026-09-11
+定位：补充本仓库已有 RAG、MCP、Context Engineering、Agent Harness 内容中尚未系统展开的生产级考点。
+使用方式：先读概念和设计框架，再用文末问题进行项目追问演练。</p>
+</blockquote>
+<h2 id="一为什么这些内容成为新考点">一、为什么这些内容成为新考点</h2>
+<p>早期 Agent 面试更关注 ReAct、RAG、Function Calling 和框架 API。2026 年的大厂面试开始把重点放到一个更难的问题：</p>
+<blockquote>
+<p>当 Agent 需要运行几十分钟甚至数小时、调用多个有副作用的工具、并发修改共享资源时，怎样保证它可恢复、可审计、可评估，而且不会重复执行危险操作？</p>
+</blockquote>
+<p>因此，面试官不只问“Agent 能不能做”，还会继续追问：</p>
+<ul>
+<li>为什么需要独立的 Runtime 或 Harness？</li>
+<li>模型、编排器、状态存储和工具执行器分别负责什么？</li>
+<li>Agent 中断后从哪里恢复？恢复后会不会重复发邮件、扣款或提交代码？</li>
+<li>如何发现路径震荡、无效重试和工具调用死循环？</li>
+<li>当工具数量从 10 个增长到 1000 个时，如何控制上下文和选错工具的概率？</li>
+<li>如何证明系统真的变好，而不是 Demo 看起来更流畅？</li>
+</ul>
+<hr>
+<h2 id="二agentorchestratorharness-与-runtime-的边界">二、Agent、Orchestrator、Harness 与 Runtime 的边界</h2>
+<h3 id="21-四个概念不要混用">2.1 四个概念不要混用</h3>
+<table>
+<thead>
+<tr>
+<th>概念</th>
+<th>核心职责</th>
+<th>不应该负责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent</td>
+<td>根据目标和上下文做决策</td>
+<td>直接承担持久化、资源隔离和审计</td>
+</tr>
+<tr>
+<td>Orchestrator</td>
+<td>拆分任务、分派执行单元、处理依赖关系</td>
+<td>替模型完成所有语义决策</td>
+</tr>
+<tr>
+<td>Harness</td>
+<td>包装模型与工具循环，提供审批、上下文、工具和执行约束</td>
+<td>替代业务工作流引擎</td>
+</tr>
+<tr>
+<td>Runtime</td>
+<td>管理任务生命周期、状态、队列、恢复、资源和事件</td>
+<td>把所有业务规则硬编码进基础设施</td>
+</tr>
+</tbody>
+</table>
+<p>可以把它们理解为：</p>
+<pre><code class="language-text">用户目标
+  ↓
+Orchestrator：任务图、依赖、分派
+  ↓
+Agent / Harness：推理、工具选择、上下文与策略
+  ↓
+Runtime：调度、状态、超时、重试、恢复、资源隔离
+  ↓
+Tool Executor：真正产生外部副作用
+</code></pre>
+<h3 id="22-为什么不能只靠-langgraph-或一个-while-循环">2.2 为什么不能只靠 LangGraph 或一个 while 循环</h3>
+<p>一个简单循环可以完成短任务：</p>
+<pre><code class="language-python">while not done:
+    action = model(messages, tools)
+    observation = execute(action)
+    messages.append(observation)
+</code></pre>
+<p>但生产环境还必须解决：</p>
+<ol>
+<li>进程重启后任务状态是否还在；</li>
+<li>工具调用超时时，究竟是“没有执行”还是“执行成功但响应丢失”；</li>
+<li>同一个任务被两个 Worker 消费时如何去重；</li>
+<li>人工审批等待数小时后如何继续；</li>
+<li>模型版本、Prompt、工具 Schema 变化后如何回放；</li>
+<li>子 Agent 部分成功、部分失败时如何补偿。</li>
+</ol>
+<p>因此，框架解决“怎样表达流程”，Runtime 解决“怎样可靠地运行流程”。</p>
+<hr>
+<h2 id="三durable-execution可恢复的长任务执行">三、Durable Execution：可恢复的长任务执行</h2>
+<h3 id="31-最小持久化状态">3.1 最小持久化状态</h3>
+<p>不要只保存聊天记录。一个可恢复任务至少需要：</p>
+<pre><code class="language-json">{
+  &quot;task_id&quot;: &quot;task-123&quot;,
+  &quot;run_id&quot;: &quot;run-7&quot;,
+  &quot;status&quot;: &quot;WAITING_APPROVAL&quot;,
+  &quot;current_step&quot;: &quot;submit_payment&quot;,
+  &quot;context_version&quot;: 12,
+  &quot;plan_version&quot;: 3,
+  &quot;tool_calls&quot;: [],
+  &quot;artifacts&quot;: [],
+  &quot;checkpoint_id&quot;: &quot;cp-42&quot;,
+  &quot;lease_owner&quot;: &quot;worker-5&quot;,
+  &quot;lease_expires_at&quot;: &quot;2026-09-11T10:30:00Z&quot;
+}
+</code></pre>
+<p>关键点：</p>
+<ul>
+<li><code>task_id</code> 表示用户任务，<code>run_id</code> 表示一次执行尝试；</li>
+<li><code>checkpoint_id</code> 必须对应一个可重放的稳定边界；</li>
+<li><code>lease</code> 防止多个 Worker 同时推进同一任务；</li>
+<li>Artifact 应外置保存，不要全部塞进消息历史；</li>
+<li>所有状态转换都应产生事件，而不是只覆盖最终状态。</li>
+</ul>
+<h3 id="32-checkpoint-不等于保存-messages">3.2 Checkpoint 不等于保存 messages</h3>
+<p>合格的 Checkpoint 应同时记录：</p>
+<ul>
+<li>当前状态机节点；</li>
+<li>已完成步骤及其输出摘要；</li>
+<li>外部 Artifact 的引用和版本；</li>
+<li>已执行工具调用的幂等键；</li>
+<li>下一步允许执行的动作；</li>
+<li>当时使用的模型、Prompt、工具 Schema 版本。</li>
+</ul>
+<p>只保存 messages 会遇到两个问题：</p>
+<ol>
+<li>无法确定哪些副作用已经发生；</li>
+<li>恢复时只能让模型“猜”接下来该做什么。</li>
+</ol>
+<h3 id="33-exactly-once-通常做不到">3.3 Exactly-once 通常做不到</h3>
+<p>分布式系统中很难保证工具调用真正 Exactly-once。更实际的设计是：</p>
+<pre><code class="language-text">At-least-once delivery
+        +
+Idempotency key
+        +
+Result journal
+        +
+Compensation
+</code></pre>
+<p>例如支付工具：</p>
+<ol>
+<li>Runtime 生成 <code>tool_call_id</code>；</li>
+<li>调用支付服务时同时发送该 ID；</li>
+<li>支付服务保存 ID 和执行结果；</li>
+<li>超时重试时返回第一次结果；</li>
+<li>如果操作不能幂等，则提供撤销或补偿动作。</li>
+</ol>
+<h3 id="34-推荐状态机">3.4 推荐状态机</h3>
+<pre><code class="language-text">PENDING
+  → RUNNING
+  → WAITING_TOOL
+  → WAITING_APPROVAL
+  → RUNNING
+  → VERIFYING
+  → COMPLETED
+
+异常分支：
+RUNNING → RETRYABLE_FAILED → RUNNING
+RUNNING → BLOCKED
+RUNNING → COMPENSATING → FAILED
+</code></pre>
+<p>面试时应强调：<code>FAILED</code>、<code>BLOCKED</code> 和 <code>WAITING_APPROVAL</code> 是三种不同状态，不能统统记成失败。</p>
+<hr>
+<h2 id="四路径震荡死循环与无效重试">四、路径震荡、死循环与无效重试</h2>
+<h3 id="41-什么是路径震荡">4.1 什么是路径震荡</h3>
+<p>路径震荡指 Agent 在两个或多个策略之间反复切换，却没有产生新的有效信息。例如：</p>
+<pre><code class="language-text">搜索代码 → 尝试修改 → 测试失败
+→ 回退修改 → 再次搜索相同文件
+→ 重复之前的修改 → 再次失败
+</code></pre>
+<p>它与普通重试的区别是：</p>
+<ul>
+<li>普通重试通常因为瞬时错误；</li>
+<li>路径震荡是决策层没有吸收失败证据。</li>
+</ul>
+<h3 id="42-检测方法">4.2 检测方法</h3>
+<p>可以组合使用：</p>
+<ul>
+<li>相同工具与参数的重复率；</li>
+<li>连续状态摘要的相似度；</li>
+<li>Artifact 是否发生有效变化；</li>
+<li>相同错误指纹是否重复出现；</li>
+<li>单位 Token 带来的进展；</li>
+<li>计划节点是否在有限集合内来回跳转。</li>
+</ul>
+<p>一个简单的震荡分数：</p>
+<pre><code class="language-text">oscillation_score =
+  0.35 × repeated_action_ratio
+  + 0.25 × state_similarity
+  + 0.20 × repeated_error_ratio
+  + 0.20 × no_progress_ratio
+</code></pre>
+<p>超过阈值后，不应只是继续增加 <code>max_iterations</code>，而应触发：</p>
+<ol>
+<li>强制总结已有证据；</li>
+<li>禁止重复最近动作；</li>
+<li>请求替代计划；</li>
+<li>切换模型或子 Agent；</li>
+<li>必要时转人工处理。</li>
+</ol>
+<h3 id="43-失败预算">4.3 失败预算</h3>
+<table>
+<thead>
+<tr>
+<th>预算</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>总迭代次数</td>
+<td>最多 30 轮</td>
+</tr>
+<tr>
+<td>相同动作次数</td>
+<td>同工具同参数最多 2 次</td>
+</tr>
+<tr>
+<td>连续无进展次数</td>
+<td>最多 3 次</td>
+</tr>
+<tr>
+<td>Token</td>
+<td>200k</td>
+</tr>
+<tr>
+<td>金额</td>
+<td>5 美元</td>
+</tr>
+<tr>
+<td>墙钟时间</td>
+<td>45 分钟</td>
+</tr>
+<tr>
+<td>高风险工具调用</td>
+<td>最多 1 次且必须审批</td>
+</tr>
+</tbody>
+</table>
+<p>预算耗尽后应生成失败报告和恢复建议，而不是只返回“达到最大轮次”。</p>
+<hr>
+<h2 id="五从-10-个工具扩展到-1000-个工具">五、从 10 个工具扩展到 1000 个工具</h2>
+<h3 id="51-为什么不能把所有工具定义都放进-prompt">5.1 为什么不能把所有工具定义都放进 Prompt</h3>
+<p>工具数量增长会带来：</p>
+<ul>
+<li>Prompt Token 成本快速增加；</li>
+<li>相似工具之间更容易误选；</li>
+<li>Schema 变更污染缓存；</li>
+<li>模型注意力被无关工具分散；</li>
+<li>权限控制难以解释。</li>
+</ul>
+<h3 id="52-分层工具路由">5.2 分层工具路由</h3>
+<p>推荐四层结构：</p>
+<pre><code class="language-text">用户意图
+  ↓
+领域路由：代码 / 数据 / CRM / 财务
+  ↓
+候选工具检索：关键词 + Embedding + 权限过滤
+  ↓
+Schema 精排：参数匹配、风险、成本、历史成功率
+  ↓
+模型从 Top-K 中选择并调用
+</code></pre>
+<p>注意顺序：<strong>先做权限过滤，再把工具暴露给模型</strong>。不能让模型看到无权调用的工具，然后依赖 Prompt 要求它“不要使用”。</p>
+<h3 id="53-skill-的渐进式披露">5.3 Skill 的渐进式披露</h3>
+<p>Skill 不应等于一段超长 Prompt。可以拆成三层：</p>
+<ol>
+<li><strong>Manifest</strong>：名称、用途、适用条件、风险等级；</li>
+<li><strong>Instructions</strong>：被选中后才加载详细步骤；</li>
+<li><strong>Resources</strong>：示例、脚本、模板按需加载。</li>
+</ol>
+<p>这既减少上下文，也能让版本、权限和审核边界更清楚。</p>
+<h3 id="54-工具-schema-版本化">5.4 工具 Schema 版本化</h3>
+<p>至少记录：</p>
+<ul>
+<li><code>tool_name</code></li>
+<li><code>schema_version</code></li>
+<li><code>risk_level</code></li>
+<li><code>required_scopes</code></li>
+<li><code>timeout</code></li>
+<li><code>retry_policy</code></li>
+<li><code>idempotency_support</code></li>
+</ul>
+<p>工具升级时要支持旧任务恢复，不能假设所有运行中的任务都会立刻使用新 Schema。</p>
+<hr>
+<h2 id="六agent-可观测性从日志升级为-trace">六、Agent 可观测性：从日志升级为 Trace</h2>
+<h3 id="61-一条-trace-应该包含什么">6.1 一条 Trace 应该包含什么</h3>
+<pre><code class="language-text">Task
+ ├─ Run
+ │   ├─ Model Span
+ │   ├─ Retrieval Span
+ │   ├─ Tool Span
+ │   ├─ Approval Span
+ │   └─ Verification Span
+ └─ Artifacts / Events / Checkpoints
+</code></pre>
+<p>每个 Span 至少记录：</p>
+<ul>
+<li>输入输出摘要和哈希；</li>
+<li>模型、Prompt、工具版本；</li>
+<li>Token、延迟、成本；</li>
+<li>重试次数和错误类型；</li>
+<li>决策原因或路由标签；</li>
+<li>是否产生副作用；</li>
+<li>关联的 Artifact 和 Checkpoint。</li>
+</ul>
+<p>敏感输入不应原样进入日志，应进行脱敏、分级存储和访问审计。</p>
+<h3 id="62-线上排障顺序">6.2 线上排障顺序</h3>
+<p>当任务失败时，按层定位：</p>
+<ol>
+<li><strong>输入层</strong>：目标是否清晰、权限是否充足；</li>
+<li><strong>规划层</strong>：任务拆分是否错误；</li>
+<li><strong>上下文层</strong>：关键信息是否被截断或污染；</li>
+<li><strong>检索层</strong>：是否召回错误、过期或相互冲突的资料；</li>
+<li><strong>工具层</strong>：参数、权限、超时、Schema 是否正确；</li>
+<li><strong>模型层</strong>：是否理解错误或违反输出约束；</li>
+<li><strong>验证层</strong>：成功条件是否太弱，导致假完成；</li>
+<li><strong>Runtime 层</strong>：是否发生重复消费、恢复错误或状态竞争。</li>
+</ol>
+<hr>
+<h2 id="七2026-年应掌握的-agent-评测指标">七、2026 年应掌握的 Agent 评测指标</h2>
+<h3 id="71-任务结果">7.1 任务结果</h3>
+<ul>
+<li>Task Success Rate：最终完成率；</li>
+<li>First-pass Success Rate：不重试一次完成率；</li>
+<li>Verified Success Rate：经过独立检查后确认的完成率；</li>
+<li>Partial Completion Rate：部分交付比例。</li>
+</ul>
+<h3 id="72-过程质量">7.2 过程质量</h3>
+<ul>
+<li>平均计划修改次数；</li>
+<li>工具选择准确率；</li>
+<li>无效工具调用率；</li>
+<li>路径震荡率；</li>
+<li>人工接管率；</li>
+<li>Recovery Success Rate。</li>
+</ul>
+<h3 id="73-成本和性能">7.3 成本和性能</h3>
+<ul>
+<li>单任务 Token 和金额；</li>
+<li>P50/P95 完成时间；</li>
+<li>模型调用与工具调用占比；</li>
+<li>上下文压缩率；</li>
+<li>缓存命中率。</li>
+</ul>
+<h3 id="74-安全">7.4 安全</h3>
+<ul>
+<li>未授权工具调用数；</li>
+<li>Prompt Injection 攻击成功率；</li>
+<li>敏感数据泄露率；</li>
+<li>高风险操作审批覆盖率；</li>
+<li>沙箱逃逸或策略违规数。</li>
+</ul>
+<h3 id="75-评测集构建">7.5 评测集构建</h3>
+<p>评测集至少包含：</p>
+<ul>
+<li>正常路径；</li>
+<li>缺少必要信息；</li>
+<li>工具超时和部分失败；</li>
+<li>工具返回冲突数据；</li>
+<li>上下文超长；</li>
+<li>Prompt Injection；</li>
+<li>需要人工审批；</li>
+<li>中途重启和恢复；</li>
+<li>同一任务并发执行。</li>
+</ul>
+<p>要保留失败案例，不要只用成功 Demo 构建评测集。</p>
+<hr>
+<h2 id="八coding-agent-的并发修改冲突">八、Coding Agent 的并发修改冲突</h2>
+<h3 id="81-常见冲突">8.1 常见冲突</h3>
+<ul>
+<li>两个 Agent 同时修改同一文件；</li>
+<li>一个 Agent 修改接口，另一个仍按旧接口实现；</li>
+<li>测试 Agent 在代码尚未稳定时读取中间状态；</li>
+<li>多个 Agent 共享同一个未提交工作区；</li>
+<li>主 Agent 合并结果时丢失子 Agent 的约束和失败证据。</li>
+</ul>
+<h3 id="82-推荐隔离策略">8.2 推荐隔离策略</h3>
+<pre><code class="language-text">Task Contract
+  ↓
+为每个子任务创建独立工作区或 worktree
+  ↓
+限制允许修改的路径
+  ↓
+每个子任务产出补丁 + 验证证据
+  ↓
+由集成者按依赖顺序合并
+  ↓
+重新运行全量验证
+</code></pre>
+<p>关键原则：</p>
+<ul>
+<li>共享 Artifact，不共享可变工作区；</li>
+<li>子 Agent 返回结构化结果，而不只是自然语言“完成了”；</li>
+<li>合并成功不等于功能验证成功；</li>
+<li>冲突解决必须保留原始需求和测试证据。</li>
+</ul>
+<hr>
+<h2 id="九近期大厂面试新增信号">九、近期大厂面试新增信号</h2>
+<blockquote>
+<p>下列内容来自公开面经的题目归纳，只作为备考线索，不代表公司固定题库。</p>
+</blockquote>
+<h3 id="字节跳动harness长任务与-coding-agent">字节跳动：Harness、长任务与 Coding Agent</h3>
+<p>近期公开面经新增关注：</p>
+<ul>
+<li>Harness 和 Orchestrator 的边界；</li>
+<li>Agent 路径震荡和失败归因；</li>
+<li>上下文超过窗口后的分层压缩；</li>
+<li>大量工具下的检索和路由；</li>
+<li>多 Agent 同时修改代码的冲突；</li>
+<li>Coding Agent 的单测、覆盖率与质量门禁；</li>
+<li>高并发 Agent 服务的容量和降级设计。</li>
+</ul>
+<p>准备时不能只背框架 API，应能画出任务、Run、Checkpoint、Tool Call 和 Artifact 的数据关系。</p>
+<h3 id="阿里-淘天mcp-评测trace-与-agent-infra">阿里 / 淘天：MCP 评测、Trace 与 Agent Infra</h3>
+<p>近期公开题目新增关注：</p>
+<ul>
+<li>一个 MCP Server 开发完成后怎样评测；</li>
+<li>Agent 链路追踪和对话历史如何保存；</li>
+<li>LangGraph State、Memory、Checkpoint 的边界；</li>
+<li>Max Tokens 中断后如何续跑；</li>
+<li>评测集如何产生并防止数据污染；</li>
+<li>Skill 如何渐进式加载；</li>
+<li>Agent 应用与推理服务的延迟、KV Cache 和批处理。</li>
+</ul>
+<p>准备时要把“应用层 Agent”和“模型推理基础设施”串起来回答。</p>
+<h3 id="腾讯失败恢复幂等和金融安全">腾讯：失败恢复、幂等和金融安全</h3>
+<p>近期公开题目重点包括：</p>
+<ul>
+<li>Agent 中断后如何恢复；</li>
+<li>工具超时后怎样判断是否已经成功执行；</li>
+<li>重试如何避免重复扣款或重复提交；</li>
+<li>多 Agent 风控流程如何设置权限和人工审批；</li>
+<li>RAG 知识库如何不停机更新；</li>
+<li>如何设计可回滚、可补偿的执行链。</li>
+</ul>
+<p>这类题目的核心不是“多试几次”，而是副作用、审计和责任边界。</p>
+<h3 id="美团框架取舍评测闭环和沙箱">美团：框架取舍、评测闭环和沙箱</h3>
+<p>近期公开题目重点包括：</p>
+<ul>
+<li>什么场景不应该使用 LangGraph；</li>
+<li>Workflow 与自主 Agent 的边界；</li>
+<li>为什么自研，而不是直接使用现成 Coding Agent；</li>
+<li>怎样构建离线评测集；</li>
+<li>如何采集 Trace 并定位 bad case；</li>
+<li>工具执行为什么需要沙箱；</li>
+<li>如何同时优化完成率、延迟和 Token 成本。</li>
+</ul>
+<p>准备时应给出基线、失败案例、改动和指标，而不是只讲系统架构图。</p>
+<hr>
+<h2 id="十面试回答模板">十、面试回答模板</h2>
+<p>回答生产级 Agent 系统设计题时，可以使用下面的顺序：</p>
+<pre><code class="language-text">1. 目标：Agent 要完成什么，成功条件是什么
+2. 约束：时延、成本、安全、权限、并发、数据边界
+3. 架构：Agent / Orchestrator / Runtime / Tool / State
+4. 状态：Task、Run、Event、Checkpoint、Artifact
+5. 可靠性：超时、重试、幂等、补偿、恢复
+6. 安全：权限、审批、沙箱、审计
+7. 评测：离线集、线上指标、失败案例
+8. 演进：先做单 Agent 基线，再证明是否需要多 Agent
+</code></pre>
+<p>避免只回答“我们用了 LangGraph、MCP 和向量数据库”。面试官真正想知道的是：为什么这样选、失败时发生什么、怎样证明它有效。</p>
+<hr>
+<h2 id="十一高频自测题">十一、高频自测题</h2>
+<ol>
+<li>Agent、Orchestrator、Harness 和 Runtime 有什么区别？</li>
+<li>为什么 Checkpoint 不能只保存消息历史？</li>
+<li>工具调用超时后，怎样判断是否可以安全重试？</li>
+<li>为什么 Exactly-once 很难？Agent 系统通常怎样近似实现？</li>
+<li>如何发现 Agent 正在路径震荡而不是正常探索？</li>
+<li><code>max_iterations</code> 为什么不能彻底解决死循环？</li>
+<li>1000 个工具为什么不能全部放进 Prompt？</li>
+<li>工具检索为什么必须先做权限过滤？</li>
+<li>Skill 的 Manifest、Instructions 和 Resources 怎样按需加载？</li>
+<li>工具 Schema 升级后，旧任务怎样恢复？</li>
+<li>一条 Agent Trace 应包含哪些 Span？</li>
+<li>Task Success 和 Verified Success 有什么区别？</li>
+<li>怎样构建包含恢复、越权和注入攻击的评测集？</li>
+<li>多个 Coding Agent 修改同一仓库时怎样避免冲突？</li>
+<li>为什么应当先证明单 Agent 的不足，再引入多 Agent？</li>
+</ol>
+<hr>
+<h2 id="十二公开面经来源">十二、公开面经来源</h2>
+<ul>
+<li><a href="https://www.nowcoder.com/discuss/922659050167226368" rel="noreferrer">字节跳动 Agent 开发近期面经汇总</a></li>
+<li><a href="https://www.nowcoder.com/discuss/923740641878646784" rel="noreferrer">阿里 Agent 开发近期面经汇总</a></li>
+<li><a href="https://www.nowcoder.com/discuss/878600528970735616" rel="noreferrer">腾讯 / 百度大模型与 Agent 面经总结</a></li>
+<li><a href="https://www.nowcoder.com/discuss/881209147377664000" rel="noreferrer">美团 Agent 开发面经与工程化追问</a></li>
+</ul>
+<blockquote>
+<p>来源分级建议：带明确轮次、日期和个人项目过程的一手复盘优先级最高；汇总型文章只用于发现题目趋势；带课程销售和“标准满分答案”的内容不可作为唯一证据。</p>
+</blockquote>
+<h2 id="关联阅读">关联阅读</h2>
+<ul>
+<li><a href="doc-061.html">Agent Harness 与编码代理深度测评</a></li>
+<li><a href="doc-072.html">Context Engineering 上下文工程</a></li>
+<li><a href="doc-065.html">Agent 安全与评估体系</a></li>
+<li><a href="doc-076.html">MCP 与工具生态</a></li>
+<li><a href="doc-084.html">最新 AI Agent / 大模型面经索引</a></li>
+</ul></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

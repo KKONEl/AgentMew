@@ -1,0 +1,578 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>2026-10 Agent 面经来源与答案资料 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-047.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/2026-10-Agent面经来源与答案资料.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/26-interview-preparation.html">26 面试准备：证据、STAR、压力追问与阶段模拟</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-Agent%E9%9D%A2%E7%BB%8F%E6%9D%A5%E6%BA%90%E4%B8%8E%E7%AD%94%E6%A1%88%E8%B5%84%E6%96%99.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/2026-10-Agent%E9%9D%A2%E7%BB%8F%E6%9D%A5%E6%BA%90%E4%B8%8E%E7%AD%94%E6%A1%88%E8%B5%84%E6%96%99.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E8%AF%81%E6%8D%AE%E5%88%86%E7%BA%A7">证据分级</a><a href="#%E9%9D%A2%E7%BB%8F%E4%B8%BB%E9%A2%98%E6%9D%A5%E6%BA%90">面经主题来源</a><a href="#s01-%E5%AD%97%E8%8A%82%E8%B7%B3%E5%8A%A8-ai-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A290-%E5%88%86%E9%92%9F%E5%85%B1%E4%BA%AB%E5%B1%8F%E5%B9%95%E7%9C%8B%E4%BB%A3%E7%A0%81">S01 · 字节跳动 AI Agent 开发一面：90 分钟共享屏幕看代码</a><a href="#s02-%E5%AD%97%E8%8A%82%E8%B7%B3%E5%8A%A8%E7%81%AB%E5%B1%B1%E5%BC%95%E6%93%8E-agent-%E5%BC%80%E5%8F%91%E7%A7%8B%E6%8B%9B%E4%B8%80%E9%9D%A2">S02 · 字节跳动火山引擎 Agent 开发秋招一面</a><a href="#s03-%E5%AD%97%E8%8A%82%E8%B7%B3%E5%8A%A8%E7%81%AB%E5%B1%B1%E5%BC%95%E6%93%8E-agent-%E5%BC%80%E5%8F%91%E7%A7%8B%E6%8B%9B%E4%BA%8C%E9%9D%A2">S03 · 字节跳动火山引擎 Agent 开发秋招二面</a><a href="#s04-%E5%B0%8F%E5%8E%82-agent-%E5%B2%97%E4%B8%80%E9%9D%A2harnessbm25-%E4%B8%8E-rag-%E8%AF%84%E6%B5%8B%E8%BF%BD%E9%97%AE">S04 · 小厂 Agent 岗一面：Harness、BM25 与 RAG 评测追问</a><a href="#s05-%E4%B8%8A%E6%B5%B7%E5%88%9D%E5%88%9B%E5%B0%8F%E5%8E%82%E9%9D%A2%E7%BB%8Fagent-%E9%A1%B9%E7%9B%AE%E4%B8%8E-ai-%E7%BC%96%E7%A8%8B%E5%B7%A5%E4%BD%9C%E6%B5%81">S05 · 上海初创小厂面经：Agent 项目与 AI 编程工作流</a><a href="#s06-%E5%AD%97%E8%8A%82-agent-%E5%BC%80%E5%8F%91%E5%90%8E%E7%AB%AF%E6%97%A5%E5%B8%B8%E5%AE%9E%E4%B9%A0%E4%B8%80%E9%9D%A2rag-%E6%A3%80%E7%B4%A2%E4%B8%8E%E8%AF%84%E6%B5%8B%E6%B7%B1%E6%8C%96">S06 · 字节 Agent 开发后端日常实习一面：RAG 检索与评测深挖</a><a href="#s07-%E5%AD%97%E8%8A%82ai-agent%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%E4%B8%89%E5%B1%82%E7%BC%96%E6%8E%92%E4%B8%8A%E4%B8%8B%E6%96%87%E9%9A%94%E7%A6%BB%E4%B8%8Egrpo">S07 · 字节AI Agent开发一面：三层编排、上下文隔离与GRPO</a><a href="#s08-%E6%90%BA%E7%A8%8B-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2langgraph-%E9%A1%B9%E7%9B%AE%E5%85%A8%E9%93%BE%E8%B7%AF%E6%8B%B7%E6%89%93">S08 · 携程 Agent 开发一面：LangGraph 项目全链路拷打</a><a href="#s09-%E5%BA%A6%E5%B0%8F%E6%BB%A1-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2react%E5%A4%9A-agent-%E4%B8%8E%E8%AE%B0%E5%BF%86%E7%B3%BB%E7%BB%9F">S09 · 度小满 Agent 开发一面：ReAct、多 Agent 与记忆系统</a><a href="#s10-%E6%B5%B7%E5%BA%B7%E5%A8%81%E8%A7%86-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%E9%9D%A2%E7%BB%8F">S10 · 海康威视 Agent 开发一面面经</a><a href="#s11-%E7%A7%91%E5%A4%A7%E8%AE%AF%E9%A3%9E-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%E4%B8%8D%E8%80%83%E5%85%AB%E8%82%A1%E5%85%A8%E6%98%AF%E5%9C%BA%E6%99%AF%E9%A2%98">S11 · 科大讯飞 Agent 开发一面：不考八股，全是场景题</a><a href="#s12-%E7%A7%91%E5%A4%A7%E8%AE%AF%E9%A3%9E-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2langgraph-%E5%8E%9F%E7%90%86%E4%B8%8E-ai-%E7%BC%96%E7%A0%81%E8%BF%BD%E9%97%AE">S12 · 科大讯飞 Agent 开发一面：LangGraph 原理与 AI 编码追问</a><a href="#s13-%E4%B9%9D%E6%96%B9%E6%99%BA%E6%8A%95-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2rag-%E5%88%87%E5%9D%97mcp-%E6%9D%83%E9%99%90%E4%B8%8E-java-%E5%85%AB%E8%82%A1">S13 · 九方智投 Agent 开发一面：RAG 切块、MCP 权限与 Java 八股</a><a href="#s14-%E9%87%91%E8%9D%B6-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%E9%A1%B9%E7%9B%AE%E4%B8%BA%E4%B8%BB">S14 · 金蝶 Agent 开发一面（项目为主）</a><a href="#s15-%E5%BF%AB%E6%89%8B%E5%A4%A7%E6%A8%A1%E5%9E%8B-agent-%E7%A0%94%E5%8F%91%E4%B8%80%E9%9D%A2reconcilelease-%E4%B8%8E%E5%A4%9A-agent-%E6%9E%B6%E6%9E%84">S15 · 快手大模型 Agent 研发一面：Reconcile、Lease 与多 Agent 架构</a><a href="#s16-%E5%BF%AB%E6%89%8B-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%E5%B7%A5%E5%85%B7%E5%85%9C%E5%BA%95%E5%A4%9A-agent-%E4%B8%8E%E6%B5%81%E5%BC%8F%E8%A7%A3%E6%9E%90">S16 · 快手 Agent 开发一面：工具兜底、多 Agent 与流式解析</a><a href="#s17-%E7%BB%BF%E7%9B%9F%E7%A7%91%E6%8A%80-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%E5%AE%9E%E4%B9%A0%E6%B7%B1%E6%8C%96%E5%90%8E%E8%BD%AC%E5%8F%8D%E9%97%AE">S17 · 绿盟科技 Agent 开发一面（实习深挖后转反问）</a><a href="#s18-shein-agent%E5%BC%80%E5%8F%91%E7%A7%8B%E6%8B%9B%E9%9D%A2%E7%BB%8Fjava%E5%9F%BA%E7%A1%80%E4%B8%8Etransformer">S18 · SHEIN Agent开发秋招面经：Java基础与Transformer</a><a href="#s19-vivo-agent-%E5%BC%80%E5%8F%91%E7%A7%8B%E6%8B%9B%E4%B8%80%E9%9D%A2%E8%B6%85%E6%97%B6%E6%81%A2%E5%A4%8D%E7%8A%B6%E6%80%81%E6%9C%BA%E4%B8%8E%E6%9D%83%E9%99%90%E8%BE%B9%E7%95%8C">S19 · VIVO Agent 开发秋招一面：超时恢复、状态机与权限边界</a><a href="#s20-vivo-agent-%E5%BC%80%E5%8F%91%E7%BA%BF%E4%B8%8B%E4%B8%80%E9%9D%A2harness-%E4%B8%8E-agent-%E5%B7%A5%E7%A8%8B">S20 · vivo Agent 开发线下一面：Harness 与 Agent 工程</a><a href="#s21-%E8%BF%85%E9%9B%B7-agent-%E4%B8%80%E9%9D%A2ragmcp-%E4%B8%8E-java-%E5%B9%B6%E5%8F%91%E5%85%AB%E8%82%A1">S21 · 迅雷 Agent 一面：RAG、MCP 与 Java 并发八股</a><a href="#s22-%E4%BD%9C%E4%B8%9A%E5%B8%AE-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%E8%AF%84%E6%B5%8B%E4%BD%93%E7%B3%BB%E4%B8%8E-trace-%E9%97%AD%E7%8E%AF">S22 · 作业帮 Agent 开发一面：评测体系与 Trace 闭环</a><a href="#s23-%E5%AD%97%E8%8A%82%E8%B7%B3%E5%8A%A8-ai-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2rag-%E6%8E%92%E6%9F%A5tool-%E7%BC%96%E6%8E%92%E4%B8%8E%E5%90%8E%E7%AB%AF%E5%9F%BA%E7%A1%80">S23 · 字节跳动 AI Agent 开发一面：RAG 排查、Tool 编排与后端基础</a><a href="#s24-%E5%AD%97%E8%8A%82%E9%9B%86%E5%9B%A2%E4%BF%A1%E6%81%AF%E7%B3%BB%E7%BB%9F%E5%90%8E%E7%AB%AF%E5%AE%9E%E4%B9%A0%E4%B8%80%E9%9D%A2plan-execute-replansse-%E4%B8%8E-rag-%E5%88%87%E5%9D%97">S24 · 字节集团信息系统后端实习一面：Plan-Execute-Replan、SSE 与 RAG 切块</a><a href="#s25-%E5%AD%97%E8%8A%82%E4%B8%80%E9%9D%A2-agent-%E5%B2%97react%E5%B9%82%E7%AD%89%E4%B8%8E%E4%B8%8A%E4%B8%8B%E6%96%87%E5%8E%8B%E7%BC%A9%E8%BF%9E%E7%8E%AF%E8%BF%BD%E9%97%AE">S25 · 字节一面 Agent 岗：ReAct、幂等与上下文压缩连环追问</a><a href="#s26-%E5%AD%97%E8%8A%82%E8%B7%B3%E5%8A%A8agent%E7%AE%97%E6%B3%95%E4%B8%80%E9%9D%A2agent%E6%8C%87%E6%A0%87%E8%AF%84%E4%BC%B0%E6%B7%B7%E5%90%88%E5%8F%AC%E5%9B%9E%E4%B8%8Erag%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2">S26 · 字节跳动Agent算法一面：Agent指标评估、混合召回与RAG向量检索</a><a href="#s27-%E5%AD%97%E8%8A%82%E8%B7%B3%E5%8A%A8-agent-%E5%BC%80%E5%8F%91%E9%9D%A2%E8%AF%95harness-%E8%AE%BE%E8%AE%A1%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E4%B8%8E%E9%95%BF%E4%BB%BB%E5%8A%A1%E6%8E%92%E6%9F%A5">S27 · 字节跳动 Agent 开发面试：Harness 设计、上下文管理与长任务排查</a><a href="#s28-%E9%95%BF%E9%91%AB%E5%AD%98%E5%82%A8-agent-%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E4%B8%80%E9%9D%A2bm25%E5%8F%8C%E8%B7%AF%E5%8F%AC%E5%9B%9E%E4%B8%8E-rerank">S28 · 长鑫存储 Agent 开发实习一面：BM25、双路召回与 Rerank</a><a href="#s29-%E7%BD%91%E6%98%93-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2react-%E8%8C%83%E5%BC%8F%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E4%B8%8E-agent-%E6%95%88%E6%9E%9C%E8%AF%84%E6%B5%8B">S29 · 网易 Agent 开发一面：ReAct 范式、工具调用与 Agent 效果评测</a><a href="#s30-%E6%8B%BC%E5%A4%9A%E5%A4%9A-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2rag-%E5%88%87%E5%9D%97%E6%B7%B7%E5%90%88%E6%A3%80%E7%B4%A2%E4%B8%8E-bm25">S30 · 拼多多 Agent 开发一面：RAG 切块、混合检索与 BM25</a><a href="#s31-%E7%99%BE%E5%BA%A6-aigc-%E5%A4%9A%E6%A8%A1%E6%80%81%E6%99%BA%E8%83%BD%E4%BD%93%E7%AE%97%E6%B3%95%E5%B7%A5%E7%A8%8B%E5%B8%88%E4%BA%8C%E9%9D%A2%E5%B7%A5%E5%85%B7%E8%B7%AF%E7%94%B1mcp-%E4%B8%8E%E4%B8%A4%E9%81%93%E6%89%8B%E6%92%95">S31 · 百度 AIGC 多模态智能体算法工程师二面：工具路由、MCP 与两道手撕</a><a href="#s32-%E7%99%BE%E5%BA%A6ai%E6%B5%8B%E5%BC%80%E4%BA%8C%E9%9D%A2agent%E8%AF%84%E6%B5%8B%E4%B8%8E%E6%A3%80%E7%B4%A2%E8%B4%A8%E9%87%8F">S32 · 百度AI测开二面：Agent评测与检索质量</a><a href="#s33-%E5%AD%97%E8%8A%82%E8%B7%B3%E5%8A%A8-agent-%E5%BC%80%E5%8F%91%E6%97%A5%E5%B8%B8%E5%AE%9E%E4%B9%A0%E4%B8%80%E9%9D%A2%E9%9D%A2%E7%BB%8F">S33 · 字节跳动 Agent 开发日常实习一面面经</a><a href="#s34-%E6%90%BA%E7%A8%8B-agent-%E4%B8%80%E9%9D%A2%E5%A4%9A-agent-%E5%8D%8F%E5%90%8Crag-%E4%B8%8E%E6%84%8F%E5%9B%BE%E8%B7%AF%E7%94%B1">S34 · 携程 Agent 一面：多 Agent 协同、RAG 与意图路由</a><a href="#s35-%E5%AD%97%E8%8A%82%E8%B7%B3%E5%8A%A8-agent-%E7%AE%97%E6%B3%95-%E4%B8%80%E9%9D%A2%E4%BA%8C%E9%9D%A2rag%E8%AE%B0%E5%BF%86%E5%88%86%E5%B1%82%E4%B8%8E%E4%B8%8A%E4%B8%8B%E6%96%87%E5%8E%8B%E7%BC%A9">S35 · 字节跳动 Agent 算法 一面二面：RAG、记忆分层与上下文压缩</a><a href="#s36-%E5%AD%97%E8%8A%82agent%E4%B8%80%E9%9D%A2%E5%87%89%E7%BB%8F%E6%89%8B%E6%92%95%E4%B9%B0%E5%8D%96%E8%82%A1%E7%A5%A8%E4%B8%8Eredis%E4%BB%A4%E7%89%8C%E6%A1%B6">S36 · 字节Agent一面凉经：手撕买卖股票与Redis令牌桶</a><a href="#s37-%E5%B0%8F%E7%BA%A2%E4%B9%A6-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%AE%97%E6%B3%95%E5%B2%97%E9%9D%A2%E7%BB%8F%E5%90%88%E9%9B%86%E9%9A%90%E5%BC%8F-cotrag-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E4%B8%8E-lora-%E5%BE%AE%E8%B0%83">S37 · 小红书 大模型算法岗面经合集：隐式 CoT、RAG 上下文管理与 LoRA 微调</a><a href="#s38-%E4%B8%AD%E5%85%B4%E6%9C%AA%E6%9D%A5%E9%A2%86%E5%86%9B%E8%AE%A1%E5%88%92-ai-%E7%AE%97%E6%B3%95%E4%B8%80%E9%9D%A2ragagent-%E4%B8%8E-claude-code-%E5%8E%9F%E7%90%86">S38 · 中兴未来领军计划 AI 算法一面：RAG、Agent 与 Claude Code 原理</a><a href="#s39-%E5%BA%A6%E5%B0%8F%E6%BB%A1%E4%B8%80%E9%9D%A2-%E5%90%8E%E7%AB%AF%E5%9F%BA%E7%A1%80%E4%B8%8E-agent-%E5%9C%BA%E6%99%AF%E8%BF%9E%E7%8E%AF%E8%BF%BD%E9%97%AE">S39 · 度小满一面 后端基础与 Agent 场景连环追问</a><a href="#s40-agent-%E9%9D%A2%E8%AF%95%E9%A2%98%E5%BA%93-80-%E9%97%AEreactrag%E8%AE%B0%E5%BF%86%E5%88%86%E5%B1%82%E4%B8%8E-mcp-%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0">S40 · Agent 面试题库 80 问：ReAct、RAG、记忆分层与 MCP 工程落地</a><a href="#s41-%E7%99%BE%E5%BA%A6-agent-%E7%A7%8B%E6%8B%9B%E7%AE%97%E6%B3%95%E5%B2%97%E4%B8%80%E9%9D%A2%E4%BA%8C%E9%9D%A2%E9%9D%A2%E7%BB%8F%E5%A4%9A%E6%99%BA%E8%83%BD%E4%BD%93%E4%B8%8E%E4%B8%89%E7%BA%A7%E8%AE%B0%E5%BF%86">S41 · 百度 Agent 秋招算法岗一面二面面经（多智能体与三级记忆）</a><a href="#s42-%E6%B5%B7%E5%BA%B7%E5%A8%81%E8%A7%86-ai-agent-%E4%B8%80%E9%9D%A2%E5%B7%A5%E5%85%B7%E7%BC%96%E6%8E%92%E4%B8%8E%E4%B8%8A%E4%B8%8B%E6%96%87%E5%8E%8B%E7%BC%A9">S42 · 海康威视 AI Agent 一面：工具编排与上下文压缩</a><a href="#s43-%E9%98%B3%E5%85%89%E4%BF%9D%E9%99%A9-ai-%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%E6%84%8F%E5%9B%BE%E6%A0%91mcp-%E5%B7%A5%E5%85%B7%E4%B8%8E%E5%A4%9A%E8%B7%AF%E6%A3%80%E7%B4%A2">S43 · 阳光保险 AI 应用开发一面：意图树、MCP 工具与多路检索</a><a href="#s44-%E7%A7%91%E5%A4%A7%E8%AE%AF%E9%A3%9E-ai-%E5%85%A8%E6%A0%88%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%E5%89%8D%E7%AB%AF%E6%9E%B6%E6%9E%84%E8%BF%9B%E7%A8%8B%E7%BA%BF%E7%A8%8B%E4%B8%8E-agent-%E6%A1%86%E6%9E%B6">S44 · 科大讯飞 AI 全栈开发一面：前端架构、进程线程与 Agent 框架</a><a href="#s45-%E7%BE%8E%E5%9B%A2kmart%E5%85%A8%E6%A0%88%E4%B8%80%E9%9D%A2%E9%9D%A2%E7%BB%8Fagent%E9%A1%B9%E7%9B%AE%E6%B7%B1%E6%8C%96%E4%B8%8E%E5%90%8E%E7%AB%AF%E5%9F%BA%E7%A1%80">S45 · 美团Kmart全栈一面面经：Agent项目深挖与后端基础</a><a href="#s46-%E4%B9%9D%E6%96%B9%E6%99%BA%E6%8A%95-ai-%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2java-%E5%85%AB%E8%82%A1rag-%E8%B0%83%E4%BC%98%E4%B8%8E%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E8%AE%BE%E8%AE%A1">S46 · 九方智投 AI 应用开发一面：Java 八股、RAG 调优与智能客服设计</a><a href="#s47-%E7%BE%8E%E5%9B%A2%E5%85%A8%E6%A0%88%E5%BC%80%E5%8F%91%E6%97%A5%E5%B8%B8%E5%AE%9E%E4%B9%A0%E4%B8%80%E9%9D%A2reactrag-%E4%B8%89%E8%B7%AF%E5%8F%AC%E5%9B%9E%E4%B8%8E-agent-%E8%87%AA%E8%BF%9B%E5%8C%96-49-%E9%97%AE">S47 · 美团全栈开发日常实习一面：ReAct、RAG 三路召回与 Agent 自进化 49 问</a><a href="#s48-%E7%BD%91%E6%98%93-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2sse-%E4%B8%8E-streamable-httpmcp-%E7%89%88%E6%9C%AC%E5%85%BC%E5%AE%B9%E8%AE%B0%E5%BF%86%E5%88%86%E5%B1%82%E8%AE%BE%E8%AE%A1">S48 · 网易 Agent 开发一面：SSE 与 Streamable HTTP、MCP 版本兼容、记忆分层设计</a><a href="#s49-%E6%B0%B4%E6%BB%B4%E5%85%AC%E5%8F%B8-ai-%E5%85%A8%E6%A0%88%E5%B7%A5%E7%A8%8B%E5%B8%88%E4%B8%80%E9%9D%A2%E4%BB%8E%E8%BF%9B%E7%A8%8B%E7%BA%BF%E7%A8%8B%E5%88%B0-agent-%E8%AE%B0%E5%BF%86%E8%AE%BE%E8%AE%A1">S49 · 水滴公司 AI 全栈工程师一面：从进程线程到 Agent 记忆设计</a><a href="#s50-%E5%BF%AB%E6%89%8B-ai-agent-%E5%BC%80%E5%8F%91%E5%87%89%E7%BB%8F%E5%A6%82%E4%BD%95%E5%AE%9A%E4%B9%89-agent">S50 · 快手 AI Agent 开发凉经：如何定义 Agent？</a><a href="#s51-58%E5%90%8C%E5%9F%8Eagent%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2">S51 · 58同城agent开发一面</a><a href="#s52-%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4-ai-agent-%E7%A0%94%E5%8F%91%E4%B8%80%E9%9D%A2%E9%9D%A2%E7%BB%8F">S52 · 阿里巴巴 AI Agent 研发一面面经</a><a href="#s53-%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4-ai-agent-%E5%BC%80%E5%8F%91%E5%B2%97%E9%9D%A2%E7%BB%8F%E5%90%88%E9%9B%86%E9%95%BF%E8%A7%86%E9%A2%91%E7%90%86%E8%A7%A3%E9%A1%B9%E7%9B%AE%E5%A4%8D%E7%9B%98">S53 · 阿里巴巴 AI Agent 开发岗面经合集：长视频理解项目复盘</a><a href="#s54-%E8%85%BE%E8%AE%AF%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%AE%97%E6%B3%95%E9%9D%A2%E7%BB%8F%E5%90%88%E9%9B%86%E6%A0%87%E7%AD%BE%E6%98%A0%E5%B0%84%E8%AF%AD%E4%B9%89%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83%E4%B8%8E-agent-%E7%BC%96%E6%8E%92%E9%80%89%E5%9E%8B">S54 · 腾讯大模型算法面经合集：标签映射、语义模型训练与 Agent 编排选型</a><a href="#s55-%E7%BE%8E%E5%9B%A2-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2markdown-%E6%B2%A1%E6%A0%87%E9%A2%98%E6%80%8E%E4%B9%88%E5%88%87%E5%88%86">S55 · 美团 Agent 开发一面：Markdown 没标题怎么切分？</a><a href="#s56-%E7%BE%8E%E5%9B%A2-agent-%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%E5%87%89%E7%BB%8F26-%E9%97%AE%E6%B7%B1%E6%8C%96-agent-%E5%B7%A5%E7%A8%8B%E4%B8%8E-skill-%E8%AE%BE%E8%AE%A1">S56 · 美团 Agent 开发一面凉经：26 问深挖 Agent 工程与 skill 设计</a><a href="#s57-%E7%99%BE%E5%BA%A6-agent-%E4%BA%8C%E9%9D%A2%E4%B8%8D%E7%9C%8B%E7%AE%80%E5%8E%86%E4%B8%8D%E5%81%9A%E8%87%AA%E6%88%91%E4%BB%8B%E7%BB%8D%E8%BF%9E%E6%8A%9B-6-%E9%81%93%E6%9E%B6%E6%9E%84%E9%A2%98">S57 · 百度 Agent 二面：不看简历、不做自我介绍，连抛 6 道架构题</a><a href="#s58-%E7%99%BE%E5%BA%A6-agent-%E4%B8%80%E9%9D%A2trace-hooksse%E5%B9%82%E7%AD%89%E5%B7%A5%E5%85%B7%E5%B9%B6%E5%8F%91">S58 · 百度 Agent 一面：Trace Hook、SSE、幂等、工具并发</a><a href="#s59-%E4%BA%AC%E4%B8%9C-ai-agent%E5%BC%80%E5%8F%91%E4%B8%80%E9%9D%A2%E6%9E%B6%E6%9E%84%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B8%8E%E8%B6%85%E6%97%B6%E9%87%8D%E8%AF%95">S59 · 京东 AI Agent开发一面：架构、上下文与超时重试</a><a href="#s60-%E4%BA%AC%E4%B8%9C-%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91%E5%B2%97%E9%9D%A2%E7%BB%8F%E5%90%88%E9%9B%86-01agent-%E6%97%A5%E5%BF%97%E6%8E%92%E6%9F%A5jvm-%E8%B0%83%E4%BC%98%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6-11-%E5%9C%BA%E7%9C%9F%E9%A2%98">S60 · 京东 后端开发岗面经合集 01：Agent 日志排查、JVM 调优与中间件 11 场真题</a><a href="#s61-%E5%B0%8F%E7%B1%B3-ai-agent-%E4%B8%89%E9%9D%A2%E5%8E%8B%E5%8A%9B%E9%9D%A2%E5%85%A8%E7%A8%8B%E9%97%AE%E4%BD%A0%E8%B8%A9%E8%BF%87%E4%BB%80%E4%B9%88%E5%9D%91">S61 · 小米 AI Agent 三面：压力面，全程问“你踩过什么坑”</a><a href="#s62-%E5%B0%8F%E7%B1%B3-ai-agent-%E4%BA%8C%E9%9D%A2%E9%87%91%E8%9E%8D%E7%90%86%E8%B5%94%E7%9A%84%E7%A1%AE%E5%AE%9A%E6%80%A7%E4%B8%8E%E8%BF%BD%E8%B4%A3">S62 · 小米 AI Agent 二面：金融理赔的确定性与追责</a><a href="#s63-%E5%B0%8F%E7%B1%B3-ai-%E5%85%A8%E6%A0%88%E5%BC%80%E5%8F%91%E9%9D%A2%E8%AF%95agent-%E6%9E%B6%E6%9E%84rag-%E4%B8%8E%E5%A4%9A-agent-%E9%9A%94%E7%A6%BB">S63 · 小米 AI 全栈开发面试：Agent 架构、RAG 与多 Agent 隔离</a><a href="#%E7%AD%94%E6%A1%88%E6%9C%BA%E5%88%B6%E8%B5%84%E6%96%99">答案机制资料</a></nav></details><article class="prose source-prose"><h1 id="2026-10-agent-面经来源与答案资料">2026-10 Agent 面经来源与答案资料</h1>
+<blockquote>
+<p>来源快照：2026-10-22；答案整理：2026-10-23。此次迁入不代表重新抓取。
+本批题目按公开面经报道主题改写，是练习题，不是公司官方真题；答案为编辑综合参考，未经独立专家逐题复核，不是公司标准答案。</p>
+</blockquote>
+<p><a href="doc-048.html">返回本批题目索引</a></p>
+<h2 id="证据分级">证据分级</h2>
+<ul>
+<li><strong>B</strong>：曾定位公开原帖，可能仅预览或最近一次抓取不可读；不是作者身份认证，也不是逐题核验。</li>
+<li><strong>C</strong>：只找到聚合线索，原帖或具体内容待核验。</li>
+<li><code>evidence</code> 保留更细分的原始状态。<code>published_month</code> 为报道月份；原帖日期和面试日期另外列示，未知则不猜。</li>
+<li>全部来源在 <code>data/interviews.json</code> 中维护，供题目按稳定 ID 引用。同帖多种练习不增加独立来源数，不把 63 条当作 63 场真实面试。</li>
+</ul>
+<h2 id="面经主题来源">面经主题来源</h2>
+<h3 id="s01-字节跳动-ai-agent-开发一面90-分钟共享屏幕看代码">S01 · 字节跳动 AI Agent 开发一面：90 分钟共享屏幕看代码</h3>
+<p><strong>ID</strong>：<code>INT-2bfa666e65</code> · <strong>报道公司</strong>：字节跳动 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-13T20:47:53+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/939623386806751232?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/bytedance-agent-development-first-round-939623386806751232/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s02-字节跳动火山引擎-agent-开发秋招一面">S02 · 字节跳动火山引擎 Agent 开发秋招一面</h3>
+<p><strong>ID</strong>：<code>INT-f135ac968c</code> · <strong>报道公司</strong>：字节跳动 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/bytedance-volcano-engine-agent-autumn-first-round-2923108/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/bytedance-volcano-engine-agent-autumn-first-round-2923108/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s03-字节跳动火山引擎-agent-开发秋招二面">S03 · 字节跳动火山引擎 Agent 开发秋招二面</h3>
+<p><strong>ID</strong>：<code>INT-04666050b7</code> · <strong>报道公司</strong>：字节跳动 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/bytedance-volcano-engine-agent-autumn-second-round-2923110/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/bytedance-volcano-engine-agent-autumn-second-round-2923110/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s04-小厂-agent-岗一面harnessbm25-与-rag-评测追问">S04 · 小厂 Agent 岗一面：Harness、BM25 与 RAG 评测追问</h3>
+<p><strong>ID</strong>：<code>INT-9e5f65a93e</code> · <strong>报道公司</strong>：未知公司 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_self_report_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_page</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-13T17:57:52+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/939580601693229056?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/unknown-company-agent-939580601693229056/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s05-上海初创小厂面经agent-项目与-ai-编程工作流">S05 · 上海初创小厂面经：Agent 项目与 AI 编程工作流</h3>
+<p><strong>ID</strong>：<code>INT-5e1c343a82</code> · <strong>报道公司</strong>：未知公司 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_self_report_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_page</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-13T16:15:17+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/939554787337441280?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/unknown-company-agent-dev-939554787337441280/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s06-字节-agent-开发后端日常实习一面rag-检索与评测深挖">S06 · 字节 Agent 开发后端日常实习一面：RAG 检索与评测深挖</h3>
+<p><strong>ID</strong>：<code>INT-1c8ef39841</code> · <strong>报道公司</strong>：字节 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_self_report_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_page</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：2026-09-23T15:29:57+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/932295617999622144?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/bytedance-agent-dev-first-round-932295617999622144/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s07-字节ai-agent开发一面三层编排上下文隔离与grpo">S07 · 字节AI Agent开发一面：三层编排、上下文隔离与GRPO</h3>
+<p><strong>ID</strong>：<code>INT-bfd0fa0cf9</code> · <strong>报道公司</strong>：字节跳动 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：2026-09-23T22:53:07+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/932407145864130560?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/bytedance-ai-agent-first-round-932407145864130560/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s08-携程-agent-开发一面langgraph-项目全链路拷打">S08 · 携程 Agent 开发一面：LangGraph 项目全链路拷打</h3>
+<p><strong>ID</strong>：<code>INT-5906c726ec</code> · <strong>报道公司</strong>：携程 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/ctrip-agent-dev-first-round-2916102/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/ctrip-agent-dev-first-round-2916102/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s09-度小满-agent-开发一面react多-agent-与记忆系统">S09 · 度小满 Agent 开发一面：ReAct、多 Agent 与记忆系统</h3>
+<p><strong>ID</strong>：<code>INT-a6e173857b</code> · <strong>报道公司</strong>：度小满 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/duxiaoman-agent-dev-first-round-2916408/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/duxiaoman-agent-dev-first-round-2916408/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s10-海康威视-agent-开发一面面经">S10 · 海康威视 Agent 开发一面面经</h3>
+<p><strong>ID</strong>：<code>INT-1f14c11bcf</code> · <strong>报道公司</strong>：海康威视 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/hikvision-agent-first-round-2929422/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/hikvision-agent-first-round-2929422/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s11-科大讯飞-agent-开发一面不考八股全是场景题">S11 · 科大讯飞 Agent 开发一面：不考八股，全是场景题</h3>
+<p><strong>ID</strong>：<code>INT-666456d67d</code> · <strong>报道公司</strong>：科大讯飞 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/iflytek-agent-development-2918952/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/iflytek-agent-development-2918952/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s12-科大讯飞-agent-开发一面langgraph-原理与-ai-编码追问">S12 · 科大讯飞 Agent 开发一面：LangGraph 原理与 AI 编码追问</h3>
+<p><strong>ID</strong>：<code>INT-55ad5284e6</code> · <strong>报道公司</strong>：科大讯飞 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/iflytek-agent-development-first-round-2917127/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/iflytek-agent-development-first-round-2917127/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s13-九方智投-agent-开发一面rag-切块mcp-权限与-java-八股">S13 · 九方智投 Agent 开发一面：RAG 切块、MCP 权限与 Java 八股</h3>
+<p><strong>ID</strong>：<code>INT-fef75911f3</code> · <strong>报道公司</strong>：九方智投 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/jiufangzhitou-agent-dev-first-round-2916834/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/jiufangzhitou-agent-dev-first-round-2916834/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s14-金蝶-agent-开发一面项目为主">S14 · 金蝶 Agent 开发一面（项目为主）</h3>
+<p><strong>ID</strong>：<code>INT-85c5706c08</code> · <strong>报道公司</strong>：金蝶 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/kingdee-agent-dev-first-round-2914937/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/kingdee-agent-dev-first-round-2914937/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s15-快手大模型-agent-研发一面reconcilelease-与多-agent-架构">S15 · 快手大模型 Agent 研发一面：Reconcile、Lease 与多 Agent 架构</h3>
+<p><strong>ID</strong>：<code>INT-065b4318d8</code> · <strong>报道公司</strong>：快手 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_self_report_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_page</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：2026-09-23T16:48:15+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/932315325276618752?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/kuaishou-agent-dev-first-round-932315325276618752/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s16-快手-agent-开发一面工具兜底多-agent-与流式解析">S16 · 快手 Agent 开发一面：工具兜底、多 Agent 与流式解析</h3>
+<p><strong>ID</strong>：<code>INT-2706b0f563</code> · <strong>报道公司</strong>：快手 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_previously_located_latest_fetch_unreadable</code> · <strong>最近抓取可读</strong>：False · <strong>访问范围</strong>：<code>unknown_latest_fetch_unreadable</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：2026-09-21T22:41:06+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/931679347587444736?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/kuaishou-agent-first-round-931679347587444736/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>确认公开帖子及正文可读；未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s17-绿盟科技-agent-开发一面实习深挖后转反问">S17 · 绿盟科技 Agent 开发一面（实习深挖后转反问）</h3>
+<p><strong>ID</strong>：<code>INT-edd0237eec</code> · <strong>报道公司</strong>：绿盟科技 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/nsfocus-agent-dev-first-round-2914970/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/nsfocus-agent-dev-first-round-2914970/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s18-shein-agent开发秋招面经java基础与transformer">S18 · SHEIN Agent开发秋招面经：Java基础与Transformer</h3>
+<p><strong>ID</strong>：<code>INT-024a0e7447</code> · <strong>报道公司</strong>：SHEIN · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/shein-agent-qiuzhao-2913432/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/shein-agent-qiuzhao-2913432/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s19-vivo-agent-开发秋招一面超时恢复状态机与权限边界">S19 · VIVO Agent 开发秋招一面：超时恢复、状态机与权限边界</h3>
+<p><strong>ID</strong>：<code>INT-4aea8e37ae</code> · <strong>报道公司</strong>：VIVO · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：2026-09-24T09:21:50+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/932565368587976704?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/vivo-agent-932565368587976704/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s20-vivo-agent-开发线下一面harness-与-agent-工程">S20 · vivo Agent 开发线下一面：Harness 与 Agent 工程</h3>
+<p><strong>ID</strong>：<code>INT-53fea6b29a</code> · <strong>报道公司</strong>：vivo · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_self_report_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_page</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：2026-09-22T21:00:02+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/932016298563809280?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/vivo-agent-development-interview-932016298563809280/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s21-迅雷-agent-一面ragmcp-与-java-并发八股">S21 · 迅雷 Agent 一面：RAG、MCP 与 Java 并发八股</h3>
+<p><strong>ID</strong>：<code>INT-e123cde6cf</code> · <strong>报道公司</strong>：迅雷 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_previously_located_latest_fetch_unreadable</code> · <strong>最近抓取可读</strong>：False · <strong>访问范围</strong>：<code>unknown_latest_fetch_unreadable</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：2026-09-23T21:56:06+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/932392798559432704?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/xunlei-agent-dev-first-round-932392798559432704/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>确认公开帖子及正文可读；未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s22-作业帮-agent-开发一面评测体系与-trace-闭环">S22 · 作业帮 Agent 开发一面：评测体系与 Trace 闭环</h3>
+<p><strong>ID</strong>：<code>INT-aa5fb6e122</code> · <strong>报道公司</strong>：作业帮 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/zuoyebang-agent-dev-first-round-2916240/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/zuoyebang-agent-dev-first-round-2916240/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s23-字节跳动-ai-agent-开发一面rag-排查tool-编排与后端基础">S23 · 字节跳动 AI Agent 开发一面：RAG 排查、Tool 编排与后端基础</h3>
+<p><strong>ID</strong>：<code>INT-c2cabe7e5b</code> · <strong>报道公司</strong>：字节跳动 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/bytedance-ai-agent-development-first-round-2927700/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/bytedance-ai-agent-development-first-round-2927700/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s24-字节集团信息系统后端实习一面plan-execute-replansse-与-rag-切块">S24 · 字节集团信息系统后端实习一面：Plan-Execute-Replan、SSE 与 RAG 切块</h3>
+<p><strong>ID</strong>：<code>INT-5001eff5c7</code> · <strong>报道公司</strong>：字节跳动 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/bytedance-backend-intern-group-information-system-first-round-00e3488329c041c5a5a357c14ce138b4/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/bytedance-backend-intern-group-information-system-first-round-00e3488329c041c5a5a357c14ce138b4/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s25-字节一面-agent-岗react幂等与上下文压缩连环追问">S25 · 字节一面 Agent 岗：ReAct、幂等与上下文压缩连环追问</h3>
+<p><strong>ID</strong>：<code>INT-52d6d4862a</code> · <strong>报道公司</strong>：字节跳动 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：2026-09-22T12:53:50+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/931893943342465024?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/bytedance-agent-first-round-931893943342465024/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s26-字节跳动agent算法一面agent指标评估混合召回与rag向量检索">S26 · 字节跳动Agent算法一面：Agent指标评估、混合召回与RAG向量检索</h3>
+<p><strong>ID</strong>：<code>INT-340e4aa1be</code> · <strong>报道公司</strong>：字节跳动 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/bytedance-agent-2928966/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/bytedance-agent-2928966/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s27-字节跳动-agent-开发面试harness-设计上下文管理与长任务排查">S27 · 字节跳动 Agent 开发面试：Harness 设计、上下文管理与长任务排查</h3>
+<p><strong>ID</strong>：<code>INT-c233db2a53</code> · <strong>报道公司</strong>：字节跳动 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_previously_located_latest_fetch_unreadable</code> · <strong>最近抓取可读</strong>：False · <strong>访问范围</strong>：<code>unknown_latest_fetch_unreadable</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-11T21:47:54+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/938913714646929408?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/bytedance-agent-development-938913714646929408/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>确认公开帖子及正文可读；未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s28-长鑫存储-agent-开发实习一面bm25双路召回与-rerank">S28 · 长鑫存储 Agent 开发实习一面：BM25、双路召回与 Rerank</h3>
+<p><strong>ID</strong>：<code>INT-6d396c411c</code> · <strong>报道公司</strong>：长鑫存储 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/changxin-agent-development-intern-first-round-2927060/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/changxin-agent-development-intern-first-round-2927060/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s29-网易-agent-开发一面react-范式工具调用与-agent-效果评测">S29 · 网易 Agent 开发一面：ReAct 范式、工具调用与 Agent 效果评测</h3>
+<p><strong>ID</strong>：<code>INT-6784717d92</code> · <strong>报道公司</strong>：网易 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/netease-agent-development-first-round-2927708/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/netease-agent-development-first-round-2927708/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s30-拼多多-agent-开发一面rag-切块混合检索与-bm25">S30 · 拼多多 Agent 开发一面：RAG 切块、混合检索与 BM25</h3>
+<p><strong>ID</strong>：<code>INT-a896abf415</code> · <strong>报道公司</strong>：拼多多 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/pdd-agent-first-round-2923332/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/pdd-agent-first-round-2923332/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s31-百度-aigc-多模态智能体算法工程师二面工具路由mcp-与两道手撕">S31 · 百度 AIGC 多模态智能体算法工程师二面：工具路由、MCP 与两道手撕</h3>
+<p><strong>ID</strong>：<code>INT-77a1694ccd</code> · <strong>报道公司</strong>：百度 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/baidu-aigc-multimodal-agent-algorithm-second-round-2919150/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/baidu-aigc-multimodal-agent-algorithm-second-round-2919150/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s32-百度ai测开二面agent评测与检索质量">S32 · 百度AI测开二面：Agent评测与检索质量</h3>
+<p><strong>ID</strong>：<code>INT-1795ef9456</code> · <strong>报道公司</strong>：百度 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/baidu-ai-test-development-second-round-2915577/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/baidu-ai-test-development-second-round-2915577/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s33-字节跳动-agent-开发日常实习一面面经">S33 · 字节跳动 Agent 开发日常实习一面面经</h3>
+<p><strong>ID</strong>：<code>INT-8a955ba862</code> · <strong>报道公司</strong>：字节跳动 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/bytedance-agent-first-round-2929450/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/bytedance-agent-first-round-2929450/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s34-携程-agent-一面多-agent-协同rag-与意图路由">S34 · 携程 Agent 一面：多 Agent 协同、RAG 与意图路由</h3>
+<p><strong>ID</strong>：<code>INT-2363ce8df7</code> · <strong>报道公司</strong>：携程 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/ctrip-agent-first-round-2928075/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/ctrip-agent-first-round-2928075/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s35-字节跳动-agent-算法-一面二面rag记忆分层与上下文压缩">S35 · 字节跳动 Agent 算法 一面二面：RAG、记忆分层与上下文压缩</h3>
+<p><strong>ID</strong>：<code>INT-332a893cbf</code> · <strong>报道公司</strong>：字节跳动 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_self_report_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_page</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-20T09:43:46+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/941992971027636224?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/bytedance-agent-algorithm-941992971027636224/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s36-字节agent一面凉经手撕买卖股票与redis令牌桶">S36 · 字节Agent一面凉经：手撕买卖股票与Redis令牌桶</h3>
+<p><strong>ID</strong>：<code>INT-e52c427938</code> · <strong>报道公司</strong>：字节跳动 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/bytedance-agent-first-round-2913828/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/bytedance-agent-first-round-2913828/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s37-小红书-大模型算法岗面经合集隐式-cotrag-上下文管理与-lora-微调">S37 · 小红书 大模型算法岗面经合集：隐式 CoT、RAG 上下文管理与 LoRA 微调</h3>
+<p><strong>ID</strong>：<code>INT-55b114dad5</code> · <strong>报道公司</strong>：小红书 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：2026-09-29T00:07:51+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/934237893025890304?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/xiaohongshu-llm-algorithm-934237893025890304/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s38-中兴未来领军计划-ai-算法一面ragagent-与-claude-code-原理">S38 · 中兴未来领军计划 AI 算法一面：RAG、Agent 与 Claude Code 原理</h3>
+<p><strong>ID</strong>：<code>INT-0eb64a1b7f</code> · <strong>报道公司</strong>：中兴 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_self_report_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_page</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：2026-09-23T16:51:45+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/932316204088180736?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/zte-ai-algorithm-first-round-932316204088180736/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s39-度小满一面-后端基础与-agent-场景连环追问">S39 · 度小满一面 后端基础与 Agent 场景连环追问</h3>
+<p><strong>ID</strong>：<code>INT-68ecfa8d6d</code> · <strong>报道公司</strong>：度小满 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/duxiaoman-backend-first-round-2913246/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/duxiaoman-backend-first-round-2913246/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s40-agent-面试题库-80-问reactrag记忆分层与-mcp-工程落地">S40 · Agent 面试题库 80 问：ReAct、RAG、记忆分层与 MCP 工程落地</h3>
+<p><strong>ID</strong>：<code>INT-4fd2be4078</code> · <strong>报道公司</strong>：牛客网用户分享 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/nowcoder-user-agent-2925942/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/nowcoder-user-agent-2925942/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s41-百度-agent-秋招算法岗一面二面面经多智能体与三级记忆">S41 · 百度 Agent 秋招算法岗一面二面面经（多智能体与三级记忆）</h3>
+<p><strong>ID</strong>：<code>INT-c0e8c51474</code> · <strong>报道公司</strong>：百度 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/baidu-ai-algorithm-first-second-round-2916318/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/baidu-ai-algorithm-first-second-round-2916318/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s42-海康威视-ai-agent-一面工具编排与上下文压缩">S42 · 海康威视 AI Agent 一面：工具编排与上下文压缩</h3>
+<p><strong>ID</strong>：<code>INT-e363eb73e2</code> · <strong>报道公司</strong>：海康威视 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-15T21:20:25+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/940356350117228544?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/hikvision-ai-agent-first-round-940356350117228544/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s43-阳光保险-ai-应用开发一面意图树mcp-工具与多路检索">S43 · 阳光保险 AI 应用开发一面：意图树、MCP 工具与多路检索</h3>
+<p><strong>ID</strong>：<code>INT-475c4541b0</code> · <strong>报道公司</strong>：阳光保险 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/sunshine-insurance-ai-app-first-round-2928627/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/sunshine-insurance-ai-app-first-round-2928627/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s44-科大讯飞-ai-全栈开发一面前端架构进程线程与-agent-框架">S44 · 科大讯飞 AI 全栈开发一面：前端架构、进程线程与 Agent 框架</h3>
+<p><strong>ID</strong>：<code>INT-076275d908</code> · <strong>报道公司</strong>：科大讯飞 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/iflytek-ai-fullstack-first-round-2927807/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/iflytek-ai-fullstack-first-round-2927807/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s45-美团kmart全栈一面面经agent项目深挖与后端基础">S45 · 美团Kmart全栈一面面经：Agent项目深挖与后端基础</h3>
+<p><strong>ID</strong>：<code>INT-0f90bd85b5</code> · <strong>报道公司</strong>：美团 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>unknown</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/meituan-fullstack-first-round-931526208536182784/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/meituan-fullstack-first-round-931526208536182784/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s46-九方智投-ai-应用开发一面java-八股rag-调优与智能客服设计">S46 · 九方智投 AI 应用开发一面：Java 八股、RAG 调优与智能客服设计</h3>
+<p><strong>ID</strong>：<code>INT-5c781adab9</code> · <strong>报道公司</strong>：九方智投 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/jiufang-ai-app-first-round-2928403/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/jiufang-ai-app-first-round-2928403/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s47-美团全栈开发日常实习一面reactrag-三路召回与-agent-自进化-49-问">S47 · 美团全栈开发日常实习一面：ReAct、RAG 三路召回与 Agent 自进化 49 问</h3>
+<p><strong>ID</strong>：<code>INT-77ca6f4ba2</code> · <strong>报道公司</strong>：美团 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/meituan-fullstack-intern-first-round-2924710/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/meituan-fullstack-intern-first-round-2924710/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s48-网易-agent-开发一面sse-与-streamable-httpmcp-版本兼容记忆分层设计">S48 · 网易 Agent 开发一面：SSE 与 Streamable HTTP、MCP 版本兼容、记忆分层设计</h3>
+<p><strong>ID</strong>：<code>INT-02e3d8f7b6</code> · <strong>报道公司</strong>：网易 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-11T21:52:50+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/938914958287306752?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/netease-agent-development-938914958287306752/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s49-水滴公司-ai-全栈工程师一面从进程线程到-agent-记忆设计">S49 · 水滴公司 AI 全栈工程师一面：从进程线程到 Agent 记忆设计</h3>
+<p><strong>ID</strong>：<code>INT-2599a140bd</code> · <strong>报道公司</strong>：水滴公司 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/shuidi-ai-fullstack-first-round-2930334/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/shuidi-ai-fullstack-first-round-2930334/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+</blockquote>
+<h3 id="s50-快手-ai-agent-开发凉经如何定义-agent">S50 · 快手 AI Agent 开发凉经：如何定义 Agent？</h3>
+<p><strong>ID</strong>：<code>INT-bbcb367aed</code> · <strong>报道公司</strong>：快手 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_previously_located_latest_fetch_unreadable</code> · <strong>最近抓取可读</strong>：False · <strong>访问范围</strong>：<code>unknown_latest_fetch_unreadable</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-10T21:08:45+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/938541475766206464?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/kuaishou-ai-agent-development-938541475766206464/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>聚合站常把月级时间写成每月1日，不能据此认定真实发布日期或面试日。</p>
+<p>确认公开帖子及正文可读；未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s51-58同城agent开发一面">S51 · 58同城agent开发一面</h3>
+<p><strong>ID</strong>：<code>INT-NC-941138590514356224</code> · <strong>报道公司</strong>：58同城 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_self_report_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_page</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-18T01:08:45+08:00 · <strong>报道面试日期</strong>：None</p>
+<p><a href="https://www.nowcoder.com/discuss/941138590514356224?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://www.nowcoder.com/discuss/941138590514356224" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s52-阿里巴巴-ai-agent-研发一面面经">S52 · 阿里巴巴 AI Agent 研发一面面经</h3>
+<p><strong>ID</strong>：<code>INT-39b8389f8f</code> · <strong>报道公司</strong>：阿里巴巴 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_previously_located_latest_fetch_unreadable</code> · <strong>最近抓取可读</strong>：False · <strong>访问范围</strong>：<code>unknown_latest_fetch_unreadable</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-09T20:51:30+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/938174747332956160?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/alibaba-ai-agent-938174747332956160/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>仅按聚合站月级日期，不能把每月1日当作真实面试日。</p>
+<p>确认公开帖子及正文可读；未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+<p>聚合站标注阿里巴巴，但牛客原标题写阿里巴巴蚂蚁；归属未独立核实，不能算官方阿里面试题。</p>
+</blockquote>
+<h3 id="s53-阿里巴巴-ai-agent-开发岗面经合集长视频理解项目复盘">S53 · 阿里巴巴 AI Agent 开发岗面经合集：长视频理解项目复盘</h3>
+<p><strong>ID</strong>：<code>INT-ea94542dea</code> · <strong>报道公司</strong>：阿里巴巴 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_previously_located_latest_fetch_unreadable</code> · <strong>最近抓取可读</strong>：False · <strong>访问范围</strong>：<code>unknown_latest_fetch_unreadable</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：2026-09-21T02:24:39+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/931373218588348416?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/alibaba-ai-agent-interview-06-931373218588348416/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>仅按聚合站月级日期，不能把每月1日当作真实面试日。</p>
+<p>确认公开帖子及正文可读；未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s54-腾讯大模型算法面经合集标签映射语义模型训练与-agent-编排选型">S54 · 腾讯大模型算法面经合集：标签映射、语义模型训练与 Agent 编排选型</h3>
+<p><strong>ID</strong>：<code>INT-7ab7609951</code> · <strong>报道公司</strong>：腾讯 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-15T23:40:45+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/940391665104064512?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/tencent-llm-algorithm-04-940391665104064512/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>仅按聚合站月级日期，不能把每月1日当作真实面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s55-美团-agent-开发一面markdown-没标题怎么切分">S55 · 美团 Agent 开发一面：Markdown 没标题怎么切分？</h3>
+<p><strong>ID</strong>：<code>INT-49f4a7b7c0</code> · <strong>报道公司</strong>：美团 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-10T21:02:38+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/938539937836683264?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/meituan-agent-development-938539937836683264/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>仅按聚合站月级日期，不能把每月1日当作真实面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s56-美团-agent-开发一面凉经26-问深挖-agent-工程与-skill-设计">S56 · 美团 Agent 开发一面凉经：26 问深挖 Agent 工程与 skill 设计</h3>
+<p><strong>ID</strong>：<code>INT-2af4c14f54</code> · <strong>报道公司</strong>：美团 · <strong>证据</strong>：C：仅聚合线索</p>
+<p><strong>细分状态</strong>：<code>C_aggregated_unverified</code> · <strong>最近抓取可读</strong>：未知 · <strong>访问范围</strong>：<code>aggregator_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：未知 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://mj.mianlingai.com/interview/meituan-agent-development-first-round-2924661/" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/meituan-agent-development-first-round-2924661/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>仅按聚合站月级日期，不能把每月1日当作真实面试日。</p>
+</blockquote>
+<h3 id="s57-百度-agent-二面不看简历不做自我介绍连抛-6-道架构题">S57 · 百度 Agent 二面：不看简历、不做自我介绍，连抛 6 道架构题</h3>
+<p><strong>ID</strong>：<code>INT-15d1d6b299</code> · <strong>报道公司</strong>：百度 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-10T21:05:52+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/938540748394217472?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/baidu-agent-938540748394217472/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>仅按聚合站月级日期，不能把每月1日当作真实面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s58-百度-agent-一面trace-hooksse幂等工具并发">S58 · 百度 Agent 一面：Trace Hook、SSE、幂等、工具并发</h3>
+<p><strong>ID</strong>：<code>INT-eb93d2a417</code> · <strong>报道公司</strong>：百度 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-10T21:09:17+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/938541608092303360?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/baidu-agent-938541608092303360/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>仅按聚合站月级日期，不能把每月1日当作真实面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s59-京东-ai-agent开发一面架构上下文与超时重试">S59 · 京东 AI Agent开发一面：架构、上下文与超时重试</h3>
+<p><strong>ID</strong>：<code>INT-8d733b0281</code> · <strong>报道公司</strong>：京东 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-13T20:57:25+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/939625784929538048?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/jd-ai-agent-dev-first-round-939625784929538048/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>仅按聚合站月级日期，不能把每月1日当作真实面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s60-京东-后端开发岗面经合集-01agent-日志排查jvm-调优与中间件-11-场真题">S60 · 京东 后端开发岗面经合集 01：Agent 日志排查、JVM 调优与中间件 11 场真题</h3>
+<p><strong>ID</strong>：<code>INT-841d9344c2</code> · <strong>报道公司</strong>：京东 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：2026-09-29T01:16:39+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/934255208178155520?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/jd-backend-934255208178155520/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>仅按聚合站月级日期，不能把每月1日当作真实面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s61-小米-ai-agent-三面压力面全程问你踩过什么坑">S61 · 小米 AI Agent 三面：压力面，全程问“你踩过什么坑”</h3>
+<p><strong>ID</strong>：<code>INT-91419e91fb</code> · <strong>报道公司</strong>：小米 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_previously_located_latest_fetch_unreadable</code> · <strong>最近抓取可读</strong>：False · <strong>访问范围</strong>：<code>unknown_latest_fetch_unreadable</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-10T21:07:13+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/938541088820695040?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/xiaomi-ai-agent-938541088820695040/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>仅按聚合站月级日期，不能把每月1日当作真实面试日。</p>
+<p>确认公开帖子及正文可读；未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s62-小米-ai-agent-二面金融理赔的确定性与追责">S62 · 小米 AI Agent 二面：金融理赔的确定性与追责</h3>
+<p><strong>ID</strong>：<code>INT-6c63a24bd2</code> · <strong>报道公司</strong>：小米 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_public_post_preview_not_authenticated</code> · <strong>最近抓取可读</strong>：True · <strong>访问范围</strong>：<code>public_preview_only</code></p>
+<p><strong>报道月份</strong>：2026-10 · <strong>原帖日期</strong>：2026-10-15T21:24:28+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/940357369693810688?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/xiaomi-ai-agent-second-round-940357369693810688/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>仅按聚合站月级日期，不能把每月1日当作真实面试日。</p>
+<p>只确认帖子及公开元数据；部分页面为付费预览，不读取或解锁付费内容。未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h3 id="s63-小米-ai-全栈开发面试agent-架构rag-与多-agent-隔离">S63 · 小米 AI 全栈开发面试：Agent 架构、RAG 与多 Agent 隔离</h3>
+<p><strong>ID</strong>：<code>INT-17e29773f1</code> · <strong>报道公司</strong>：小米 · <strong>证据</strong>：B：曾定位公开原帖</p>
+<p><strong>细分状态</strong>：<code>B_previously_located_latest_fetch_unreadable</code> · <strong>最近抓取可读</strong>：False · <strong>访问范围</strong>：<code>unknown_latest_fetch_unreadable</code></p>
+<p><strong>报道月份</strong>：2026-09 · <strong>原帖日期</strong>：2026-09-22T13:08:00+08:00 · <strong>报道面试日期</strong>：未知</p>
+<p><a href="https://www.nowcoder.com/discuss/931897509520109568?sourceSSR=post" rel="noreferrer">公开来源</a> · <a href="https://mj.mianlingai.com/interview/xiaomi-ai-fullstack-agent-931897509520109568/" rel="noreferrer">原始采集链接</a></p>
+<blockquote>
+<p>仅按聚合站月级日期，不能把每月1日当作真实面试日。</p>
+<p>确认公开帖子及正文可读；未独立核实作者是否亲历、公司真实性或题目准确性。</p>
+</blockquote>
+<h2 id="答案机制资料">答案机制资料</h2>
+<p>这些规范、官方文档与原始论文仅支持机制解释，不证明公司曾问过对应题目。保留原整理记录中的检查日期，此次迁入不声称逐链接重新在线核验。</p>
+<ul>
+<li><strong>REACT</strong>：<a href="https://arxiv.org/abs/2210.03629" rel="noreferrer">ReAct: Synergizing Reasoning and Acting in Language Models</a>（original_paper；原记录检查：2026-10-23）</li>
+<li><strong>GRAPH</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" rel="noreferrer">LangGraph: Workflows and agents</a>（official_docs；原记录检查：2026-10-23）</li>
+<li><strong>REPLAY</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/graph-api" rel="noreferrer">LangGraph Graph API: re-execution and idempotency</a>（official_docs_via_context7；原记录检查：2026-10-23）</li>
+<li><strong>STATE</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/persistence" rel="noreferrer">LangGraph persistence</a>（official_docs；原记录检查：2026-10-23）</li>
+<li><strong>INTERRUPT</strong>：<a href="https://docs.langchain.com/oss/python/langgraph/interrupts" rel="noreferrer">LangGraph interrupts and idempotent side effects</a>（official_docs_via_context7；原记录检查：2026-10-23）</li>
+<li><strong>MCPHTTP</strong>：<a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http" rel="noreferrer">MCP Streamable HTTP, revision 2026-07-28</a>（official_spec；原记录检查：2026-10-23）</li>
+<li><strong>MCPVERSION</strong>：<a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/versioning" rel="noreferrer">MCP versioning and legacy initialization compatibility</a>（official_spec_via_context7；原记录检查：2026-10-23）</li>
+<li><strong>MCPCHANGE</strong>：<a href="https://modelcontextprotocol.io/specification/2026-07-28/changelog" rel="noreferrer">MCP changelog: sessions and standalone GET stream removal</a>（official_spec；原记录检查：2026-10-23）</li>
+<li><strong>MCPTOOLS</strong>：<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" rel="noreferrer">MCP tools</a>（official_spec；原记录检查：2026-10-23）</li>
+<li><strong>BM25</strong>：<a href="https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity" rel="noreferrer">Elasticsearch similarity settings: BM25</a>（official_docs；原记录检查：2026-10-23）</li>
+<li><strong>RRF</strong>：<a href="https://learn.microsoft.com/en-us/azure/search/hybrid-search-ranking" rel="noreferrer">Reciprocal rank fusion in hybrid search</a>（official_docs；原记录检查：2026-10-23）</li>
+<li><strong>RAGAS</strong>：<a href="https://docs.ragas.io/en/stable/references/evaluate" rel="noreferrer">Ragas evaluation error handling and NaN results</a>（official_docs_via_context7；原记录检查：2026-10-23）</li>
+<li><strong>FENCE</strong>：<a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html" rel="noreferrer">How to do distributed locking, Martin Kleppmann</a>（original_author_analysis；原记录检查：2026-10-23）</li>
+<li><strong>REDISATOMIC</strong>：<a href="https://redis.io/docs/latest/develop/programmability/" rel="noreferrer">Redis programmability and atomic script execution</a>（official_docs；原记录检查：2026-10-23）</li>
+<li><strong>REDISLATENCY</strong>：<a href="https://redis.io/docs/latest/operate/oss_and_stack/management/optimization/latency/" rel="noreferrer">Redis latency troubleshooting</a>（official_docs；原记录检查：2026-10-23）</li>
+<li><strong>INJECTION</strong>：<a href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/" rel="noreferrer">OWASP LLM01: Prompt Injection</a>（security_project_guidance；原记录检查：2026-10-23）</li>
+<li><strong>SANDBOX</strong>：<a href="https://gvisor.dev/docs/architecture_guide/intro/" rel="noreferrer">gVisor architecture guide</a>（official_docs；原记录检查：2026-10-23）</li>
+<li><strong>TCP</strong>：<a href="https://www.rfc-editor.org/rfc/rfc9293.html" rel="noreferrer">RFC 9293: Transmission Control Protocol</a>（official_standard；原记录检查：2026-10-23）</li>
+<li><strong>POOL</strong>：<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html" rel="noreferrer">Java 21 ThreadPoolExecutor</a>（official_docs；原记录检查：2026-10-23）</li>
+<li><strong>CHM</strong>：<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html" rel="noreferrer">Java 21 ConcurrentHashMap</a>（official_docs；原记录检查：2026-10-23）</li>
+<li><strong>JMM</strong>：<a href="https://docs.oracle.com/javase/specs/jls/se21/html/jls-17.html" rel="noreferrer">Java Language Specification 21, threads and locks</a>（official_spec；原记录检查：2026-10-23）</li>
+<li><strong>ATTENTION</strong>：<a href="https://arxiv.org/abs/1706.03762" rel="noreferrer">Attention Is All You Need</a>（original_paper；原记录检查：2026-10-23）</li>
+<li><strong>BLIP2</strong>：<a href="https://arxiv.org/abs/2301.12597" rel="noreferrer">BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models</a>（original_paper；原记录检查：2026-10-23）</li>
+<li><strong>PPO</strong>：<a href="https://arxiv.org/abs/1707.06347" rel="noreferrer">Proximal Policy Optimization Algorithms</a>（original_paper；原记录检查：2026-10-23）</li>
+<li><strong>GRPO</strong>：<a href="https://arxiv.org/html/2402.03300v1" rel="noreferrer">DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models</a>（original_paper；原记录检查：2026-10-23）</li>
+<li><strong>LORA</strong>：<a href="https://arxiv.org/abs/2106.09685" rel="noreferrer">LoRA: Low-Rank Adaptation of Large Language Models</a>（original_paper；原记录检查：2026-10-23）</li>
+</ul></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

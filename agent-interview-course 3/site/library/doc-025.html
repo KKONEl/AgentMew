@@ -1,0 +1,103 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>小红书 AI Agent 工程师 - 面试题 &amp; 面经 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-025.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">小红书/面试题与面经.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：拓展资料；按目录选择性深挖</p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E5%B0%8F%E7%BA%A2%E4%B9%A6/%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E9%9D%A2%E7%BB%8F.md">GitHub 固定版本</a> · <a href="../../source/%E5%B0%8F%E7%BA%A2%E4%B9%A6/%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E9%9D%A2%E7%BB%8F.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E9%9D%A2%E8%AF%95%E7%89%B9%E7%82%B9">面试特点</a><a href="#%E4%B8%80agent-%E6%9E%B6%E6%9E%84%E4%B8%8E%E8%AE%BE%E8%AE%A1">一、Agent 架构与设计</a><a href="#q-%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E5%B9%B3%E5%8F%B0%E7%9A%84-multi-agent-%E6%9E%B6%E6%9E%84">Q: 如何设计平台的 Multi-Agent 架构？</a><a href="#q-%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E8%83%BD%E5%AE%8C%E6%88%90%E5%B0%8F%E7%BA%A2%E4%B9%A6%E5%8F%91%E5%B8%96%E5%85%A8%E6%B5%81%E7%A8%8B%E7%9A%84-ai-agent">Q: 实现一个能完成小红书发帖全流程的 AI Agent？</a><a href="#q-agent-%E6%9E%B6%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E8%B7%AF%E7%BA%BF">Q: Agent 架构的演进路线？</a><a href="#q-agent-%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86%E9%94%99%E8%AF%AF%E5%92%8C%E6%A8%A1%E7%B3%8A%E6%80%A7">Q: Agent 如何处理错误和模糊性？</a><a href="#%E4%BA%8C%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9D%A2%E8%AF%95%E9%A2%98">二、大模型面试题</a><a href="#q-llama-123-%E7%9A%84%E5%BC%82%E5%90%8C">Q: LLaMA 1/2/3 的异同？</a><a href="#q-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%8F%82%E6%95%B0%E9%87%8F%E4%B8%BA%E4%BD%95%E6%98%AF-7b13b-%E7%AD%89%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97">Q: 大模型参数量为何是 7B/13B 等特殊数字？</a><a href="#q-vllm-%E5%8A%A0%E9%80%9F%E6%8E%A8%E7%90%86%E7%9A%84%E5%8E%9F%E7%90%86">Q: vLLM 加速推理的原理？</a><a href="#%E4%B8%89%E4%BA%A7%E5%93%81%E7%90%86%E8%A7%A3%E5%B0%8F%E7%BA%A2%E4%B9%A6%E7%89%B9%E8%89%B2">三、产品理解（小红书特色）</a><a href="#q-ai-%E5%86%85%E5%AE%B9%E7%94%9F%E6%80%81%E7%9A%84%E6%9C%BA%E9%81%87%E5%92%8C%E6%8C%91%E6%88%98">Q: AI 内容生态的机遇和挑战？</a><a href="#q-%E5%B0%8F%E7%BA%A2%E4%B9%A6%E5%81%9A%E7%8B%AC%E7%AB%8B-ai-%E5%8A%9F%E8%83%BD%E7%9A%84%E6%84%8F%E4%B9%89">Q: 小红书做独立 AI 功能的意义？</a><a href="#%E5%9B%9B%E7%AE%97%E6%B3%95%E9%A2%98%E9%9A%BE%E5%BA%A6%E5%81%8F%E5%A4%A7">四、算法题（难度偏大）</a><a href="#%E4%BA%94%E5%89%8D%E7%AB%AF-ai-%E5%BA%94%E7%94%A8%E9%9D%A2%E8%AF%95%E9%A2%98%E5%A6%82%E6%9C%89%E5%89%8D%E7%AB%AF%E6%96%B9%E5%90%91">五、前端 AI 应用面试题（如有前端方向）</a></nav></details><article class="prose source-prose"><h1 id="小红书-ai-agent-工程师-面试题-面经">小红书 AI Agent 工程师 - 面试题 &amp; 面经</h1>
+<h2 id="面试特点">面试特点</h2>
+<ul>
+<li>算法题难度偏大</li>
+<li>会考察对<strong>小红书产品和内容生态</strong>的理解</li>
+<li>Agent 架构设计题较多</li>
+<li>前端 AI 应用方向也有独立考察</li>
+</ul>
+<hr>
+<h2 id="一agent-架构与设计">一、Agent 架构与设计</h2>
+<h3 id="q-如何设计平台的-multi-agent-架构">Q: 如何设计平台的 Multi-Agent 架构？</h3>
+<p><strong>参考答案：</strong>
+按职能拆分 Agent：
+- <strong>Planner Agent</strong>：任务理解和分解
+- <strong>Executor Agent</strong>：具体任务执行
+- <strong>Reviewer Agent</strong>：结果验证和质量控制
+- <strong>Router Agent</strong>：任务分发和调度</p>
+<p>通信方式：
+- 共享黑板（Blackboard）：所有 Agent 读写共享状态
+- 消息传递：Agent 之间直接通信
+- 编排器模式：中心化控制流程</p>
+<h3 id="q-实现一个能完成小红书发帖全流程的-ai-agent">Q: 实现一个能完成小红书发帖全流程的 AI Agent？</h3>
+<p><strong>参考答案：</strong>
+思路：<strong>让世界适应 AI</strong>（结构化接口）而非让 AI 适应世界（视觉识别 UI）
+1. 通过 API 接口完成发帖，而不是模拟 UI 操作
+2. 任务分解：
+   - 意图理解：用户想发什么内容
+   - 内容生成：文案撰写 + 图片选择/生成
+   - 标签推荐：基于内容匹配话题标签
+   - 发布执行：调用发帖 API
+   - 效果跟踪：监控数据反馈
+3. 每个步骤有校验和人工确认节点</p>
+<h3 id="q-agent-架构的演进路线">Q: Agent 架构的演进路线？</h3>
+<p><strong>参考答案：</strong>
+1. <strong>v1 - Prompt 驱动</strong>：单次 LLM 调用，提示词工程
+2. <strong>v2 - 工具调用 + RAG</strong>：Function Calling + 知识检索
+3. <strong>v3 - 多智能体 + 动态 Context</strong>：多 Agent 协同、状态管理、自适应上下文</p>
+<h3 id="q-agent-如何处理错误和模糊性">Q: Agent 如何处理错误和模糊性？</h3>
+<p><strong>参考答案：</strong>
+- <strong>模糊性</strong>：向用户澄清、多候选方案并行探索、置信度阈值触发确认
+- <strong>错误处理</strong>：
+  - 重试（指数退避）
+  - 降级（切换到简单策略）
+  - 回滚（恢复到上一个正确状态）
+  - 人工介入（超过错误阈值时）</p>
+<hr>
+<h2 id="二大模型面试题">二、大模型面试题</h2>
+<h3 id="q-llama-123-的异同">Q: LLaMA 1/2/3 的异同？</h3>
+<p><strong>参考答案：</strong>
+- <strong>LLaMA 1</strong>：基础开源模型，使用 RoPE、SwiGLU、Pre-Norm
+- <strong>LLaMA 2</strong>：扩大训练数据（2T tokens）、GQA 注意力、更长上下文（4K）、RLHF 对齐
+- <strong>LLaMA 3</strong>：更大训练数据（15T+ tokens）、128K vocab、GQA、多语言能力增强</p>
+<h3 id="q-大模型参数量为何是-7b13b-等特殊数字">Q: 大模型参数量为何是 7B/13B 等特殊数字？</h3>
+<p><strong>参考答案：</strong>
+- 主要由模型维度（hidden_size）、层数（num_layers）和注意力头数决定
+- 这些超参数通常选择 2 的幂次或其倍数，利于 GPU 并行计算
+- 经验性的 Scaling Law 指导：在给定计算预算下最优配置</p>
+<h3 id="q-vllm-加速推理的原理">Q: vLLM 加速推理的原理？</h3>
+<p><strong>参考答案：</strong>
+核心：<strong>PagedAttention</strong>
+- 将 KV Cache 分成固定大小的页（blocks）
+- 类似操作系统虚拟内存管理
+- 解决 KV Cache 内存碎片化和浪费问题
+- 支持 Continuous Batching：动态调度请求</p>
+<hr>
+<h2 id="三产品理解小红书特色">三、产品理解（小红书特色）</h2>
+<h3 id="q-ai-内容生态的机遇和挑战">Q: AI 内容生态的机遇和挑战？</h3>
+<p><strong>参考答案：</strong>
+机遇：
+- AI 降低内容创作门槛，更多用户能产出高质量内容
+- 个性化推荐 + AI 生成 = 千人千面的内容体验
+- 搜索场景 AI 化，提升信息获取效率</p>
+<p>挑战：
+- 内容同质化、AI 水文泛滥
+- 真实性和信任问题
+- UGC 平台的"人味"vs AI 生成内容的平衡
+- 版权和原创性界定</p>
+<h3 id="q-小红书做独立-ai-功能的意义">Q: 小红书做独立 AI 功能的意义？</h3>
+<p><strong>参考答案：</strong>
+- 小红书有独特的生活方式内容数据，AI 可挖掘决策价值
+- AI 搜索/推荐增强用户找信息效率
+- AI 创作工具降低 UGC 门槛
+- 差异化竞争：结合社区生态的 AI，而非通用 AI</p>
+<hr>
+<h2 id="四算法题难度偏大">四、算法题（难度偏大）</h2>
+<ul>
+<li>和大于 Target 的最短子数组</li>
+<li>n 个灯泡问题（n 轮操作后亮着几个）</li>
+<li>数组取数最大化（取数后移除相邻元素）</li>
+<li>不同的子序列</li>
+<li>LRU Cache 实现</li>
+</ul>
+<hr>
+<h2 id="五前端-ai-应用面试题如有前端方向">五、前端 AI 应用面试题（如有前端方向）</h2>
+<ul>
+<li>流式输出的 Layout Shift 如何解决？</li>
+<li>AI 聊天界面新消息平滑滚动 + 用户回看历史的处理</li>
+<li>Markdown 代码块高亮 + 一键复制</li>
+<li>Prompt 模板管理系统设计</li>
+<li>RAG 流程中前端的职责</li>
+<li>提示词注入（Prompt Injection）前端防护</li>
+<li>AI 应用特有的性能监控指标</li>
+</ul></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

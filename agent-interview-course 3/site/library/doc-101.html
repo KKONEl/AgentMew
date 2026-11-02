@@ -1,0 +1,913 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>项目二：多 Agent 协作系统 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-101.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">项目实战/02-多Agent协作系统.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/16-multi-agent.html">16 多 Agent 协作、交接与隔离</a> · <a href="../lessons/25-coding-agent-project.html">25 项目二：多 Agent 研发、Code Review 与 Harness 门禁</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/02-%E5%A4%9AAgent%E5%8D%8F%E4%BD%9C%E7%B3%BB%E7%BB%9F.md">GitHub 固定版本</a> · <a href="../../source/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/02-%E5%A4%9AAgent%E5%8D%8F%E4%BD%9C%E7%B3%BB%E7%BB%9F.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%BF%B0">一、项目概述</a><a href="#%E4%BA%8C%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1">二、架构设计</a><a href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84">整体架构</a><a href="#%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E7%A4%BA%E4%BE%8B">执行流程示例</a><a href="#%E4%B8%89%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0">三、核心实现</a><a href="#31-state-%E8%AE%BE%E8%AE%A1">3.1 State 设计</a><a href="#32-%E5%90%84-agent-%E8%8A%82%E7%82%B9%E5%AE%9E%E7%8E%B0">3.2 各 Agent 节点实现</a><a href="#33-%E5%9B%BE%E7%BB%93%E6%9E%84%E5%AE%9A%E4%B9%89">3.3 图结构定义</a><a href="#34-human-in-the-loop">3.4 Human-in-the-Loop</a><a href="#35-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E5%92%8C%E8%B6%85%E6%97%B6">3.5 错误处理和超时</a><a href="#36-%E6%88%90%E6%9C%AC%E8%BF%BD%E8%B8%AA">3.6 成本追踪</a><a href="#%E5%9B%9B%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF">四、面试话术</a><a href="#1-%E5%88%86%E9%92%9F%E7%89%88">1 分钟版</a><a href="#3-%E5%88%86%E9%92%9F%E7%89%88">3 分钟版</a><a href="#5-%E5%88%86%E9%92%9F%E7%89%88">5 分钟版</a><a href="#%E4%BA%94%E5%B8%B8%E8%A7%81%E8%BF%BD%E9%97%AE%E5%8F%8A%E5%9B%9E%E7%AD%94">五、常见追问及回答</a><a href="#q1-%E4%B8%BA%E4%BB%80%E4%B9%88%E7%94%A8-langgraph-%E4%B8%8D%E7%94%A8-crewai">Q1: 为什么用 LangGraph 不用 CrewAI？</a><a href="#q2-agent-%E9%97%B4%E5%A6%82%E4%BD%95%E5%85%B1%E4%BA%AB%E7%8A%B6%E6%80%81">Q2: Agent 间如何共享状态？</a><a href="#q3-%E6%9F%90%E4%B8%AA-agent-%E5%A4%B1%E8%B4%A5%E4%BA%86%E6%80%8E%E4%B9%88%E5%8A%9E">Q3: 某个 Agent 失败了怎么办？</a><a href="#q4-%E5%A6%82%E4%BD%95%E6%8E%A7%E5%88%B6%E6%88%90%E6%9C%AC">Q4: 如何控制成本？</a><a href="#q5-%E6%80%8E%E4%B9%88%E8%B0%83%E8%AF%95%E5%A4%9A-agent-%E7%B3%BB%E7%BB%9F">Q5: 怎么调试多 Agent 系统？</a><a href="#%E5%85%AD%E9%A1%B9%E7%9B%AE%E4%BA%AE%E7%82%B9%E6%80%BB%E7%BB%93">六、项目亮点总结</a><a href="#%E4%B8%83%E9%A1%B9%E7%9B%AE%E9%AA%8C%E6%94%B6%E6%A0%87%E5%87%86%E4%B8%8E%E8%AF%84%E5%88%86%E8%A1%A8">七、项目验收标准与评分表</a><a href="#%E6%9C%80%E4%BD%8E%E5%8F%AF%E4%BA%A4%E4%BB%98%E7%89%88%E6%9C%AC60-%E5%88%86">最低可交付版本（60 分）</a><a href="#%E8%BF%9B%E9%98%B6%E5%8F%AF%E7%AD%94%E8%BE%A9%E7%89%88%E6%9C%AC80-%E5%88%86">进阶可答辩版本（80 分）</a><a href="#%E9%9D%A2%E8%AF%95%E4%BA%AE%E7%82%B9%E7%89%88%E6%9C%AC100-%E5%88%86">面试亮点版本（100 分）</a><a href="#%E8%AF%84%E5%88%86%E8%A1%A8">评分表</a><a href="#github-%E9%A1%B9%E7%9B%AE%E5%8F%82%E8%80%83">GitHub 项目参考</a></nav></details><article class="prose source-prose"><h1 id="项目二多-agent-协作系统">项目二：多 Agent 协作系统</h1>
+<h2 id="一项目概述">一、项目概述</h2>
+<p><strong>一句话描述</strong>：基于 LangGraph 构建的 Supervisor 模式多 Agent 系统，由一个调度 Agent 协调研究、代码、写作三个专业 Agent 协作完成复杂任务（如"调研某技术方案并生成带代码示例的技术报告"）。</p>
+<p><strong>技术亮点</strong>：
+- Supervisor 路由架构，动态决策任务分发，支持多轮协作
+- 基于 LangGraph 的有状态图，支持条件路由、循环、断点
+- Human-in-the-loop 机制，关键决策需人工确认
+- 结构化 State 设计，Agent 间通过共享状态通信
+- 完善的错误处理、超时控制和成本上限
+- 支持流式输出和执行过程可视化</p>
+<hr>
+<h2 id="二架构设计">二、架构设计</h2>
+<h3 id="整体架构">整体架构</h3>
+<p><img alt="Multi-Agent 协作（LangGraph Supervisor）" src="../../source/diagrams/multi-agent-langgraph.svg" loading="lazy" decoding="async"></p>
+<h3 id="执行流程示例">执行流程示例</h3>
+<p>用户任务："调研 RAG 的最新进展，写一个 Python 示例代码，最后生成一份技术报告"</p>
+<pre><code>1. Supervisor 分析任务 → 先派研究 Agent
+2. 研究 Agent 搜索、总结 → 结果写入 State
+3. Supervisor 判断研究完成 → 派代码 Agent
+4. 代码 Agent 基于研究结果写代码 → 写入 State
+5. Supervisor 判断代码完成 → 派写作 Agent
+6. 写作 Agent 整合研究+代码生成报告 → 写入 State
+7. Supervisor 判断任务完成 → 进入 Human Review（可选）
+8. 返回最终结果
+</code></pre>
+<hr>
+<h2 id="三核心实现">三、核心实现</h2>
+<h3 id="31-state-设计">3.1 State 设计</h3>
+<pre><code class="language-python">from typing import TypedDict, Annotated, Literal, Optional
+from langchain_core.messages import BaseMessage
+import operator
+
+
+class ResearchResult(TypedDict):
+    &quot;&quot;&quot;研究结果&quot;&quot;&quot;
+    topic: str
+    summary: str
+    sources: list[str]
+    key_findings: list[str]
+
+
+class CodeResult(TypedDict):
+    &quot;&quot;&quot;代码结果&quot;&quot;&quot;
+    language: str
+    code: str
+    explanation: str
+    test_result: Optional[str]
+
+
+class AgentState(TypedDict):
+    &quot;&quot;&quot;全局共享状态&quot;&quot;&quot;
+    # 消息历史（追加模式）
+    messages: Annotated[list[BaseMessage], operator.add]
+
+    # 任务信息
+    task: str
+    plan: list[str]  # Supervisor 制定的执行计划
+
+    # 各 Agent 的输出
+    research: Optional[ResearchResult]
+    code: Optional[CodeResult]
+    document: Optional[str]
+
+    # 控制流
+    next_agent: str  # 下一个要执行的 Agent
+    iteration: int   # 当前迭代次数
+    max_iterations: int  # 最大迭代次数（防无限循环）
+    error: Optional[str]
+
+    # 成本追踪
+    total_tokens: int
+    total_cost: float
+    cost_limit: float  # 成本上限
+</code></pre>
+<p><strong>设计要点</strong>：
+- <code>messages</code> 用 <code>Annotated[list, operator.add]</code> 实现追加语义，每个节点往里加消息
+- 每个 Agent 有独立的输出字段（<code>research</code>/<code>code</code>/<code>document</code>），避免相互覆盖
+- <code>iteration</code> + <code>max_iterations</code> 防止无限循环
+- <code>total_cost</code> 实时追踪成本，超限自动终止</p>
+<h3 id="32-各-agent-节点实现">3.2 各 Agent 节点实现</h3>
+<h4 id="supervisor-节点">Supervisor 节点</h4>
+<pre><code class="language-python">from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage, SystemMessage
+import json
+
+
+llm = ChatOpenAI(model=&quot;gpt-4o&quot;, temperature=0)
+
+
+SUPERVISOR_SYSTEM_PROMPT = &quot;&quot;&quot;你是一个任务调度 Supervisor。你的职责是：
+1. 分析用户任务，制定执行计划
+2. 根据当前状态，决定下一步派哪个 Agent 执行
+3. 判断任务是否完成
+
+你可以调度以下 Agent：
+- researcher: 负责搜索和调研，输出研究报告
+- coder: 负责编写和测试代码
+- writer: 负责撰写文档和报告
+
+请以 JSON 格式回复：
+{
+    &quot;next&quot;: &quot;researcher|coder|writer|FINISH&quot;,
+    &quot;reason&quot;: &quot;为什么选择这个 Agent&quot;,
+    &quot;instruction&quot;: &quot;给该 Agent 的具体指令&quot;
+}
+
+如果所有子任务都完成了，next 设为 &quot;FINISH&quot;。
+&quot;&quot;&quot;
+
+
+def supervisor_node(state: AgentState) -&gt; dict:
+    &quot;&quot;&quot;Supervisor 路由决策节点&quot;&quot;&quot;
+    # 检查迭代次数
+    if state[&quot;iteration&quot;] &gt;= state[&quot;max_iterations&quot;]:
+        return {
+            &quot;next_agent&quot;: &quot;FINISH&quot;,
+            &quot;messages&quot;: [
+                SystemMessage(content=&quot;已达最大迭代次数，强制结束。&quot;)
+            ],
+        }
+
+    # 检查成本
+    if state[&quot;total_cost&quot;] &gt;= state[&quot;cost_limit&quot;]:
+        return {
+            &quot;next_agent&quot;: &quot;FINISH&quot;,
+            &quot;messages&quot;: [
+                SystemMessage(content=&quot;已达成本上限，强制结束。&quot;)
+            ],
+        }
+
+    # 构造上下文
+    context_parts = [f&quot;用户任务: {state['task']}&quot;]
+    if state.get(&quot;research&quot;):
+        context_parts.append(
+            f&quot;研究结果: {state['research']['summary'][:500]}&quot;
+        )
+    if state.get(&quot;code&quot;):
+        context_parts.append(
+            f&quot;代码结果: {state['code']['explanation'][:300]}&quot;
+        )
+    if state.get(&quot;document&quot;):
+        context_parts.append(f&quot;文档: 已生成（{len(state['document'])}字）&quot;)
+
+    messages = [
+        SystemMessage(content=SUPERVISOR_SYSTEM_PROMPT),
+        HumanMessage(content=&quot;\n&quot;.join(context_parts)),
+    ]
+
+    response = llm.invoke(messages)
+    decision = json.loads(response.content)
+
+    return {
+        &quot;next_agent&quot;: decision[&quot;next&quot;],
+        &quot;messages&quot;: [
+            SystemMessage(
+                content=f&quot;Supervisor 决策: {decision['reason']}. &quot;
+                f&quot;指令: {decision['instruction']}&quot;
+            )
+        ],
+        &quot;iteration&quot;: state[&quot;iteration&quot;] + 1,
+    }
+</code></pre>
+<h4 id="研究-agent">研究 Agent</h4>
+<pre><code class="language-python">from langchain_community.tools import TavilySearchResults
+from langchain_core.messages import AIMessage
+
+
+search_tool = TavilySearchResults(max_results=5)
+
+
+RESEARCHER_PROMPT = &quot;&quot;&quot;你是一个专业的研究助手。根据任务要求进行搜索和调研。
+
+任务: {task}
+Supervisor 指令: {instruction}
+
+请输出结构化的研究结果，包括：
+1. 主题概述
+2. 关键发现（3-5条）
+3. 信息来源
+
+搜索结果：
+{search_results}
+&quot;&quot;&quot;
+
+
+def researcher_node(state: AgentState) -&gt; dict:
+    &quot;&quot;&quot;研究 Agent：搜索 + 分析 + 总结&quot;&quot;&quot;
+    task = state[&quot;task&quot;]
+
+    # 获取 Supervisor 的指令
+    last_msg = state[&quot;messages&quot;][-1].content
+    instruction = last_msg if &quot;指令:&quot; in last_msg else task
+
+    # Step 1: 搜索
+    search_results = search_tool.invoke(task)
+    search_text = &quot;\n&quot;.join(
+        [f&quot;- {r['content'][:200]}&quot; for r in search_results]
+    )
+
+    # Step 2: 分析总结
+    prompt = RESEARCHER_PROMPT.format(
+        task=task,
+        instruction=instruction,
+        search_results=search_text,
+    )
+    response = llm.invoke([HumanMessage(content=prompt)])
+
+    # Step 3: 结构化输出
+    research_result: ResearchResult = {
+        &quot;topic&quot;: task,
+        &quot;summary&quot;: response.content,
+        &quot;sources&quot;: [r.get(&quot;url&quot;, &quot;&quot;) for r in search_results],
+        &quot;key_findings&quot;: [],  # 简化处理
+    }
+
+    return {
+        &quot;research&quot;: research_result,
+        &quot;messages&quot;: [
+            AIMessage(
+                content=f&quot;[Researcher] 研究完成: {response.content[:200]}...&quot;
+            )
+        ],
+    }
+</code></pre>
+<h4 id="代码-agent">代码 Agent</h4>
+<pre><code class="language-python">import subprocess
+import tempfile
+
+
+CODER_PROMPT = &quot;&quot;&quot;你是一个高级 Python 开发者。根据任务要求和研究资料编写代码。
+
+任务: {task}
+Supervisor 指令: {instruction}
+
+研究资料:
+{research_summary}
+
+请输出：
+1. 完整的 Python 代码
+2. 代码说明
+3. 用 ```python ``` 包裹代码块
+&quot;&quot;&quot;
+
+
+def coder_node(state: AgentState) -&gt; dict:
+    &quot;&quot;&quot;代码 Agent：编码 + 测试&quot;&quot;&quot;
+    task = state[&quot;task&quot;]
+    research = state.get(&quot;research&quot;, {})
+    research_summary = research.get(&quot;summary&quot;, &quot;无研究资料&quot;)
+
+    last_msg = state[&quot;messages&quot;][-1].content
+    instruction = last_msg if &quot;指令:&quot; in last_msg else task
+
+    prompt = CODER_PROMPT.format(
+        task=task,
+        instruction=instruction,
+        research_summary=research_summary[:1000],
+    )
+    response = llm.invoke([HumanMessage(content=prompt)])
+
+    # 提取代码块
+    content = response.content
+    code = &quot;&quot;
+    if &quot;```python&quot; in content:
+        code = content.split(&quot;```python&quot;)[1].split(&quot;```&quot;)[0].strip()
+
+    # 沙箱执行测试（可选）
+    test_result = None
+    if code:
+        test_result = _safe_execute(code)
+
+    code_result: CodeResult = {
+        &quot;language&quot;: &quot;python&quot;,
+        &quot;code&quot;: code,
+        &quot;explanation&quot;: content,
+        &quot;test_result&quot;: test_result,
+    }
+
+    return {
+        &quot;code&quot;: code_result,
+        &quot;messages&quot;: [
+            AIMessage(
+                content=f&quot;[Coder] 代码编写完成。测试结果: {test_result or '未执行'}&quot;
+            )
+        ],
+    }
+
+
+def _safe_execute(code: str, timeout: int = 10) -&gt; str:
+    &quot;&quot;&quot;安全沙箱执行代码&quot;&quot;&quot;
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode=&quot;w&quot;, suffix=&quot;.py&quot;, delete=False
+        ) as f:
+            f.write(code)
+            f.flush()
+            result = subprocess.run(
+                [&quot;python&quot;, f.name],
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+            if result.returncode == 0:
+                return f&quot;✅ 执行成功\n{result.stdout[:500]}&quot;
+            else:
+                return f&quot;❌ 执行失败\n{result.stderr[:500]}&quot;
+    except subprocess.TimeoutExpired:
+        return &quot;⏰ 执行超时&quot;
+    except Exception as e:
+        return f&quot;❌ 异常: {str(e)}&quot;
+</code></pre>
+<h4 id="写作-agent">写作 Agent</h4>
+<pre><code class="language-python">WRITER_PROMPT = &quot;&quot;&quot;你是一个技术文档写作专家。根据研究资料和代码，撰写一份完整的技术报告。
+
+任务: {task}
+Supervisor 指令: {instruction}
+
+研究资料:
+{research_summary}
+
+代码:
+{code}
+
+请输出一份结构化的技术报告，包含：标题、摘要、正文、代码示例、结论。
+使用 Markdown 格式。
+&quot;&quot;&quot;
+
+
+def writer_node(state: AgentState) -&gt; dict:
+    &quot;&quot;&quot;写作 Agent：整合生成文档&quot;&quot;&quot;
+    task = state[&quot;task&quot;]
+    research = state.get(&quot;research&quot;, {})
+    code_result = state.get(&quot;code&quot;, {})
+
+    last_msg = state[&quot;messages&quot;][-1].content
+    instruction = last_msg if &quot;指令:&quot; in last_msg else task
+
+    prompt = WRITER_PROMPT.format(
+        task=task,
+        instruction=instruction,
+        research_summary=research.get(&quot;summary&quot;, &quot;无&quot;)[:2000],
+        code=code_result.get(&quot;code&quot;, &quot;无&quot;)[:2000],
+    )
+    response = llm.invoke([HumanMessage(content=prompt)])
+
+    return {
+        &quot;document&quot;: response.content,
+        &quot;messages&quot;: [
+            AIMessage(
+                content=f&quot;[Writer] 文档撰写完成，共 {len(response.content)} 字。&quot;
+            )
+        ],
+    }
+</code></pre>
+<h3 id="33-图结构定义">3.3 图结构定义</h3>
+<pre><code class="language-python">from langgraph.graph import StateGraph, END
+from langgraph.checkpoint.memory import MemorySaver
+
+
+def should_continue(state: AgentState) -&gt; str:
+    &quot;&quot;&quot;条件路由：根据 Supervisor 决策走向不同节点&quot;&quot;&quot;
+    next_agent = state[&quot;next_agent&quot;]
+    if next_agent == &quot;FINISH&quot;:
+        return &quot;end&quot;
+    elif next_agent == &quot;researcher&quot;:
+        return &quot;researcher&quot;
+    elif next_agent == &quot;coder&quot;:
+        return &quot;coder&quot;
+    elif next_agent == &quot;writer&quot;:
+        return &quot;writer&quot;
+    else:
+        return &quot;end&quot;  # 兜底
+
+
+def build_graph():
+    &quot;&quot;&quot;构建 LangGraph 状态图&quot;&quot;&quot;
+    graph = StateGraph(AgentState)
+
+    # 添加节点
+    graph.add_node(&quot;supervisor&quot;, supervisor_node)
+    graph.add_node(&quot;researcher&quot;, researcher_node)
+    graph.add_node(&quot;coder&quot;, coder_node)
+    graph.add_node(&quot;writer&quot;, writer_node)
+
+    # 入口
+    graph.set_entry_point(&quot;supervisor&quot;)
+
+    # 条件边：Supervisor → 各 Agent 或结束
+    graph.add_conditional_edges(
+        &quot;supervisor&quot;,
+        should_continue,
+        {
+            &quot;researcher&quot;: &quot;researcher&quot;,
+            &quot;coder&quot;: &quot;coder&quot;,
+            &quot;writer&quot;: &quot;writer&quot;,
+            &quot;end&quot;: END,
+        },
+    )
+
+    # 各 Agent 执行完都回到 Supervisor
+    graph.add_edge(&quot;researcher&quot;, &quot;supervisor&quot;)
+    graph.add_edge(&quot;coder&quot;, &quot;supervisor&quot;)
+    graph.add_edge(&quot;writer&quot;, &quot;supervisor&quot;)
+
+    # 编译（带 checkpoint 支持断点续跑）
+    checkpointer = MemorySaver()
+    return graph.compile(checkpointer=checkpointer)
+
+
+# 使用
+app = build_graph()
+
+result = app.invoke(
+    {
+        &quot;task&quot;: &quot;调研 RAG 最新进展，写示例代码，生成技术报告&quot;,
+        &quot;messages&quot;: [],
+        &quot;plan&quot;: [],
+        &quot;research&quot;: None,
+        &quot;code&quot;: None,
+        &quot;document&quot;: None,
+        &quot;next_agent&quot;: &quot;&quot;,
+        &quot;iteration&quot;: 0,
+        &quot;max_iterations&quot;: 10,
+        &quot;error&quot;: None,
+        &quot;total_tokens&quot;: 0,
+        &quot;total_cost&quot;: 0.0,
+        &quot;cost_limit&quot;: 1.0,  # 成本上限 $1
+    },
+    config={&quot;configurable&quot;: {&quot;thread_id&quot;: &quot;task-001&quot;}},
+)
+</code></pre>
+<h3 id="34-human-in-the-loop">3.4 Human-in-the-Loop</h3>
+<pre><code class="language-python">from langgraph.graph import StateGraph, END
+
+
+def build_graph_with_human():
+    &quot;&quot;&quot;带人工审核的图&quot;&quot;&quot;
+    graph = StateGraph(AgentState)
+
+    graph.add_node(&quot;supervisor&quot;, supervisor_node)
+    graph.add_node(&quot;researcher&quot;, researcher_node)
+    graph.add_node(&quot;coder&quot;, coder_node)
+    graph.add_node(&quot;writer&quot;, writer_node)
+    graph.add_node(&quot;human_review&quot;, human_review_node)
+
+    graph.set_entry_point(&quot;supervisor&quot;)
+
+    graph.add_conditional_edges(
+        &quot;supervisor&quot;,
+        should_continue_with_review,
+        {
+            &quot;researcher&quot;: &quot;researcher&quot;,
+            &quot;coder&quot;: &quot;coder&quot;,
+            &quot;writer&quot;: &quot;writer&quot;,
+            &quot;human_review&quot;: &quot;human_review&quot;,
+            &quot;end&quot;: END,
+        },
+    )
+
+    graph.add_edge(&quot;researcher&quot;, &quot;supervisor&quot;)
+    graph.add_edge(&quot;coder&quot;, &quot;supervisor&quot;)
+    graph.add_edge(&quot;writer&quot;, &quot;supervisor&quot;)
+    graph.add_edge(&quot;human_review&quot;, &quot;supervisor&quot;)
+
+    checkpointer = MemorySaver()
+    # interrupt_before 让图在进入 human_review 节点前暂停
+    return graph.compile(
+        checkpointer=checkpointer,
+        interrupt_before=[&quot;human_review&quot;],
+    )
+
+
+def human_review_node(state: AgentState) -&gt; dict:
+    &quot;&quot;&quot;人工审核节点 - 实际由外部系统提供输入&quot;&quot;&quot;
+    # LangGraph 的 interrupt 机制会在这里暂停
+    # 外部系统通过 graph.update_state() 提供审核结果
+    return {
+        &quot;messages&quot;: [
+            HumanMessage(content=&quot;人工审核已通过&quot;)
+        ]
+    }
+
+
+def should_continue_with_review(state: AgentState) -&gt; str:
+    next_agent = state[&quot;next_agent&quot;]
+    if next_agent == &quot;FINISH&quot;:
+        # 完成前先过人工审核
+        if not state.get(&quot;human_reviewed&quot;):
+            return &quot;human_review&quot;
+        return &quot;end&quot;
+    return next_agent
+
+
+# 使用 Human-in-the-Loop
+app = build_graph_with_human()
+config = {&quot;configurable&quot;: {&quot;thread_id&quot;: &quot;task-002&quot;}}
+
+# 第一次运行，会在 human_review 前暂停
+result = app.invoke(initial_state, config)
+
+# 查看当前状态
+snapshot = app.get_state(config)
+print(f&quot;暂停在: {snapshot.next}&quot;)  # ('human_review',)
+
+# 人工审核后，更新状态并继续
+app.update_state(
+    config,
+    {&quot;human_reviewed&quot;: True, &quot;messages&quot;: [HumanMessage(content=&quot;审核通过，可以输出&quot;)]},
+)
+result = app.invoke(None, config)  # 继续执行
+</code></pre>
+<h3 id="35-错误处理和超时">3.5 错误处理和超时</h3>
+<pre><code class="language-python">import asyncio
+from functools import wraps
+
+
+def with_error_handling(node_name: str):
+    &quot;&quot;&quot;Agent 节点错误处理装饰器&quot;&quot;&quot;
+    def decorator(func):
+        @wraps(func)
+        def wrapper(state: AgentState) -&gt; dict:
+            try:
+                return func(state)
+            except Exception as e:
+                error_msg = f&quot;[{node_name}] 执行失败: {str(e)}&quot;
+                return {
+                    &quot;error&quot;: error_msg,
+                    &quot;messages&quot;: [
+                        SystemMessage(content=error_msg)
+                    ],
+                    # 失败后回到 Supervisor 重新决策
+                    &quot;next_agent&quot;: &quot;supervisor&quot;,
+                }
+        return wrapper
+    return decorator
+
+
+def with_timeout(timeout_seconds: int = 60):
+    &quot;&quot;&quot;Agent 节点超时控制装饰器&quot;&quot;&quot;
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(state: AgentState) -&gt; dict:
+            try:
+                result = await asyncio.wait_for(
+                    asyncio.to_thread(func, state),
+                    timeout=timeout_seconds,
+                )
+                return result
+            except asyncio.TimeoutError:
+                return {
+                    &quot;error&quot;: f&quot;执行超时（{timeout_seconds}s）&quot;,
+                    &quot;messages&quot;: [
+                        SystemMessage(content=f&quot;节点执行超时&quot;)
+                    ],
+                }
+        return wrapper
+    return decorator
+
+
+# 应用装饰器
+@with_error_handling(&quot;researcher&quot;)
+def researcher_node(state: AgentState) -&gt; dict:
+    # ... 原有逻辑
+    pass
+
+
+# Supervisor 中处理错误
+def supervisor_node(state: AgentState) -&gt; dict:
+    if state.get(&quot;error&quot;):
+        # 有错误，决定是重试还是跳过
+        error = state[&quot;error&quot;]
+        retry_prompt = f&quot;&quot;&quot;
+上一步执行出错: {error}
+请决定：
+1. 重试同一个 Agent
+2. 跳过，继续下一步
+3. 终止任务
+
+以 JSON 格式回复 {{&quot;action&quot;: &quot;retry|skip|abort&quot;, &quot;next&quot;: &quot;agent_name|FINISH&quot;}}
+&quot;&quot;&quot;
+        # ... 调用 LLM 决策
+        pass
+</code></pre>
+<h3 id="36-成本追踪">3.6 成本追踪</h3>
+<pre><code class="language-python">from langchain_core.callbacks import BaseCallbackHandler
+
+
+class CostTracker(BaseCallbackHandler):
+    &quot;&quot;&quot;Token 和成本追踪&quot;&quot;&quot;
+
+    PRICING = {
+        &quot;gpt-4o&quot;: {&quot;input&quot;: 2.5 / 1e6, &quot;output&quot;: 10 / 1e6},
+        &quot;gpt-4o-mini&quot;: {&quot;input&quot;: 0.15 / 1e6, &quot;output&quot;: 0.6 / 1e6},
+    }
+
+    def __init__(self):
+        self.total_tokens = 0
+        self.total_cost = 0.0
+
+    def on_llm_end(self, response, **kwargs):
+        usage = response.llm_output.get(&quot;token_usage&quot;, {})
+        model = kwargs.get(&quot;invocation_params&quot;, {}).get(
+            &quot;model_name&quot;, &quot;gpt-4o&quot;
+        )
+        pricing = self.PRICING.get(model, self.PRICING[&quot;gpt-4o&quot;])
+
+        input_cost = usage.get(&quot;prompt_tokens&quot;, 0) * pricing[&quot;input&quot;]
+        output_cost = usage.get(&quot;completion_tokens&quot;, 0) * pricing[&quot;output&quot;]
+
+        self.total_tokens += usage.get(&quot;total_tokens&quot;, 0)
+        self.total_cost += input_cost + output_cost
+
+
+# 在 Supervisor 中检查成本
+def supervisor_node(state: AgentState) -&gt; dict:
+    if state[&quot;total_cost&quot;] &gt;= state[&quot;cost_limit&quot;]:
+        return {
+            &quot;next_agent&quot;: &quot;FINISH&quot;,
+            &quot;messages&quot;: [
+                SystemMessage(
+                    content=f&quot;成本已达上限 ${state['cost_limit']:.2f}，任务终止&quot;
+                )
+            ],
+        }
+    # ... 正常路由逻辑
+</code></pre>
+<hr>
+<h2 id="四面试话术">四、面试话术</h2>
+<h3 id="1-分钟版">1 分钟版</h3>
+<blockquote>
+<p>我做了一个基于 LangGraph 的多 Agent 协作系统，Supervisor 模式。一个 Supervisor Agent 负责任务规划和调度，下面有研究、代码、写作三个专业 Agent。用户输入复杂任务后，Supervisor 拆解任务、动态选择 Agent 执行，Agent 间通过共享 State 通信。关键设计包括：条件路由实现灵活调度、Human-in-the-loop 做关键审核、成本追踪防止失控、错误重试机制保证健壮性。</p>
+</blockquote>
+<h3 id="3-分钟版">3 分钟版</h3>
+<blockquote>
+<p>项目背景是团队需要一个能处理复杂任务的 AI 助手，比如"调研某个技术方案，写 demo 代码，出一份技术报告"这种涉及多个步骤的任务。单个 LLM 直接做效果不好，所以设计了多 Agent 协作方案。</p>
+<p>架构上选择了 LangGraph 的 Supervisor 模式。核心是一个有状态图：Supervisor 节点做路由决策，通过条件边分发到研究、代码、写作三个 Agent 节点，每个 Agent 执行完回到 Supervisor 做下一步决策，形成一个循环直到任务完成。</p>
+<p>State 设计是关键。用 TypedDict 定义全局状态，每个 Agent 有独立的输出字段（research/code/document），消息历史用 operator.add 做追加。Supervisor 根据 State 中各字段的填充情况判断进度。</p>
+<p>几个工程重点：第一，错误处理——任何 Agent 失败都回到 Supervisor 重新决策（重试/跳过/终止）；第二，成本控制——通过 callback 实时追踪 token 用量，超限自动终止；第三，Human-in-the-loop——用 LangGraph 的 interrupt_before 在关键节点暂停，等人工确认后继续。</p>
+<p>这套系统现在每天处理 200+ 复杂任务请求，平均单任务涉及 3-5 次 Agent 调用，整体满意度 85%。</p>
+</blockquote>
+<h3 id="5-分钟版">5 分钟版</h3>
+<blockquote>
+<p>（在 3 分钟版基础上补充）</p>
+<p>选 LangGraph 而不是 CrewAI 有几个原因。第一，LangGraph 是底层框架，对图结构有完全控制权，可以实现复杂的条件路由和循环；CrewAI 封装程度高但灵活性不足，比如我们需要根据中间结果动态改变执行计划，CrewAI 做不到。第二，LangGraph 的 checkpoint 机制天然支持断点续跑，这对长任务很重要。第三，LangGraph 和 LangChain 生态无缝集成。</p>
+<p>调试多 Agent 系统是个挑战。我们做了三件事：一是结构化日志，每个节点入出都打日志，包括 State 快照；二是用 LangSmith 做 Tracing，可以看到完整的调用链和每步的 token 消耗；三是搭了一个简单的可视化 UI，实时展示图的执行路径。</p>
+<p>状态管理踩过一个坑：最初所有 Agent 都往 messages 里写，消息太长导致 Supervisor 的 context 爆了。后来改成 Agent 的详细输出写到独立字段（research/code/document），messages 里只放摘要。这样 Supervisor 看的上下文可控。</p>
+<p>还有一个有意思的问题是 Agent 间的"沟通效率"。比如代码 Agent 需要用到研究 Agent 的成果，最初是通过 Supervisor 中转指令，效率低。后来改成代码 Agent 直接读 State 中的 research 字段，减少了不必要的 Supervisor 调度轮次。</p>
+</blockquote>
+<hr>
+<h2 id="五常见追问及回答">五、常见追问及回答</h2>
+<h3 id="q1-为什么用-langgraph-不用-crewai">Q1: 为什么用 LangGraph 不用 CrewAI？</h3>
+<p><strong>回答</strong>：</p>
+<blockquote>
+<p>选型时两个都评估了，最终选 LangGraph 有三个原因：</p>
+<p><strong>1. 控制力</strong>：LangGraph 是底层图框架，节点、边、路由全部自定义。CrewAI 是高层封装，适合标准场景但遇到特殊需求（如动态改变执行计划、复杂条件分支）就很受限。</p>
+<p><strong>2. 状态管理</strong>：LangGraph 的 State 是类型安全的 TypedDict，支持 Annotated 的 reducer 语义（追加/覆盖），checkpoint 支持持久化和断点续跑。CrewAI 的状态管理相对简单。</p>
+<p><strong>3. 生态集成</strong>：LangGraph 和 LangChain 无缝集成，工具、LLM、Embedding 等组件可以直接复用。我们已有的 RAG 系统就是 LangChain 搭的，用 LangGraph 扩展成本最低。</p>
+<p>CrewAI 的优势是上手快、API 简洁，适合快速原型。如果项目简单且不需要复杂路由，CrewAI 是更好的选择。</p>
+</blockquote>
+<h3 id="q2-agent-间如何共享状态">Q2: Agent 间如何共享状态？</h3>
+<p><strong>回答</strong>：</p>
+<blockquote>
+<p>LangGraph 的核心就是 <strong>共享 State</strong>。所有节点（Agent）操作同一个 State 对象。</p>
+<p>具体设计：
+- State 是一个 TypedDict，定义了所有字段
+- 每个节点函数接收 State，返回要更新的字段（部分更新）
+- 特殊字段（如 messages）用 Annotated + reducer 实现追加语义
+- 各 Agent 有独立输出字段，不会互相覆盖</p>
+<p>比如研究 Agent 把结果写到 <code>state["research"]</code>，代码 Agent 直接读 <code>state["research"]</code> 获取研究成果。不需要额外的消息传递机制。</p>
+<p>这比消息传递模式简单很多，缺点是所有 Agent 必须在同一进程内。如果需要跨进程/跨机器协作，需要用 Redis 或数据库做 State 持久化层。</p>
+</blockquote>
+<h3 id="q3-某个-agent-失败了怎么办">Q3: 某个 Agent 失败了怎么办？</h3>
+<p><strong>回答</strong>：</p>
+<blockquote>
+<p>我们做了三层错误处理：</p>
+<p><strong>第一层：节点级 try-catch</strong>。每个 Agent 节点用装饰器包裹，异常不会导致整个图崩溃。失败后将错误信息写入 State，流程回到 Supervisor。</p>
+<p><strong>第二层：Supervisor 决策</strong>。Supervisor 看到 error 字段后，调用 LLM 决策：重试（最多 2 次）、跳过（用已有结果继续）、或终止（错误不可恢复）。</p>
+<p><strong>第三层：全局兜底</strong>。<code>max_iterations</code> 限制总轮次（默认 10），<code>cost_limit</code> 限制总成本。无论什么原因死循环，最终都会触发终止。</p>
+<p>实际案例：搜索 API 偶尔超时，研究 Agent 失败后 Supervisor 会重试一次，如果还失败就跳过研究阶段，让写作 Agent 基于已有信息输出一个"信息有限"的报告，比直接报错好很多。</p>
+</blockquote>
+<h3 id="q4-如何控制成本">Q4: 如何控制成本？</h3>
+<p><strong>回答</strong>：</p>
+<blockquote>
+<p>成本控制做了四件事：</p>
+<p><strong>1. 实时追踪</strong>：通过 LangChain 的 callback 机制追踪每次 LLM 调用的 token 消耗，换算成美元。State 中有 <code>total_cost</code> 字段实时更新。</p>
+<p><strong>2. 成本上限</strong>：每个任务设成本上限（默认 $1），Supervisor 每轮检查，超限自动终止并返回已有结果。</p>
+<p><strong>3. 模型分级</strong>：Supervisor 路由决策用 GPT-4o（需要强推理），研究总结用 GPT-4o-mini（够用即可），简单格式化走更便宜的模型。</p>
+<p><strong>4. 控制轮次</strong>：<code>max_iterations</code> 限制为 10，避免 Agent 来回"踢皮球"。Supervisor 的 prompt 里也明确要求"尽量减少不必要的迭代"。</p>
+<p>实际效果：平均单任务成本 $0.15-0.30，极端情况不超过 $1。</p>
+</blockquote>
+<h3 id="q5-怎么调试多-agent-系统">Q5: 怎么调试多 Agent 系统？</h3>
+<p><strong>回答</strong>：</p>
+<blockquote>
+<p>多 Agent 调试比单 Agent 复杂很多，我们用了三个工具：</p>
+<p><strong>1. LangSmith Tracing</strong>：每次执行生成完整的 trace，可以看到每个节点的输入输出、token 消耗、延迟。是最重要的调试工具。</p>
+<p><strong>2. 结构化日志</strong>：每个节点入出打日志，包括 State 的关键字段快照。日志格式统一，方便 grep。</p>
+<p>```python
+import logging</p>
+<p>logger = logging.getLogger("multi_agent")</p>
+<p>def supervisor_node(state):
+    logger.info(
+        "supervisor_enter",
+        extra={
+            "iteration": state["iteration"],
+            "has_research": state.get("research") is not None,
+            "has_code": state.get("code") is not None,
+            "cost": state["total_cost"],
+        },
+    )
+    # ... 逻辑
+```</p>
+<p><strong>3. 可视化回放</strong>：把 State 的每步快照存到 JSON 文件，前端做了一个简单的时间线 UI，可以回放整个执行过程，看每步 State 怎么变化的。</p>
+<p><strong>4. 单节点测试</strong>：每个 Agent 节点可以单独测试，传入 mock State 验证逻辑。图的结构（边和路由）也可以用 unit test 验证。</p>
+</blockquote>
+<hr>
+<h2 id="六项目亮点总结">六、项目亮点总结</h2>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>架构</td>
+<td>LangGraph Supervisor 模式，有状态图 + 条件路由</td>
+</tr>
+<tr>
+<td>Agent 设计</td>
+<td>3 个专业 Agent + 共享 State 通信</td>
+</tr>
+<tr>
+<td>人工介入</td>
+<td>interrupt_before 实现 Human-in-the-loop</td>
+</tr>
+<tr>
+<td>健壮性</td>
+<td>三层错误处理 + 迭代上限 + 成本上限</td>
+</tr>
+<tr>
+<td>可观测</td>
+<td>LangSmith Tracing + 结构化日志 + 可视化回放</td>
+</tr>
+<tr>
+<td>成本</td>
+<td>模型分级 + 实时追踪 + 上限控制，平均 $0.15/任务</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="七项目验收标准与评分表">七、项目验收标准与评分表</h2>
+<h3 id="最低可交付版本60-分">最低可交付版本（60 分）</h3>
+<table>
+<thead>
+<tr>
+<th>验收项</th>
+<th>标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent 分工</td>
+<td>至少包含 Supervisor + 2 个 Worker Agent</td>
+</tr>
+<tr>
+<td>状态管理</td>
+<td>使用结构化 State 保存任务、消息和各 Agent 输出</td>
+</tr>
+<tr>
+<td>路由逻辑</td>
+<td>Supervisor 能根据状态决定下一步执行者</td>
+</tr>
+<tr>
+<td>终止条件</td>
+<td>支持最大轮次、任务完成、错误终止</td>
+</tr>
+<tr>
+<td>示例任务</td>
+<td>能完成一个端到端复杂任务，例如“调研 + 写代码 + 输出报告”</td>
+</tr>
+</tbody>
+</table>
+<h3 id="进阶可答辩版本80-分">进阶可答辩版本（80 分）</h3>
+<table>
+<thead>
+<tr>
+<th>验收项</th>
+<th>标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LangGraph 状态图</td>
+<td>使用 Node / Edge / Conditional Edge 实现流程</td>
+</tr>
+<tr>
+<td>错误处理</td>
+<td>Agent 失败后能重试、跳过或终止</td>
+</tr>
+<tr>
+<td>成本控制</td>
+<td>记录 token 和成本，并支持 cost_limit</td>
+</tr>
+<tr>
+<td>Human-in-the-loop</td>
+<td>关键节点可人工审批或修改</td>
+</tr>
+<tr>
+<td>可观测性</td>
+<td>输出每轮调度、Agent 输入输出和状态变化</td>
+</tr>
+</tbody>
+</table>
+<h3 id="面试亮点版本100-分">面试亮点版本（100 分）</h3>
+<table>
+<thead>
+<tr>
+<th>验收项</th>
+<th>标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>并行探索</td>
+<td>支持多个 Agent 并行处理子任务并合并结果</td>
+</tr>
+<tr>
+<td>任务规划</td>
+<td>Supervisor 能先生成 plan，再动态 replan</td>
+</tr>
+<tr>
+<td>防循环机制</td>
+<td>能识别重复状态、重复工具调用或无进展循环</td>
+</tr>
+<tr>
+<td>质量评估</td>
+<td>对最终报告做事实核查、引用检查或 reviewer 评分</td>
+</tr>
+<tr>
+<td>产品化 Demo</td>
+<td>提供 Web/CLI 可视化运行轨迹</td>
+</tr>
+</tbody>
+</table>
+<h3 id="评分表">评分表</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>权重</th>
+<th>面试官关注点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>多 Agent 设计合理性</td>
+<td>30%</td>
+<td>为什么要多 Agent，边界是否清晰</td>
+</tr>
+<tr>
+<td>状态与控制流</td>
+<td>25%</td>
+<td>State、路由、checkpoint、终止条件是否可靠</td>
+</tr>
+<tr>
+<td>错误与成本控制</td>
+<td>20%</td>
+<td>是否能防止失控、循环和成本爆炸</td>
+</tr>
+<tr>
+<td>可观测性</td>
+<td>15%</td>
+<td>能否 replay 每一步决策</td>
+</tr>
+<tr>
+<td>答辩表达</td>
+<td>10%</td>
+<td>能否讲清多 Agent 的 trade-off</td>
+</tr>
+</tbody>
+</table>
+<h3 id="github-项目参考">GitHub 项目参考</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/langchain-ai/langgraph" rel="noreferrer">langchain-ai/langgraph</a></td>
+<td>学 StateGraph、checkpoint、human-in-the-loop</td>
+</tr>
+<tr>
+<td><a href="https://github.com/microsoft/autogen" rel="noreferrer">microsoft/autogen</a></td>
+<td>学多 Agent 对话和代码执行沙箱</td>
+</tr>
+<tr>
+<td><a href="https://github.com/crewAIInc/crewAI" rel="noreferrer">crewAIInc/crewAI</a></td>
+<td>学角色/任务/Crew 抽象</td>
+</tr>
+<tr>
+<td><a href="https://github.com/openai/openai-agents-python" rel="noreferrer">openai/openai-agents-python</a></td>
+<td>学 handoff、guardrails、tracing</td>
+</tr>
+<tr>
+<td><a href="https://github.com/NirDiamant/GenAI_Agents" rel="noreferrer">NirDiamant/GenAI_Agents</a></td>
+<td>学不同 Agent 模式的代码实现</td>
+</tr>
+</tbody>
+</table></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>

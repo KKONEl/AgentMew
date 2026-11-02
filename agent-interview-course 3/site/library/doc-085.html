@@ -1,0 +1,367 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="循序渐进的 Agent 工程与面试学习手册"><title>AI Agent 面试 - 核心概念详解与参考答案 · Agent 工程学习手册</title><link rel="stylesheet" href="../assets/style.css?v=linked-3"><script defer src="../assets/catalog.js"></script><script defer src="../assets/app.js?v=linked-3"></script></head><body data-page="library/doc-085.html" data-lesson=""><a class="skip" href="#main">跳到正文</a><aside class="sidebar"><a class="brand" href="../index.html"><span class="brand-mark">A</span><span>Agent 工程<span class="brand-sub">学习 · 实验 · 面试</span></span></a><button type="button" id="menu-close" aria-label="关闭课程导航">关闭</button><nav class="top-nav" aria-label="主要导航"><a href="../index.html">学习路线</a><a href="../library.html">全库资料</a><a href="../questions.html">156 题练习</a><a href="../visuals.html">图解实验室</a><a href="../review.html">复习与自评</a><a href="../corrections.html">勘误与来源</a><a href="../coverage.html">文件覆盖清单</a></nav><div class="nav-label">顺序课程 / 26 LESSONS</div><nav class="course-nav" aria-label="课程"><a class="lesson-nav " href="../lessons/01-foundations.html"><span>01</span>LLM 基础：token、上下文、采样与幻觉</a><a class="lesson-nav " href="../lessons/02-agent-control.html"><span>02</span>Agent 与 Workflow：有界控制流与观察反馈</a><a class="lesson-nav " href="../lessons/03-tool-calling.html"><span>03</span>工具调用：校验、权限、幂等与未知结果</a><a class="lesson-nav " href="../lessons/04-mcp.html"><span>04</span>MCP：Host、Client、Server 与工具数据流</a><a class="lesson-nav " href="../lessons/05-context-engineering.html"><span>05</span>Prompt 与上下文工程：选择、预算、压缩与回放</a><a class="lesson-nav " href="../lessons/06-memory.html"><span>06</span>记忆系统：存储、检索、写回与租户隔离</a><a class="lesson-nav " href="../lessons/07-rag-basics.html"><span>07</span>RAG 起点：从文档到有出处的回答</a><a class="lesson-nav " href="../lessons/08-hybrid-retrieval.html"><span>08</span>检索工程：切块、BM25、向量、RRF 与重排</a><a class="lesson-nav " href="../lessons/09-rag-evaluation.html"><span>09</span>RAG 质量与更新：把“回答错了”拆成可定位问题</a><a class="lesson-nav " href="../lessons/10-agentic-rag.html"><span>10</span>Agentic RAG：用证据缺口驱动有界决策</a><a class="lesson-nav " href="../lessons/11-self-corrective-adaptive.html"><span>11</span>Self-RAG、CRAG、Adaptive-RAG 与 FLARE：信号不同，责任不同</a><a class="lesson-nav " href="../lessons/12-graph-index.html"><span>12</span>GraphRAG 离线索引：实体、关系、社区与来源</a><a class="lesson-nav " href="../lessons/13-graph-query.html"><span>13</span>GraphRAG 查询：Local、Global 与混合检索</a><a class="lesson-nav " href="../lessons/14-advanced-rag.html"><span>14</span>高级 RAG：HyDE、RAPTOR、多模态与工程选择</a><a class="lesson-nav " href="../lessons/15-state-recovery.html"><span>15</span>状态机、持久化与崩溃恢复</a><a class="lesson-nav " href="../lessons/16-multi-agent.html"><span>16</span>多 Agent 协作、交接与隔离</a><a class="lesson-nav " href="../lessons/17-evaluation-harness.html"><span>17</span>评测、失败归因与发布门禁</a><a class="lesson-nav " href="../lessons/18-security-governance.html"><span>18</span>安全治理、注入防护与工具权限</a><a class="lesson-nav " href="../lessons/19-backend-engineering.html"><span>19</span>后端工程：并发、队列、缓存与事务</a><a class="lesson-nav " href="../lessons/20-performance-serving.html"><span>20</span>性能、成本与推理服务原理</a><a class="lesson-nav " href="../lessons/21-model-training.html"><span>21</span>模型训练：从 SFT、LoRA 到偏好优化与显存预算</a><a class="lesson-nav " href="../lessons/22-algorithms.html"><span>22</span>算法与手写：检索、LRU缓存、堆与有界调度</a><a class="lesson-nav " href="../lessons/23-framework-selection.html"><span>23</span>框架与平台选型：职责、恢复契约和 Skill 生命周期</a><a class="lesson-nav " href="../lessons/24-document-agent-project.html"><span>24</span>项目一：从简单检索到可验收的文档问答 Agent</a><a class="lesson-nav " href="../lessons/25-coding-agent-project.html"><span>25</span>项目二：多 Agent 研发、Code Review 与 Harness 门禁</a><a class="lesson-nav " href="../lessons/26-interview-preparation.html"><span>26</span>面试准备：证据、STAR、压力追问与阶段模拟</a></nav><p class="sidebar-foot">本地离线 · 相对路径<br>同例教学 v3 · 源快照 2026-11-01 · e5b9261</p></aside><div class="shell"><header class="toolbar"><button type="button" id="menu-toggle" aria-label="展开课程导航" aria-expanded="false">☰</button><span>FIELD GUIDE / AGENT ENGINEERING</span><button type="button" id="search-open">搜索课程与资料 <kbd>/</kbd></button><button type="button" onclick="window.print()" class="print-button">打印</button></header><main id="main" tabindex="-1"><div class="eyebrow">SOURCE LIBRARY / 完整原文</div><p class="source-path">通用知识/核心概念详解与参考答案.md</p><div class="callout">原文快照 / 非本课程新编正文。公司信息、面经、趋势及产品参数可能有时效或二手转述问题；示例代码不保证可直接运行。原文内容保持原样，请结合勘误页和一手来源使用。</div><p>关联课程：<a href="../lessons/01-foundations.html">01 LLM 基础：token、上下文、采样与幻觉</a> · <a href="../lessons/04-mcp.html">04 MCP：Host、Client、Server 与工具数据流</a></p><p><a href="https://github.com/Zchary1106/agent-interview-hub/blob/e5b92617455e5ecc105162a22a42796c3041162d/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5%E8%AF%A6%E8%A7%A3%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md">GitHub 固定版本</a> · <a href="../../source/%E9%80%9A%E7%94%A8%E7%9F%A5%E8%AF%86/%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5%E8%AF%A6%E8%A7%A3%E4%B8%8E%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md" download>下载原始 Markdown</a></p><details class="toc" open><summary>本页目录</summary><nav><a href="#%E4%B8%80ai-agent-%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5">一、AI Agent 核心概念</a><a href="#q1-%E4%BB%80%E4%B9%88%E6%98%AF-ai-agent%E4%B8%8E%E4%BC%A0%E7%BB%9F-ai-%E7%9A%84%E5%8C%BA%E5%88%AB">Q1: 什么是 AI Agent？与传统 AI 的区别？</a><a href="#q2-agent-%E7%9A%84%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6%E6%9C%89%E5%93%AA%E4%BA%9B">Q2: Agent 的核心组件有哪些？</a><a href="#q3-react-%E6%A1%86%E6%9E%B6%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C">Q3: ReAct 框架如何工作？</a><a href="#q4-agent-%E8%AE%B0%E5%BF%86%E7%B3%BB%E7%BB%9F%E6%80%8E%E4%B9%88%E8%AE%BE%E8%AE%A1">Q4: Agent 记忆系统怎么设计？</a><a href="#%E4%BA%8Crag-%E5%85%A8%E9%93%BE%E8%B7%AF%E8%AF%A6%E8%A7%A3">二、RAG 全链路详解</a><a href="#q5-rag-%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B">Q5: RAG 完整流程？</a><a href="#q6-chunk-%E5%A4%A7%E5%B0%8F%E6%80%8E%E4%B9%88%E7%A1%AE%E5%AE%9A">Q6: Chunk 大小怎么确定？</a><a href="#q7-%E5%90%91%E9%87%8F%E5%8F%AC%E5%9B%9E%E4%B8%8D%E5%87%86%E6%80%8E%E4%B9%88%E5%8A%9E">Q7: 向量召回不准怎么办？</a><a href="#q8-rag-vs-%E5%BE%AE%E8%B0%83%E6%80%8E%E4%B9%88%E9%80%89">Q8: RAG vs 微调怎么选？</a><a href="#q9-lost-in-the-middle-%E9%97%AE%E9%A2%98">Q9: &quot;Lost in the Middle&quot; 问题？</a><a href="#%E4%B8%89lora-qlora">三、LoRA / QLoRA</a><a href="#q10-lora-%E5%8E%9F%E7%90%86qlora-%E6%80%8E%E4%B9%88%E4%BC%98%E5%8C%96%E6%98%BE%E5%AD%98">Q10: LoRA 原理？QLoRA 怎么优化显存？</a><a href="#q11-lora-%E6%95%88%E6%9E%9C%E4%B8%8D%E5%A5%BD%E6%80%8E%E4%B9%88%E5%8A%9E">Q11: LoRA 效果不好怎么办？</a><a href="#%E5%9B%9Brlhf-dpo-grpo">四、RLHF / DPO / GRPO</a><a href="#q12-rlhf-%E4%B8%89%E9%98%B6%E6%AE%B5%E8%AF%A6%E8%A7%A3">Q12: RLHF 三阶段详解？</a><a href="#q13-dpo-%E4%B8%8E-rlhf-%E7%9A%84%E5%8C%BA%E5%88%AB">Q13: DPO 与 RLHF 的区别？</a><a href="#q14-deepseek-%E7%9A%84-grpo">Q14: DeepSeek 的 GRPO？</a><a href="#%E4%BA%94mcp-vs-a2a-%E5%8D%8F%E8%AE%AE%E6%96%B0%E7%83%AD%E7%82%B9">五、MCP vs A2A 协议（新热点！）</a><a href="#q15-mcp-%E5%92%8C-a2a-%E7%9A%84%E5%8C%BA%E5%88%AB">Q15: MCP 和 A2A 的区别？</a><a href="#%E5%85%AD%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E7%B1%BB">六、系统设计类</a><a href="#q16-%E9%AB%98%E5%B9%B6%E5%8F%91-agent-%E7%B3%BB%E7%BB%9F%E6%80%8E%E4%B9%88%E8%AE%BE%E8%AE%A1">Q16: 高并发 Agent 系统怎么设计？</a><a href="#q17-%E5%A6%82%E4%BD%95%E6%8E%A7%E5%88%B6-llm-%E6%88%90%E6%9C%AC">Q17: 如何控制 LLM 成本？</a><a href="#q18-%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%B9%BB%E8%A7%89">Q18: 如何解决大模型幻觉？</a></nav></details><article class="prose source-prose"><h1 id="ai-agent-面试-核心概念详解与参考答案">AI Agent 面试 - 核心概念详解与参考答案</h1>
+<blockquote>
+<p>面试高频必考题的完整参考答案，可直接用于准备</p>
+</blockquote>
+<hr>
+<h2 id="一ai-agent-核心概念">一、AI Agent 核心概念</h2>
+<h3 id="q1-什么是-ai-agent与传统-ai-的区别">Q1: 什么是 AI Agent？与传统 AI 的区别？</h3>
+<p><strong>参考答案：</strong>
+AI Agent 是具备<strong>自主感知、决策、执行和迭代</strong>能力的智能系统。</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>传统 AI</th>
+<th>AI Agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>交互模式</td>
+<td>被动响应（输入→输出）</td>
+<td>主动规划 + 持续交互</td>
+</tr>
+<tr>
+<td>能力边界</td>
+<td>固定功能，不能调用外部工具</td>
+<td>动态调用工具、API、数据库</td>
+</tr>
+<tr>
+<td>决策方式</td>
+<td>单次推理</td>
+<td>多步推理 + 反思 + 重规划</td>
+</tr>
+<tr>
+<td>记忆</td>
+<td>无状态或简单上下文</td>
+<td>短期 + 长期记忆体系</td>
+</tr>
+<tr>
+<td>举例</td>
+<td>分类模型返回航班链接</td>
+<td>Agent 查询→比价→预订→通知用户</td>
+</tr>
+</tbody>
+</table>
+<h3 id="q2-agent-的核心组件有哪些">Q2: Agent 的核心组件有哪些？</h3>
+<p><strong>参考答案：</strong></p>
+<ol>
+<li>
+<p><strong>感知模块（Perception）</strong>
+   - 接收用户输入、环境反馈
+   - 多模态：文本/语音/图像/传感器</p>
+</li>
+<li>
+<p><strong>规划模块（Planning）</strong>
+   - 任务分解（Task Decomposition）
+   - 方法：CoT（链式思考）、ToT（树状思考）、GoT（图状思考）
+   - 框架：ReAct（推理+行动交替）、Plan-and-Execute（先规划后执行）</p>
+</li>
+<li>
+<p><strong>记忆模块（Memory）</strong>
+   - <strong>短期记忆</strong>：当前对话上下文（In-context Window）
+   - <strong>长期记忆</strong>：向量数据库持久化存储（用户偏好、历史交互）
+   - <strong>工作记忆</strong>：当前任务的中间状态和推理链</p>
+</li>
+<li>
+<p><strong>工具调用模块（Tool Use）</strong>
+   - Function Calling / MCP 协议调用外部 API
+   - 搜索引擎、数据库、代码执行器、第三方服务</p>
+</li>
+<li>
+<p><strong>行动模块（Action）</strong>
+   - 执行具体操作并观察结果
+   - 根据反馈调整策略（闭环）</p>
+</li>
+</ol>
+<h3 id="q3-react-框架如何工作">Q3: ReAct 框架如何工作？</h3>
+<p><strong>参考答案：</strong>
+ReAct = <strong>Re</strong>asoning + <strong>Act</strong>ing，交替执行"思考"与"行动"：</p>
+<pre><code>循环：
+  1. 观察（Observation）：接收用户输入或上一步结果
+  2. 思考（Thought）：LLM 生成推理链，分析当前状态
+  3. 行动（Action）：选择并执行工具调用
+  4. 观察结果 → 回到步骤 2，直到任务完成
+</code></pre>
+<p><strong>优势</strong>：减少幻觉（有真实观察做锚点）、可解释性强（每步有思考过程）
+<strong>劣势</strong>：串行执行，多步任务延迟高</p>
+<h3 id="q4-agent-记忆系统怎么设计">Q4: Agent 记忆系统怎么设计？</h3>
+<p><strong>参考答案：</strong></p>
+<table>
+<thead>
+<tr>
+<th>记忆类型</th>
+<th>实现方式</th>
+<th>存储内容</th>
+<th>生命周期</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>短期记忆</td>
+<td>LLM 上下文窗口</td>
+<td>当前对话历史</td>
+<td>单次会话</td>
+</tr>
+<tr>
+<td>工作记忆</td>
+<td>变量/状态机</td>
+<td>任务中间结果</td>
+<td>单次任务</td>
+</tr>
+<tr>
+<td>长期记忆</td>
+<td>向量数据库（Milvus/PGVector）</td>
+<td>用户偏好、历史摘要</td>
+<td>永久</td>
+</tr>
+</tbody>
+</table>
+<p><strong>协同机制</strong>：
+- 每轮对话结束 → 摘要压缩 → 存入长期记忆
+- 新对话开始 → 从长期记忆检索相关上下文 → 注入短期记忆
+- 关键设计：<strong>什么时候压缩、保留什么、丢弃什么</strong></p>
+<hr>
+<h2 id="二rag-全链路详解">二、RAG 全链路详解</h2>
+<h3 id="q5-rag-完整流程">Q5: RAG 完整流程？</h3>
+<p><strong>参考答案：</strong></p>
+<pre><code>离线阶段（知识库构建）：
+  文档收集 → 预处理 → 分块（Chunking）→ Embedding → 存入向量数据库
+
+在线阶段（查询响应）：
+  用户查询 → Query 改写/扩展 → Embedding → 向量检索（Top-K）
+  → 重排序（Rerank）→ 上下文拼接 → LLM 生成 → 返回答案 + 引用
+</code></pre>
+<h3 id="q6-chunk-大小怎么确定">Q6: Chunk 大小怎么确定？</h3>
+<p><strong>参考答案：</strong>
+- <strong>太小</strong>（&lt;100 tokens）：语义不完整，检索到碎片
+- <strong>太大</strong>（&gt;1000 tokens）：噪声多，相关性被稀释
+- <strong>经验值</strong>：256-512 tokens，overlap 50-100 tokens
+- <strong>最佳实践</strong>：
+  - 按语义分块（段落/章节边界）而非固定长度
+  - 递归分块：先按段落 → 段落太长再按句子
+  - A/B 测试不同 chunk 大小的检索效果</p>
+<h3 id="q7-向量召回不准怎么办">Q7: 向量召回不准怎么办？</h3>
+<p><strong>参考答案：</strong>
+1. <strong>Query 改写</strong>：HyDE（生成假设文档再检索）、Multi-Query（多角度改写）
+2. <strong>混合检索</strong>：向量检索 + BM25 关键词检索，结合两者优势
+3. <strong>Rerank</strong>：用 Cross-Encoder 模型对 Top-K 结果重排序
+4. <strong>Embedding 模型升级</strong>：BGE-M3、E5-Mistral 等更强模型
+5. <strong>元数据过滤</strong>：先按时间/类别缩小范围，再做向量检索
+6. <strong>知识图谱辅助</strong>：对实体关系类查询用 GraphRAG</p>
+<h3 id="q8-rag-vs-微调怎么选">Q8: RAG vs 微调怎么选？</h3>
+<p><strong>参考答案：</strong></p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>RAG</th>
+<th>微调</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>适用场景</td>
+<td>知识频繁更新、需要引用来源</td>
+<td>学习特定风格/格式、领域深度理解</td>
+</tr>
+<tr>
+<td>成本</td>
+<td>低（不用训练）</td>
+<td>高（需要 GPU + 训练数据）</td>
+</tr>
+<tr>
+<td>实时性</td>
+<td>好（更新知识库即可）</td>
+<td>差（需要重新训练）</td>
+</tr>
+<tr>
+<td>幻觉控制</td>
+<td>好（有检索依据）</td>
+<td>一般（仍可能幻觉）</td>
+</tr>
+<tr>
+<td>推荐</td>
+<td><strong>优先选 RAG</strong>，不够再加微调</td>
+<td>两者可以结合使用</td>
+</tr>
+</tbody>
+</table>
+<h3 id="q9-lost-in-the-middle-问题">Q9: "Lost in the Middle" 问题？</h3>
+<p><strong>参考答案：</strong>
+LLM 对上下文中间位置的信息关注度最低，开头和结尾最高。</p>
+<p><strong>缓解方法</strong>：
+- 将最相关的文档放在上下文的<strong>开头和结尾</strong>
+- 减少检索文档数量，只保留最相关的 3-5 个
+- 使用 Map-Reduce：先对每个文档单独问答，再汇总</p>
+<hr>
+<h2 id="三lora-qlora">三、LoRA / QLoRA</h2>
+<h3 id="q10-lora-原理qlora-怎么优化显存">Q10: LoRA 原理？QLoRA 怎么优化显存？</h3>
+<p><strong>参考答案：</strong></p>
+<p><strong>LoRA（Low-Rank Adaptation）</strong>：
+- 冻结原始权重 W₀，注入低秩矩阵：W = W₀ + BA
+- B ∈ R^(d×r)，A ∈ R^(r×k)，r &lt;&lt; min(d,k)
+- 只训练 B 和 A，参数量通常只有原模型的 0.01%-1%
+- 优势：训练快、避免灾难性遗忘、可热插拔</p>
+<p><strong>QLoRA 进一步优化</strong>：
+1. <strong>4-bit 量化</strong>：将冻结的基础模型从 FP16 量化到 NF4（4-bit NormalFloat）
+2. <strong>双重量化</strong>：对量化常数也做二次量化，进一步压缩
+3. <strong>分页优化器</strong>：当 GPU 显存不够时，自动将优化器状态转移到 CPU 内存</p>
+<p><strong>效果</strong>：QLoRA 可以在<strong>单张 24GB 显卡</strong>上微调 65B 参数模型</p>
+<h3 id="q11-lora-效果不好怎么办">Q11: LoRA 效果不好怎么办？</h3>
+<p><strong>参考答案：</strong>
+1. 增大 rank r（从 8 → 16 → 32）
+2. 扩大 LoRA 应用层（不只 Q/V，加上 K/O/FFN）
+3. 检查训练数据质量和多样性
+4. 学习率调整（LoRA 通常需要比全量微调更大的学习率）
+5. 考虑 DoRA（Weight-Decomposed LoRA）或 rsLoRA</p>
+<hr>
+<h2 id="四rlhf-dpo-grpo">四、RLHF / DPO / GRPO</h2>
+<h3 id="q12-rlhf-三阶段详解">Q12: RLHF 三阶段详解？</h3>
+<p><strong>参考答案：</strong></p>
+<p><strong>阶段 1：SFT（有监督微调）</strong>
+- 用高质量人工标注的指令-回答对微调基座模型
+- 让模型学会遵循指令</p>
+<p><strong>阶段 2：奖励模型训练（RM）</strong>
+- 人类标注者对模型生成的多个回答进行排序
+- 训练一个判别模型预测人类偏好分数
+- 损失函数：Bradley-Terry 模型 → 最大化 chosen 与 rejected 的分数差</p>
+<p><strong>阶段 3：PPO 强化学习</strong>
+- 将 SFT 模型作为策略（policy）
+- 奖励 = RM 分数 - β × KL散度（防止偏离 SFT 太远）
+- 迭代优化策略，最大化期望奖励</p>
+<h3 id="q13-dpo-与-rlhf-的区别">Q13: DPO 与 RLHF 的区别？</h3>
+<p><strong>参考答案：</strong></p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>RLHF (PPO)</th>
+<th>DPO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>是否需要 RM</td>
+<td>需要单独训练</td>
+<td>不需要</td>
+</tr>
+<tr>
+<td>训练稳定性</td>
+<td>不稳定，超参敏感</td>
+<td>稳定，类似 SFT</td>
+</tr>
+<tr>
+<td>实现复杂度</td>
+<td>高（RM + PPO）</td>
+<td>低（直接优化）</td>
+</tr>
+<tr>
+<td>计算成本</td>
+<td>高</td>
+<td>低</td>
+</tr>
+<tr>
+<td>核心思想</td>
+<td>先训 RM 再用 RL 优化策略</td>
+<td>数学上将 RM 和策略优化合并为一个损失函数</td>
+</tr>
+</tbody>
+</table>
+<p><strong>DPO 损失函数直觉</strong>：直接让模型增大 chosen 回答的概率，减小 rejected 的概率。</p>
+<h3 id="q14-deepseek-的-grpo">Q14: DeepSeek 的 GRPO？</h3>
+<p><strong>参考答案：</strong>
+GRPO（Group Relative Policy Optimization）：
+- <strong>去掉 Critic 模型</strong>（PPO 需要 Critic，增加计算量）
+- 对同一个 prompt 采样一组回答（Group），用组内相对排名作为优势函数
+- 奖励 = 组内回答的相对好坏，而非绝对分数
+- <strong>优势</strong>：减少一半模型参数需求，训练效率更高
+- DeepSeek R1 用 GRPO 训练出了强大的推理能力</p>
+<hr>
+<h2 id="五mcp-vs-a2a-协议新热点">五、MCP vs A2A 协议（新热点！）</h2>
+<h3 id="q15-mcp-和-a2a-的区别">Q15: MCP 和 A2A 的区别？</h3>
+<p><strong>参考答案：</strong></p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>MCP（Model Context Protocol）</th>
+<th>A2A（Agent-to-Agent）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>发起者</td>
+<td>Anthropic（2024.11）</td>
+<td>Google（2025.04）</td>
+</tr>
+<tr>
+<td>解决什么</td>
+<td>Agent 如何调用外部工具/数据</td>
+<td>Agent 之间如何通信协作</td>
+</tr>
+<tr>
+<td>方向</td>
+<td><strong>纵向</strong>：Agent ↔ 工具</td>
+<td><strong>横向</strong>：Agent ↔ Agent</td>
+</tr>
+<tr>
+<td>类比</td>
+<td>USB-C 接口（连接设备和外设）</td>
+<td>HTTP 协议（设备间通信）</td>
+</tr>
+<tr>
+<td>协议基础</td>
+<td>JSON-RPC 2.0</td>
+<td>JSON-RPC 2.0 over HTTPS</td>
+</tr>
+<tr>
+<td>核心特性</td>
+<td>工具发现、函数调用标准化</td>
+<td>Agent Card（能力描述）、任务委托</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键面试答案</strong>：MCP 和 A2A 是<strong>互补</strong>关系，不是竞争关系。
+- MCP 让 Agent 有能力（调工具）
+- A2A 让 Agent 会协作（跨 Agent 通信）
+- 一个完整的多 Agent 系统两者都需要</p>
+<p><strong>举例</strong>：
+1. 库存 Agent 通过 <strong>MCP</strong> 查询数据库发现库存不足
+2. 库存 Agent 通过 <strong>A2A</strong> 通知采购 Agent 下单补货
+3. 采购 Agent 通过 <strong>MCP</strong> 调用供应商 API 完成采购</p>
+<hr>
+<h2 id="六系统设计类">六、系统设计类</h2>
+<h3 id="q16-高并发-agent-系统怎么设计">Q16: 高并发 Agent 系统怎么设计？</h3>
+<p><strong>参考答案：</strong></p>
+<pre><code>用户请求 → 负载均衡（Nginx/K8s Ingress）
+         → 请求队列（Kafka/RabbitMQ）
+         → Agent 服务集群
+              ├── 语义缓存层（相似 query 直接返回）
+              ├── LLM 推理层（vLLM/TGI，Continuous Batching）
+              ├── 向量检索层（Milvus 集群）
+              └── 工具调用层（异步执行 + 超时控制）
+         → 流式返回（SSE/WebSocket）
+</code></pre>
+<p><strong>关键优化点</strong>：
+1. <strong>语义缓存</strong>：Embedding 相似度 &gt; 阈值的 query 直接命中缓存
+2. <strong>模型路由</strong>：简单问题用小模型，复杂问题用大模型
+3. <strong>异步工具调用</strong>：不阻塞主流程
+4. <strong>降级策略</strong>：LLM 超时 → 返回预设回答
+5. <strong>成本控制</strong>：Token 计量 + 按业务方配额限制</p>
+<h3 id="q17-如何控制-llm-成本">Q17: 如何控制 LLM 成本？</h3>
+<p><strong>参考答案：</strong>
+1. <strong>模型分级</strong>：简单 query 用 GPT-3.5/小模型，复杂用 GPT-4
+2. <strong>语义缓存</strong>：相似问题直接返回缓存答案
+3. <strong>Prompt 压缩</strong>：删除冗余上下文、摘要历史对话
+4. <strong>Batch 推理</strong>：合并请求降低单次调用开销
+5. <strong>开源模型替代</strong>：Qwen/DeepSeek 部署私有化
+6. <strong>Token 配额</strong>：按用户/业务方设限</p>
+<h3 id="q18-如何解决大模型幻觉">Q18: 如何解决大模型幻觉？</h3>
+<p><strong>参考答案：</strong>
+1. <strong>RAG</strong>：提供检索依据，约束生成范围
+2. <strong>Prompt 约束</strong>："仅基于提供的上下文回答，如无信息请说不知道"
+3. <strong>Self-Consistency</strong>：采样多次取多数一致的答案
+4. <strong>Citation 生成</strong>：要求模型标注来源，便于验证
+5. <strong>后处理校验</strong>：用规则/小模型检查事实性
+6. <strong>温度调低</strong>：减少随机性（temperature → 0.1-0.3）</p></article></main><footer>源资料 © 2026 Zchary1106 · <a href="../../source/LICENSE">MIT 许可</a> · 教学编排与实验为本次补充 · <a href="../coverage.html">来源和覆盖清单</a></footer></div><dialog id="search-dialog"><div class="search-heading"><label for="search-input">检索全部本地资料</label><button type="button" id="search-close" aria-label="关闭搜索">关闭</button></div><input id="search-input" type="search" placeholder="输入主题、术语、公司或文件名…"><p id="search-count" aria-live="polite"></p><div id="search-results"></div></dialog><div id="toast" role="status"></div></body></html>
